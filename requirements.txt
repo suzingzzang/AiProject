@@ -1,0 +1,38 @@
+# Django 프레임워크 (웹 프레임워크)
+Django==4.2.13
+
+# MySQL 데이터베이스 어댑터 (MySQL 데이터베이스 사용을 위해)
+mysqlclient==2.2.4
+
+uWSGI==2.0.26
+# # Django REST 프레임워크 (API 구축을 위해)
+# djangorestframework==3.12.4
+
+# # Django REST 프레임워크의 JWT 인증 (토큰 기반 인증)
+# djangorestframework-simplejwt==4.7.2
+
+# # CORS 헤더 (크로스 오리진 요청 처리를 위해)
+# # 사용 예시: 프론트엔드 애플리케이션이 백엔드 API 서버와 다른 도메인에 있을 때, 프론트엔드에서 백엔드로 API 요청을 할 수 있도록 허용할 때 사용
+# django-cors-headers==3.7.0
+
+
+# # Gunicorn HTTP 서버 (Django 배포를 위해)
+# gunicorn==20.1.0
+
+# # Pillow (이미지 처리 기능을 위해)
+# Pillow==8.2.0
+
+# # django-environ (환경 변수 관리)
+# django-environ==0.8.1
+
+# # WhiteNoise (정적 파일 제공을 위해)
+# whitenoise==5.2.0
+
+# # django-filter (Django QuerySet 필터링을 위해, 선택 사항)
+# django-filter==2.4.0
+
+# # drf-yasg (Swagger 문서 생성을 위해)
+# drf-yasg==1.20.0
+
+# # django-debug-toolbar (디버깅을 위해, 개발 환경에서만)
+# django-debug-toolbar==3.2.2
