@@ -4,18 +4,19 @@
 
 ### • 라이브러리 설치
 
-### 1. 가상환경 생성
+### 1. 가상환경 생성(anaconda) 및 확인
+
+- 환경이름: seedo
 
 ```
-python3.9 -m venv venv
+conda create -n seedo python=3.11
+conda env list
 ```
 
 ### 2. 가상환경 이동
 
-BaseDir= {BACK-END}
-
 ```
-source ./venv/bin/activate
+conda activate seedo
 ```
 
 ### 3. pip install upgrade
