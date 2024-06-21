@@ -1,14 +1,1 @@
 #requirements.txt
-
-#gittest
-
-#gittest3
-
-#gittest11
-
-#gittest22
-
-#gittest44
-
-
-#gittest55
