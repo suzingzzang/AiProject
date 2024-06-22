@@ -38,6 +38,12 @@ pip install -r requirements.txt
 > pre-commit 훅이 git add, git commit 할 때,<br>
 > 자동으로 코드 스타일과 형식을 유지
 
+### 0. 가상환경 이동
+
+```
+conda activate seedo
+```
+
 ### 1. 라이브러리 설치
 
 ```
