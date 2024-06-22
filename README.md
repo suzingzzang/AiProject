@@ -62,7 +62,7 @@ windowOS:
 INSTALL_PYTHON=C:\Users\{username}\anaconda3\envs\seedo\python.exe
 
 
->>> 경로가 다르다면, 환경변수에 자신의 프로젝트 경로의 bin 디렉토리 추가하기
+>>> 경로가 다르다면, 환경변수에 자신의 conda 환경 python 경로 추가하기
 macOS:
 export PATH=/Users/{username}/anaconda3/envs/seedo/bin:$PATH
 windowOS:
