@@ -77,6 +77,13 @@ windowOS:
 
 ```
 
+### 3-1. 경로 수정한 경우 pre-commit 환경 초기화
+
+```
+pre-commit clean
+pre-commit install
+```
+
 ### 4. 작업 후, git add, git commit
 
 > 처음 commit 할 때, pre-commit 세팅 다운로드 - cache 되는 과정이 있어 오래 걸린다.<br><br> > [INFO] This may take a few minutes...<br><br>
