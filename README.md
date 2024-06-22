@@ -79,7 +79,7 @@ windowOS:
 
 ### 4. 작업 후, git add, git commit
 
-> 처음 commit 할 때, pre-commit 세팅 다운로드 - cache 되는 과정이 있어 오래걸린다.<br><br> > [INFO] This may take a few minutes...<br><br>
+> 처음 commit 할 때, pre-commit 세팅 다운로드 - cache 되는 과정이 있어 오래 걸린다.<br><br> > [INFO] This may take a few minutes...<br><br>
 > 차후 반복되는 commit은 빠르게 가능하다.
 
 ```
