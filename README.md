@@ -80,7 +80,7 @@ windowOS:
 ### 3-1. 경로 수정한 경우 pre-commit 환경 초기화
 
 ```
-pre-commit clean
+pre-commit uninstall
 pre-commit install
 ```
 
