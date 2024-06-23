@@ -84,10 +84,15 @@ pre-commit uninstall
 pre-commit install
 ```
 
-### 4. 작업 후, git add, git commit
+### 4. 작업 후 커밋 사전작업, pre-commit 자동 포멧팅 실행
 
-> 처음 commit 할 때, pre-commit 세팅 다운로드 - cache 되는 과정이 있어 오래 걸린다.<br><br> > [INFO] This may take a few minutes...<br><br>
-> 차후 반복되는 commit은 빠르게 가능하다.
+- 모든 포멧팅이 passed가 나오도록 반복 실행한다.
+
+```
+pre-commit run --all-files
+```
+
+### 4. pre-commit 자동 포멧팅 후, git add, git commit
 
 ```
 git add {file}
