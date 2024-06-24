@@ -1,3 +1,7 @@
 #requirements.txt
 
 Django==5.0.6
+
+PyJWT==2.8.0
+
+django-environ==0.11.2
