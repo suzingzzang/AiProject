@@ -10,17 +10,28 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import datetime
+import os
+from datetime import timedelta
 from pathlib import Path
+
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+# read env config
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+env_path = BASE_DIR.parent / ".env"
+environ.Env.read_env(env_file=env_path)
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure--%o^pk6obw^6n#&c^hh7mj71l*)yzx373ktnt1!fqs)-1e4)np"
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "accounts",
 ]
 
 MIDDLEWARE = [
@@ -49,12 +61,14 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+AUTH_USER_MODEL = "accounts.CustomUser"
+
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -69,12 +83,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+# JWT 관련 설정
+JWT_SECRET_KEY = env("JWT_SECRET_KEY")
+JWT_REFRESH_SECRET_KEY = env("JWT_REFRESH_SECRET_KEY")
+JWT_ALGORITHM = "HS256"  # 선택적으로 알고리즘을 설정할 수 있습니다.
+# Access Token 유효 기간 설정 (예: 1시간)
+JWT_ACCESS_TOKEN_EXPIRATION = timedelta(hours=1)
+# Refresh Token 유효 기간 설정 (예: 30일)
+JWT_REFRESH_TOKEN_EXPIRATION = timedelta(days=30)
+JWT_EXPIRATION_DELTA = datetime.timedelta(hours=1)
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
