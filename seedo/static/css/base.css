@@ -1,0 +1,31 @@
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px 10px;
+  border-bottom: 1px solid #00000080;
+}
+
+header .logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  text-decoration-line: none;
+}
+
+header .material-symbols-outlined,
+header a {
+  color: #337614;
+  font-size: 24px;
+  text-decoration-line: none;
+  flex-shrink: 0;
+}
+
+header .logo img {
+  margin-right: 8px;
+}
+
+header .mypage:hover {
+  font-weight: bold;
+}

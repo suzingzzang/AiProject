@@ -1,0 +1,31 @@
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+}
+
+main div {
+  font-size: 40px;
+  color: #ffffff;
+  text-shadow:
+    -1px 0px #000000,
+    0px 1px #000000,
+    1px 0px #000000,
+    0px -1px #000000,
+    2px 2px 5px #00000080;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 700;
+
+  margin: 20px 0;
+  padding: 20px 0;
+  width: 300px;
+  background-color: #a0ce8a;
+}
+
+main .walk,
+main .navi {
+  background-color: #e01b41;
+}
