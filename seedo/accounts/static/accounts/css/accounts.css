@@ -23,6 +23,10 @@ form {
   padding: 16px;
 }
 
+.form-group.error {
+  border-color: #e01b41; /* Red color */
+}
+
 .error-message {
   height: 28px;
   padding-left: 5px;

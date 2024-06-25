@@ -11,7 +11,7 @@
     <form method="post">
       {% csrf_token %}
       <div class="form-wrapper">
-        <div class="form-group">
+        <div class="form-group {% if form.email.errors %}error{% endif %}">
           <label for="email">이메일:</label>
           <input
             type="text"
@@ -25,7 +25,9 @@
           <p>⎷{{ error }}</p>
           {% endfor %}
         </div>
-        <div class="form-group">
+        <div
+          class="form-group {% if form.phonenumber.errors %}error{% endif %}"
+        >
           <label for="phonenumber">전화번호:</label>
           <input
             type="text"
@@ -39,7 +41,7 @@
           <p>⎷{{ error }}</p>
           {% endfor %}
         </div>
-        <div class="form-group">
+        <div class="form-group {% if form.password1.errors %}error{% endif %}">
           <label for="password1">비밀번호:</label>
           <input
             type="password"
@@ -53,7 +55,9 @@
           <p>⎷{{ error }}</p>
           {% endfor %}
         </div>
-        <div class="form-group">
+        <div
+          class="form-group {% if form.password2.errors and error%}error{% endif %}"
+        >
           <label for="passwor2">비밀번호 확인:</label>
           <input
             type="password"
