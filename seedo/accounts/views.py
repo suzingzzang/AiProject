@@ -24,7 +24,7 @@ class SignUpView(View):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect("accounts:home")  # 적절한 리디렉션 URL로 변경
+            return redirect("accounts:login")  # 적절한 리디렉션 URL로 변경
         return render(request, "accounts/signup.html", {"form": form})
 
 
