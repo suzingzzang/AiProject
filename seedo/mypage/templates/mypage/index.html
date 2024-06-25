@@ -1,0 +1,36 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<main>
+  <div class="userName">아이디 | Seedo_Name</div>
+  <div class="partner">
+    동반자 |
+    <button>추가하기</button>
+    <button>삭제하기</button>
+  </div>
+  <div class="partnerList">
+    <div class="eachPartner">
+      <input type="checkbox" name="selectPartner" />
+      <span class="partnerName">Partner1</span>
+      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
+      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
+    </div>
+    <div class="eachPartner">
+      <input type="checkbox" name="selectPartner" />
+      <span class="partnerName">Partner2</span>
+      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
+      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
+    </div>
+    <div class="eachPartner">
+      <input type="checkbox" name="selectPartner" />
+      <span class="partnerName">Partner3</span>
+      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
+      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
+    </div>
+    <div class="eachPartner">
+      <input type="checkbox" name="selectPartner" />
+      <span class="partnerName">Partner4</span>
+      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
+      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
+    </div>
+  </div>
+</main>
+{% endblock content %}
