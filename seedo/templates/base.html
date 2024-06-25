@@ -8,45 +8,8 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
     />
-    <style>
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        border-bottom: 1px solid #00000080;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: #fff; /* Ensure the header has a background color */
-        z-index: 1000; /* Ensure the header is above other content */
-      }
-
-      header .logo {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-grow: 1;
-        text-decoration-line: none;
-      }
-
-      header .material-symbols-outlined,
-      header a {
-        color: #337614;
-        font-size: 24px;
-        text-decoration-line: none;
-        flex-shrink: 0;
-      }
-
-      header .logo img {
-        margin-right: 8px;
-      }
-
-      header .mypage:hover {
-        font-weight: bold;
-      }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" />
     <title>Seedo</title>
     {% block extra_head %}
     <!-- Child templates can add extra head content here -->
@@ -55,8 +18,16 @@
   <body>
     <header>
       <span class="material-symbols-outlined"> notifications </span>
-      <a href="/" class="logo"> Seedo </a>
-      <a href="mypage/" class="mypage">My</a>
+      <a href="/" class="logo">
+        <img
+          src="{% static 'images/seedo_logo.png' %} "
+          alt="seedo_logo"
+          width="25px"
+          height="25px"
+        />
+        Seedo
+      </a>
+      <a href="/mypage/" class="mypage">My</a>
     </header>
     {% block content %} {% endblock content %}
   </body>

@@ -1,4 +1,6 @@
-{% extends "base.html" %} {% load static %} {% block content %}
+{% extends "base.html" %} {% load static %} {% block extra_head %}
+<link rel="stylesheet" href="{% static 'mypage/css/mypage.css' %}" />
+{% endblock extra_head %} {% block content %}
 <main>
   <div class="userName">아이디 | Seedo_Name</div>
   <div class="partner">
@@ -32,5 +34,6 @@
       <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
     </div>
   </div>
+  <button class="logout">로그아웃</button>
 </main>
 {% endblock content %}
