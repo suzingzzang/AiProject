@@ -12,7 +12,7 @@ form {
 .form-wrapper {
   display: flex;
   flex-direction: column; /* Arrange buttons vertically */
-  gap: 28px; /* Gap between buttons */
+  gap: 0px; /* Gap between buttons */
   width: 100%; /* Ensure it takes full width */
   margin-top: 20px;
 }
@@ -21,6 +21,16 @@ form {
   border: 1px solid #ced4da;
   border-radius: 8px;
   padding: 16px;
+}
+
+.error-message {
+  height: 28px;
+  padding-left: 5px;
+}
+
+.error-message p {
+  color: #e01b41;
+  font-size: 18px;
 }
 
 label {
@@ -41,7 +51,7 @@ input {
   flex-direction: column; /* Arrange buttons vertically */
   gap: 20px; /* Gap between buttons */
   width: 100%; /* Ensure it takes full width */
-  margin-top: 38px;
+  margin-top: 10px;
 }
 
 .button-link {

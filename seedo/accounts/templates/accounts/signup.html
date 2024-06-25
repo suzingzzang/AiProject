@@ -12,13 +12,18 @@
       {% csrf_token %}
       <div class="form-wrapper">
         <div class="form-group">
-          <label for="email">아이디:</label>
+          <label for="email">이메일:</label>
           <input
-            type="email"
+            type="text"
             name="email"
             id="email"
-            placeholder="아이디를 입력해주세요."
+            placeholder="이메일을 입력해주세요."
           />
+        </div>
+        <div class="error-message">
+          {% for error in form.email.errors %}
+          <p>⎷{{ error }}</p>
+          {% endfor %}
         </div>
         <div class="form-group">
           <label for="phonenumber">전화번호:</label>
@@ -29,6 +34,11 @@
             placeholder="전화번호를 입력해주세요."
           />
         </div>
+        <div class="error-message">
+          {% for error in form.phonenumber.errors %}
+          <p>⎷{{ error }}</p>
+          {% endfor %}
+        </div>
         <div class="form-group">
           <label for="password1">비밀번호:</label>
           <input
@@ -38,6 +48,11 @@
             placeholder="비밀번호를 입력해주세요."
           />
         </div>
+        <div class="error-message">
+          {% for error in form.password1.errors %}
+          <p>⎷{{ error }}</p>
+          {% endfor %}
+        </div>
         <div class="form-group">
           <label for="passwor2">비밀번호 확인:</label>
           <input
@@ -46,6 +61,12 @@
             id="password2"
             placeholder="비밀번호를 확인해주세요."
           />
+        </div>
+        <div class="error-message">
+          {% for error in form.password2.errors %}
+
+          <p>{% if error %}⎷{%endif%}{{ error }}</p>
+          {% endfor %}
         </div>
       </div>
       <div class="button-wrapper">
