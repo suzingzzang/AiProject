@@ -55,7 +55,7 @@ class LoginView(View):
                 response.set_cookie("refresh_token", refresh_token, max_age=settings.JWT_REFRESH_TOKEN_EXPIRATION)
                 return response
 
-        return render(request, "login.html", {"form": form})
+        return render(request, "accounts/login.html", {"form": form})
 
 
 @token_required
