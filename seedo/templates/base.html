@@ -8,10 +8,47 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
     />
+    <style>
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px 10px;
+        border-bottom: 1px solid #00000080;
+      }
+
+      header .logo {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-grow: 1;
+        text-decoration-line: none;
+      }
+
+      header .material-symbols-outlined,
+      header a {
+        color: #337614;
+        font-size: 24px;
+        text-decoration-line: none;
+        flex-shrink: 0;
+      }
+
+      header .logo img {
+        margin-right: 8px;
+      }
+
+      header .mypage:hover {
+        font-weight: bold;
+      }
+    </style>
     <title>Seedo</title>
   </head>
   <body>
-    <header></header>
+    <header>
+      <span class="material-symbols-outlined"> notifications </span>
+      <a href="/" class="logo"> Seedo </a>
+      <a href="mypage/" class="mypage">My</a>
+    </header>
     {% block content %} {% endblock content %}
   </body>
 </html>
