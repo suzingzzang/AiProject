@@ -50,7 +50,7 @@ class LoginView(View):
                 refresh_token_instance.save()
 
                 # 클라이언트 측에 토큰 저장
-                response = redirect("accounts:home")
+                response = redirect("home")
                 response.set_cookie("access_token", access_token, max_age=settings.JWT_ACCESS_TOKEN_EXPIRATION)
                 response.set_cookie("refresh_token", refresh_token, max_age=settings.JWT_REFRESH_TOKEN_EXPIRATION)
                 return response

@@ -1,19 +1,5 @@
 /* myapp/static/css/sample.css */
 
-/* Global styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-size: 20px;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f8f9fa;
-  line-height: 1.6;
-}
-
 h2 {
   color: #193b08;
   text-align: center;
