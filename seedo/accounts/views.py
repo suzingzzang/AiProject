@@ -2,14 +2,13 @@
 
 
 import jwt
+from common.decorators import token_required
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import logout as auth_logout
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.decorators.csrf import csrf_protect
-
-from SeedoPJT.seedo.common.views import token_required
 
 from .forms import CustomAuthenticationForm, CustomUserCreationForm
 from .models import RefreshToken

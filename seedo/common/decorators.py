@@ -1,9 +1,9 @@
 from functools import wraps
 
 import jwt
+from accounts.models import RefreshToken
+from django.conf import settings
 from django.http import JsonResponse
-
-from SeedoPJT.seedo.accounts.models import RefreshToken
 
 
 def token_required(view_func):
@@ -16,17 +16,17 @@ def token_required(view_func):
             return JsonResponse({"error": "Authentication required"}, status=401)
 
         try:
-            decoded_token = jwt.decode(access_token, "seedo_project_key", algorithms=["HS256"])
+            decoded_token = jwt.decode(access_token, settings.JWT_SECRET_KEY, algorithms=["HS256"])
             request.user_id = decoded_token["user_id"]
         except jwt.ExpiredSignatureError:
             try:
-                decoded_refresh_token = jwt.decode(refresh_token, "seedo_project_key", algorithms=["HS256"])
+                decoded_refresh_token = jwt.decode(refresh_token, settings.JWT_REFRESH_SECRET_KEY, algorithms=["HS256"])
                 user_id = decoded_refresh_token["user_id"]
                 refresh_token_instance = RefreshToken.objects.get(user_id=user_id, token=refresh_token)
                 if refresh_token_instance.token_blacklist:
                     return JsonResponse({"error": "Refresh Token is blacklisted"}, status=401)
 
-                new_access_token = jwt.encode({"user_id": user_id}, "seedo_project_key", algorithm="HS256")
+                new_access_token = jwt.encode({"user_id": user_id}, settings.JWT_SECRET_KEY, algorithm="HS256")
                 if isinstance(new_access_token, bytes):
                     new_access_token = new_access_token.decode("utf-8")
 
