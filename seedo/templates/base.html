@@ -13,8 +13,14 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0 10px 10px;
+        padding: 10px;
         border-bottom: 1px solid #00000080;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #fff; /* Ensure the header has a background color */
+        z-index: 1000; /* Ensure the header is above other content */
       }
 
       header .logo {
@@ -42,6 +48,9 @@
       }
     </style>
     <title>Seedo</title>
+    {% block extra_head %}
+    <!-- Child templates can add extra head content here -->
+    {% endblock %}
   </head>
   <body>
     <header>
