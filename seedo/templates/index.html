@@ -1,7 +1,42 @@
 {% extends "base.html" %} {% load static %} {% block content %}
-<div class="walk">보행모드</div>
-<div class="navi">길안내</div>
-<div class="breaklog">시설 파손 기록</div>
-<div class="accidentlog">사고 기록 확인</div>
-<div class="qnapost">문의 게시판</div>
+<style>
+  main {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+  }
+
+  main div {
+    font-size: 40px;
+    color: #ffffff;
+    text-shadow:
+      -1px 0px #000000,
+      0px 1px #000000,
+      1px 0px #000000,
+      0px -1px #000000,
+      2px 2px 5px #00000080;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: 700;
+
+    margin: 20px 0;
+    padding: 20px 0;
+    width: 300px;
+    background-color: #a0ce8a;
+  }
+
+  main .walk,
+  main .navi {
+    background-color: #e01b41;
+  }
+</style>
+<main>
+  <div class="walk">보행모드</div>
+  <div class="navi">길안내</div>
+  <div class="breaklog">시설 파손 기록</div>
+  <div class="accidentlog">사고 기록 확인</div>
+  <div class="qnapost">문의 게시판</div>
+</main>
 {% endblock content %}
