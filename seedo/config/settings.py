@@ -98,6 +98,18 @@ JWT_EXPIRATION_DELTA = datetime.timedelta(hours=1)
 
 DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",  # 고정
+#         "NAME": env("DATABASE_NAME"),  # DB 이름
+#         "USER": env("DATABASE_USER"),  # 계정
+#         "PASSWORD": env("DATABASE_PW"),  # 암호
+#         "HOST": env("DATABASE_HOST"),  # IP
+#         "PORT": "3306",  # default
+#     }
+# }
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -125,6 +137,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # collectstatic으로 모아놓을 디렉토리
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # 프로젝트 수준의 static 디렉토리
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
