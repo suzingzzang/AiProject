@@ -18,20 +18,20 @@ from .utils import generate_tokens
 class SignUpView(View):
     def get(self, request):
         form = CustomUserCreationForm()
-        return render(request, "signup.html", {"form": form})
+        return render(request, "accounts/signup.html", {"form": form})
 
     def post(self, request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect("home")  # 적절한 리디렉션 URL로 변경
-        return render(request, "signup.html", {"form": form})
+            return redirect("accounts:login")  # 적절한 리디렉션 URL로 변경
+        return render(request, "accounts/signup.html", {"form": form})
 
 
 class LoginView(View):
     def get(self, request):
         form = CustomAuthenticationForm()
-        return render(request, "login.html", {"form": form})
+        return render(request, "accounts/login.html", {"form": form})
 
     def post(self, request):
         form = CustomAuthenticationForm(data=request.POST)
@@ -55,13 +55,13 @@ class LoginView(View):
                 response.set_cookie("refresh_token", refresh_token, max_age=settings.JWT_REFRESH_TOKEN_EXPIRATION)
                 return response
 
-        return render(request, "login.html", {"form": form})
+        return render(request, "accounts/login.html", {"form": form})
 
 
 @token_required
 def home(request):
     message = "Welcome to Home Page!!!"
-    return render(request, "index.html", {"message": message})
+    return render(request, "accounts/index.html", {"message": message})
 
 
 @csrf_protect
@@ -78,7 +78,7 @@ def logout(request):
             pass
 
     auth_logout(request)
-    response = render(request, "login.html")
+    response = render(request, "accounts/login.html")
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
 

@@ -7,7 +7,7 @@
   </head>
   <body>
     <h1>Welcome to Home Page!!!</h1>
-    <form method="post" action="{% url 'account_logout' %}">
+    <form method="post" action="{% url 'accounts:account_logout' %}">
       {% csrf_token %}
       <button type="submit">Logout</button>
     </form>

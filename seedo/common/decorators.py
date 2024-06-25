@@ -3,7 +3,8 @@ from functools import wraps
 import jwt
 from accounts.models import RefreshToken
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
+from django.urls import reverse
 
 
 def token_required(view_func):
@@ -13,7 +14,7 @@ def token_required(view_func):
         refresh_token = request.COOKIES.get("refresh_token")
 
         if not access_token or not refresh_token:
-            return JsonResponse({"error": "Authentication required"}, status=401)
+            return HttpResponseRedirect(reverse("accounts:login"))
 
         try:
             decoded_token = jwt.decode(access_token, settings.JWT_SECRET_KEY, algorithms=["HS256"])
@@ -24,7 +25,7 @@ def token_required(view_func):
                 user_id = decoded_refresh_token["user_id"]
                 refresh_token_instance = RefreshToken.objects.get(user_id=user_id, token=refresh_token)
                 if refresh_token_instance.token_blacklist:
-                    return JsonResponse({"error": "Refresh Token is blacklisted"}, status=401)
+                    return HttpResponseRedirect(reverse("accounts:login"))
 
                 new_access_token = jwt.encode({"user_id": user_id}, settings.JWT_SECRET_KEY, algorithm="HS256")
                 if isinstance(new_access_token, bytes):
@@ -34,9 +35,9 @@ def token_required(view_func):
                 response.set_cookie("access_token", new_access_token)
                 return response
             except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, RefreshToken.DoesNotExist):
-                return JsonResponse({"error": "Invalid or expired Refresh Token"}, status=401)
+                return HttpResponseRedirect(reverse("accounts:login"))
         except jwt.InvalidTokenError:
-            return JsonResponse({"error": "Invalid Access Token"}, status=401)
+            return HttpResponseRedirect(reverse("accounts:login"))
 
         return view_func(request, *args, **kwargs)
 

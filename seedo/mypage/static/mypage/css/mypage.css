@@ -1,0 +1,19 @@
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 50px 15px 15px;
+}
+
+main div {
+  font-size: 24px;
+  color: #183b08;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 700;
+}
+
+body > main > div.partnerList a {
+  text-decoration-line: none;
+}
