@@ -24,4 +24,9 @@ def index(request):
     return render(request, "index.html")
 
 
-urlpatterns = [path("admin/", admin.site.urls), path("accounts/", include("accounts.urls")), path("", index)]
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("accounts/", include("accounts.urls")),
+    path("", index, name="home"),
+    path("mypage/", include("mypage.urls")),
+]

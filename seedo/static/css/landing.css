@@ -1,9 +1,12 @@
 main {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  min-height: 100vh;
   align-items: center;
-  padding: 15px;
+  flex-direction: column; /* Arrange buttons vertically */
+  gap: 34px; /* Gap between buttons */
+  padding: 100px 0px;
 }
 
 main div {
@@ -19,7 +22,6 @@ main div {
   text-align: center;
   font-weight: 700;
 
-  margin: 20px 0;
   padding: 20px 0;
   width: 300px;
   background-color: #a0ce8a;

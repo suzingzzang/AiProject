@@ -24,7 +24,7 @@ class SignUpView(View):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect("accounts:home")  # 적절한 리디렉션 URL로 변경
+            return redirect("accounts:login")  # 적절한 리디렉션 URL로 변경
         return render(request, "accounts/signup.html", {"form": form})
 
 
@@ -50,12 +50,12 @@ class LoginView(View):
                 refresh_token_instance.save()
 
                 # 클라이언트 측에 토큰 저장
-                response = redirect("accounts:home")
+                response = redirect("home")
                 response.set_cookie("access_token", access_token, max_age=settings.JWT_ACCESS_TOKEN_EXPIRATION)
                 response.set_cookie("refresh_token", refresh_token, max_age=settings.JWT_REFRESH_TOKEN_EXPIRATION)
                 return response
 
-        return render(request, "login.html", {"form": form})
+        return render(request, "accounts/login.html", {"form": form})
 
 
 @token_required

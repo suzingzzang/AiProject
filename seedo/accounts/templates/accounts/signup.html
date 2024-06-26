@@ -1,7 +1,83 @@
-{% extends "base.html" %} {% block content %}
-<h2>Sign Up</h2>
-<form method="post">
-  {% csrf_token %} {{ form.as_p }}
-  <button type="submit">Sign Up</button>
-</form>
+{% extends "base.html" %} {% load static %} {% block extra_head %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{% static 'accounts/css/accounts.css' %}"
+/>
+{% endblock %} {% block content %}
+<div class="layout">
+  <div class="content-wrapper">
+    <h2>회원가입</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-wrapper">
+        <div class="form-group {% if form.email.errors %}error{% endif %}">
+          <label for="email">이메일:</label>
+          <input
+            type="text"
+            name="email"
+            id="email"
+            placeholder="이메일을 입력해주세요."
+          />
+        </div>
+        <div class="error-message">
+          {% for error in form.email.errors %}
+          <p>⎷{{ error }}</p>
+          {% endfor %}
+        </div>
+        <div
+          class="form-group {% if form.phonenumber.errors %}error{% endif %}"
+        >
+          <label for="phonenumber">전화번호:</label>
+          <input
+            type="text"
+            name="phonenumber"
+            id="phonenumber"
+            placeholder="전화번호를 입력해주세요."
+          />
+        </div>
+        <div class="error-message">
+          {% for error in form.phonenumber.errors %}
+          <p>⎷{{ error }}</p>
+          {% endfor %}
+        </div>
+        <div class="form-group {% if form.password1.errors %}error{% endif %}">
+          <label for="password1">비밀번호:</label>
+          <input
+            type="password"
+            name="password1"
+            id="password1"
+            placeholder="비밀번호를 입력해주세요."
+          />
+        </div>
+        <div class="error-message">
+          {% for error in form.password1.errors %}
+          <p>⎷{{ error }}</p>
+          {% endfor %}
+        </div>
+        <div
+          class="form-group {% for error in form.password2.errors %}{% if error %}error{%endif%}{% endfor %}"
+        >
+          <label for="passwor2">비밀번호 확인:</label>
+          <input
+            type="password"
+            name="password2"
+            id="password2"
+            placeholder="비밀번호를 확인해주세요."
+          />
+        </div>
+        <div class="error-message">
+          {% for error in form.password2.errors %}
+
+          <p>{% if error %}⎷{%endif%}{{ error }}</p>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="button-wrapper">
+        <a href="{% url 'accounts:login' %}" class="button-link">로그인</a>
+        <button type="submit" class="button-link">회원가입</button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

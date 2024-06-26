@@ -1,19 +1,5 @@
 /* myapp/static/css/sample.css */
 
-/* Global styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-size: 20px;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f8f9fa;
-  line-height: 1.6;
-}
-
 h2 {
   color: #193b08;
   text-align: center;
@@ -26,17 +12,9 @@ form {
 .form-wrapper {
   display: flex;
   flex-direction: column; /* Arrange buttons vertically */
-  gap: 38px; /* Gap between buttons */
+  gap: 0px; /* Gap between buttons */
   width: 100%; /* Ensure it takes full width */
-  margin-top: 30px;
-}
-
-.button-wrapper {
-  display: flex;
-  flex-direction: column; /* Arrange buttons vertically */
-  gap: 20px; /* Gap between buttons */
-  width: 100%; /* Ensure it takes full width */
-  margin-top: 48px;
+  margin-top: 20px;
 }
 
 .form-group {
@@ -45,13 +23,26 @@ form {
   padding: 16px;
 }
 
+.form-group.error {
+  border-color: #e01b41; /* Red color */
+}
+
+.error-message {
+  height: 28px;
+  padding-left: 5px;
+}
+
+.error-message p {
+  color: #e01b41;
+  font-size: 18px;
+}
+
 label {
   display: block;
   font-weight: bold;
 }
 
-input[name="username"],
-input[name="password"] {
+input {
   width: 100%;
   background-color: #f8f9fa;
   margin-top: 12px;
@@ -64,9 +55,10 @@ input[name="password"] {
   flex-direction: column; /* Arrange buttons vertically */
   gap: 20px; /* Gap between buttons */
   width: 100%; /* Ensure it takes full width */
+  margin-top: 10px;
 }
 
-button {
+.button-link {
   width: 100%;
   height: 52px;
   background-color: #193b08;
@@ -75,9 +67,11 @@ button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  text-align: center;
+  text-decoration: none;
 }
 
-button[type="submit"]:hover {
+.button-link:hover {
   background-color: #337614;
 }
 
