@@ -2,9 +2,9 @@
 
 
 import jwt
-from common.decorators import token_required
 from django.conf import settings
 from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.shortcuts import redirect, render
 from django.views import View
@@ -49,6 +49,9 @@ class LoginView(View):
                 refresh_token_instance.token_blacklist = False
                 refresh_token_instance.save()
 
+                # 세션을 사용하여 request.user 설정
+                auth_login(request, user)
+
                 # 클라이언트 측에 토큰 저장
                 response = redirect("home")
                 response.set_cookie("access_token", access_token, max_age=settings.JWT_ACCESS_TOKEN_EXPIRATION)
@@ -56,12 +59,6 @@ class LoginView(View):
                 return response
 
         return render(request, "accounts/login.html", {"form": form})
-
-
-@token_required
-def home(request):
-    message = "Welcome to Home Page!!!"
-    return render(request, "accounts/index.html", {"message": message})
 
 
 @csrf_protect
