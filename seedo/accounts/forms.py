@@ -3,6 +3,7 @@ import re
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UsernameField
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
 from .models import CustomUser
@@ -68,6 +69,13 @@ class CustomUserCreationForm(UserCreationForm):
                 raise ValidationError("비밀번호가 일치하지 않습니다.")
             if len(password2) < 8:
                 raise ValidationError("비밀번호는 8자 이상이어야 합니다.")
+            try:
+                validate_password(password2)
+            except ValidationError as e:
+                # Customize the error message for "This password is too common"
+                if "This password is too common." in e.messages:
+                    raise ValidationError("이 비밀번호는 너무 흔합니다.")
+                raise e
         if not password1:
             raise ValidationError("")
         return password2

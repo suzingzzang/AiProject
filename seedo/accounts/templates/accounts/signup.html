@@ -56,7 +56,7 @@
           {% endfor %}
         </div>
         <div
-          class="form-group {% if form.password2.errors and error%}error{% endif %}"
+          class="form-group {% for error in form.password2.errors %}{% if error %}error{%endif%}{% endfor %}"
         >
           <label for="passwor2">비밀번호 확인:</label>
           <input
