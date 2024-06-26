@@ -2,38 +2,119 @@
 <link rel="stylesheet" href="{% static 'accounts/css/mypage.css' %}" />
 {% endblock extra_head %} {% block content %}
 <main>
-  <div class="userName">아이디 | Seedo_Name</div>
-  <div class="partner">
-    동반자 |
-    <button>추가하기</button>
-    <button>삭제하기</button>
+  <div class="layout">
+    <div class="userName">
+      아이디 |
+      <span class="userID">Seedo_Namedafdsfsdadsaddadgerrfsdfsdfsfdsfd</span>
+    </div>
+    <div class="partner">
+      동반자 |
+      <button class="addPartner">추가하기</button>
+      <button class="delPartner">삭제하기</button>
+    </div>
+    <div class="partnerList">
+      <div class="eachPartner">
+        <div class="left">
+          <input type="checkbox" name="selectPartner" />
+          <span class="partnerName"
+            >Partner1dafdsfsdadsaddadgerrfsdfsdfsfdsfd</span
+          >
+        </div>
+        <div class="right">
+          <a href="파트너의 breaklog" class="logButton">시설</a>
+          <a href="파트너의 accidentlog" class="logButton">사고</a>
+        </div>
+      </div>
+
+      <div class="eachPartner">
+        <div class="left">
+          <input type="checkbox" name="selectPartner" />
+          <span class="partnerName">Partner2d</span>
+        </div>
+        <div class="right">
+          <a href="파트너의 breaklog" class="logButton">시설</a>
+          <a href="파트너의 accidentlog" class="logButton">사고</a>
+        </div>
+      </div>
+
+      <div class="eachPartner">
+        <div class="left">
+          <input type="checkbox" name="selectPartner" />
+          <span class="partnerName">Partner3</span>
+        </div>
+        <div class="right">
+          <a href="파트너의 breaklog" class="logButton">시설</a>
+          <a href="파트너의 accidentlog" class="logButton">사고</a>
+        </div>
+      </div>
+
+      <div class="eachPartner">
+        <div class="left">
+          <input type="checkbox" name="selectPartner" />
+          <span class="partnerName">Partner4</span>
+        </div>
+        <div class="right">
+          <a href="파트너의 breaklog" class="logButton">시설</a>
+          <a href="파트너의 accidentlog" class="logButton">사고</a>
+        </div>
+      </div>
+
+      <div class="eachPartner">
+        <div class="left">
+          <input type="checkbox" name="selectPartner" />
+          <span class="partnerName">Partner5</span>
+        </div>
+        <div class="right">
+          <a href="파트너의 breaklog" class="logButton">시설</a>
+          <a href="파트너의 accidentlog" class="logButton">사고</a>
+        </div>
+      </div>
+
+      <div class="eachPartner">
+        <div class="left">
+          <input type="checkbox" name="selectPartner" />
+          <span class="partnerName">Partner6</span>
+        </div>
+        <div class="right">
+          <a href="파트너의 breaklog" class="logButton">시설</a>
+          <a href="파트너의 accidentlog" class="logButton">사고</a>
+        </div>
+      </div>
+
+      <div class="eachPartner">
+        <div class="left">
+          <input type="checkbox" name="selectPartner" />
+          <span class="partnerName">Partner7</span>
+        </div>
+        <div class="right">
+          <a href="파트너의 breaklog" class="logButton">시설</a>
+          <a href="파트너의 accidentlog" class="logButton">사고</a>
+        </div>
+      </div>
+
+      <div class="eachPartner">
+        <div class="left">
+          <input type="checkbox" name="selectPartner" />
+          <span class="partnerName">Partner8</span>
+        </div>
+        <div class="right">
+          <a href="파트너의 breaklog" class="logButton">시설</a>
+          <a href="파트너의 accidentlog" class="logButton">사고</a>
+        </div>
+      </div>
+
+      <div class="eachPartner">
+        <div class="left">
+          <input type="checkbox" name="selectPartner" />
+          <span class="partnerName">Partner9</span>
+        </div>
+        <div class="right">
+          <a href="파트너의 breaklog" class="logButton">시설</a>
+          <a href="파트너의 accidentlog" class="logButton">사고</a>
+        </div>
+      </div>
+    </div>
+    <a href="/accounts/logout/" class="button-link">로그아웃</a>
   </div>
-  <div class="partnerList">
-    <div class="eachPartner">
-      <input type="checkbox" name="selectPartner" />
-      <span class="partnerName">Partner1</span>
-      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
-      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
-    </div>
-    <div class="eachPartner">
-      <input type="checkbox" name="selectPartner" />
-      <span class="partnerName">Partner2</span>
-      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
-      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
-    </div>
-    <div class="eachPartner">
-      <input type="checkbox" name="selectPartner" />
-      <span class="partnerName">Partner3</span>
-      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
-      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
-    </div>
-    <div class="eachPartner">
-      <input type="checkbox" name="selectPartner" />
-      <span class="partnerName">Partner4</span>
-      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
-      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
-    </div>
-  </div>
-  <a href="/accounts/logout/">로그아웃</a>
 </main>
 {% endblock content %}
