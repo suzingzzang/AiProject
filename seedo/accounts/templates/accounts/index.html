@@ -1,16 +1,39 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home</title>
-  </head>
-  <body>
-    <h1>Welcome to Home Page!!!</h1>
-    <form method="post" action="{% url 'accounts:account_logout' %}">
-      {% csrf_token %}
-      <button type="submit">Logout</button>
-    </form>
-    <p id="message">{{ message }}</p>
-  </body>
-</html>
+{% extends "base.html" %} {% load static %} {% block extra_head %}
+<link rel="stylesheet" href="{% static 'accounts/css/mypage.css' %}" />
+{% endblock extra_head %} {% block content %}
+<main>
+  <div class="userName">아이디 | Seedo_Name</div>
+  <div class="partner">
+    동반자 |
+    <button>추가하기</button>
+    <button>삭제하기</button>
+  </div>
+  <div class="partnerList">
+    <div class="eachPartner">
+      <input type="checkbox" name="selectPartner" />
+      <span class="partnerName">Partner1</span>
+      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
+      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
+    </div>
+    <div class="eachPartner">
+      <input type="checkbox" name="selectPartner" />
+      <span class="partnerName">Partner2</span>
+      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
+      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
+    </div>
+    <div class="eachPartner">
+      <input type="checkbox" name="selectPartner" />
+      <span class="partnerName">Partner3</span>
+      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
+      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
+    </div>
+    <div class="eachPartner">
+      <input type="checkbox" name="selectPartner" />
+      <span class="partnerName">Partner4</span>
+      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
+      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
+    </div>
+  </div>
+  <a href="/accounts/logout/">로그아웃</a>
+</main>
+{% endblock content %}

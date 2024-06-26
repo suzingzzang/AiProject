@@ -17,6 +17,7 @@
   </head>
   <body>
     <header>
+      {% if user.is_authenticated %}
       <span class="material-symbols-outlined"> notifications </span>
       <a href="/" class="logo">
         <img
@@ -27,7 +28,18 @@
         />
         Seedo
       </a>
-      <a href="/mypage/" class="mypage">My</a>
+      <a href="/accounts/" class="mypage">My</a>
+      {% else %}
+      <a href="/" class="logo">
+        <img
+          src="{% static 'images/seedo_logo.png' %} "
+          alt="seedo_logo"
+          width="25px"
+          height="25px"
+        />
+        Seedo
+      </a>
+      {% endif %}
     </header>
     {% block content %} {% endblock content %}
   </body>
