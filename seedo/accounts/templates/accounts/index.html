@@ -164,9 +164,20 @@
           addPartnerModal.style.display = "none";
           console.log("success");
         } else {
-          alert("요청을 보내는 도중 오류가 발생했습니다.");
-          console.error(data.errors);
+          // 오류 메시지에 따라 다른 알림을 표시
+          if (data.message === "이미 요청을 보냈습니다.") {
+            alert("이미 요청을 보냈습니다.");
+          } else if (data.message === "자신에게 요청을 보낼 수 없습니다.") {
+            alert("자신에게 요청을 보낼 수 없습니다.");
+          } else {
+            alert("요청을 보내는 도중 오류가 발생했습니다.");
+          }
+          console.error(data.message);
         }
+      })
+      .catch((error) => {
+        alert("요청을 보내는 도중 오류가 발생했습니다.");
+        console.error("Error:", error);
       });
   });
 
