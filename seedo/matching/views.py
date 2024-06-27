@@ -1,20 +1,22 @@
 # matching/views.py
 
 import json
+import random
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from twilio.rest import Client
+
+from SeedoPJT.seedo.common.decorators import token_required
 
 from .models import UserRequest
 
 User = get_user_model()
 
 
-@login_required
+@token_required
 def search_users(request):
     if request.method == "GET" and "email" in request.GET:
         email_query = request.GET.get("email")
@@ -24,7 +26,7 @@ def search_users(request):
     return JsonResponse({"error": "Invalid request"})
 
 
-@login_required
+@token_required
 def send_request(request):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -33,7 +35,7 @@ def send_request(request):
 
         if recipient != request.user:
             Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-            # verification_code = str(random.randint(100000, 999999))  # 인증 코드 생성
+            verification_code = str(random.randint(100000, 999999))  # 인증 코드 생성
 
             # SMS 보내기
             # message = client.messages.create(
@@ -42,7 +44,8 @@ def send_request(request):
             #    to=recipient.phonenumber
             # )
 
-            # user_request = UserRequest.objects.create(requester=request.user, recipient=recipient, verification_code=verification_code)
+            # user_request =
+            UserRequest.objects.create(requester=request.user, recipient=recipient, verification_code=verification_code)
 
             return JsonResponse({"status": "success"})
         else:
@@ -50,7 +53,7 @@ def send_request(request):
     return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
 
 
-@login_required
+@token_required
 def accept_request(request, request_id):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -67,7 +70,7 @@ def accept_request(request, request_id):
     return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
 
 
-@login_required
+@token_required
 def remove_connection(request, request_id):
     user_request = get_object_or_404(UserRequest, id=request_id)
     if request.user == user_request.requester or request.user == user_request.recipient:
