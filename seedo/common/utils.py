@@ -3,9 +3,8 @@
 from datetime import datetime
 
 import jwt
+from accounts.models import RefreshToken
 from django.conf import settings
-
-from .models import RefreshToken
 
 
 def generate_tokens(user):
@@ -20,6 +19,7 @@ def generate_tokens(user):
     # Refresh Token 저장
     token, created = RefreshToken.objects.get_or_create(user=user)
     token.token = refresh_token  # 문자열로 디코딩할 필요 없음
+    token.token_blacklist = False
     token.save()
 
     return access_token, refresh_token
