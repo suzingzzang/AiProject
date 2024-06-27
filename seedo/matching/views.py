@@ -33,6 +33,11 @@ def send_request(request):
         recipient = get_object_or_404(User, email=recipient_email)
 
         if recipient != request.user:
+            # 이미 요청을 보냈는지 확인
+            existing_request = UserRequest.objects.filter(requester=request.user, recipient=recipient).exists()
+            if existing_request:
+                return JsonResponse({"status": "error", "message": "이미 요청을 보냈습니다."}, status=400)
+
             Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
             verification_code = str(random.randint(100000, 999999))  # 인증 코드 생성
 
@@ -42,14 +47,13 @@ def send_request(request):
             #    from_=settings.TWILIO_PHONE_NUMBER,
             #    to=recipient.phonenumber
             # )
-
             # user_request =
             UserRequest.objects.create(requester=request.user, recipient=recipient, verification_code=verification_code)
 
             return JsonResponse({"status": "success"})
         else:
-            return JsonResponse({"status": "error", "message": "You cannot send request to yourself."}, status=400)
-    return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
+            return JsonResponse({"status": "error", "message": "자신에게 요청을 보낼 수 없습니다."}, status=400)
+    return JsonResponse({"status": "error", "message": "잘못된 요청입니다."}, status=400)
 
 
 @token_required
