@@ -39,6 +39,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+TWILIO_ACCOUNT_SID = "your_account_sid"
+TWILIO_AUTH_TOKEN = "your_auth_token"
+TWILIO_PHONE_NUMBER = "your_twilio_phone_number"
 # Application definition
 
 INSTALLED_APPS = [
@@ -49,6 +52,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "accounts",
+    "matching",
 ]
 
 MIDDLEWARE = [
