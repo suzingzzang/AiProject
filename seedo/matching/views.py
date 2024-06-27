@@ -3,13 +3,12 @@
 import json
 import random
 
+from common.decorators import token_required
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from twilio.rest import Client
-
-from SeedoPJT.seedo.common.decorators import token_required
 
 from .models import UserRequest
 
