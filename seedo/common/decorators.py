@@ -3,7 +3,7 @@ from functools import wraps
 import jwt
 from accounts.models import RefreshToken
 from django.conf import settings
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 
@@ -31,7 +31,7 @@ def token_required(view_func):
                 if isinstance(new_access_token, bytes):
                     new_access_token = new_access_token.decode("utf-8")
 
-                response = JsonResponse({"access_token": new_access_token})
+                response = view_func(request, *args, **kwargs)
                 response.set_cookie("access_token", new_access_token)
                 return response
             except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, RefreshToken.DoesNotExist):

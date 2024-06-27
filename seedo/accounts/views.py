@@ -2,7 +2,6 @@
 
 
 import jwt
-from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
@@ -51,8 +50,8 @@ class LoginView(View):
 
                 # 클라이언트 측에 토큰 저장
                 response = redirect("home")
-                response.set_cookie("access_token", access_token, max_age=settings.JWT_ACCESS_TOKEN_EXPIRATION)
-                response.set_cookie("refresh_token", refresh_token, max_age=settings.JWT_REFRESH_TOKEN_EXPIRATION)
+                response.set_cookie("access_token", access_token)
+                response.set_cookie("refresh_token", refresh_token)
 
                 # 세션을 사용하여 request.user 설정
                 auth_login(request, user)

@@ -4,8 +4,8 @@
 <main>
   <div class="layout">
     <div class="userName">
-      아이디 |
-      <span class="userID">Seedo_Namedafdsfsdadsaddadgerrfsdfsdfsfdsfd</span>
+      아이디 | {% load custom_filters %}
+      <span class="userID">{{ user.email|email_username }}</span>
     </div>
     <div class="partner">
       동반자 |
