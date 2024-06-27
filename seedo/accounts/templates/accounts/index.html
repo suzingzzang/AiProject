@@ -1,39 +1,96 @@
 {% extends "base.html" %} {% load static %} {% block extra_head %}
 <link rel="stylesheet" href="{% static 'accounts/css/mypage.css' %}" />
-{% endblock extra_head %} {% block content %}
+{% endblock extra_head %} {% block content %} {% load custom_filters %}
 <main>
-  <div class="userName">아이디 | Seedo_Name</div>
-  <div class="partner">
-    동반자 |
-    <button>추가하기</button>
-    <button>삭제하기</button>
+  <div class="layout">
+    <div class="userName">
+      아이디 |
+      <span class="userID">{{ user.email|email_username }}</span>
+    </div>
+
+    <div class="partner">
+      동반자 |
+      <button id="addPartnerBtn" class="addPartner">추가하기</button>
+      <button id="removePartnerBtn" class="delPartner">삭제하기</button>
+    </div>
+
+    <div class="partnerList">
+      {% for partner in partner_list %}
+      <div class="eachPartner">
+        <div class="left">
+          {% if partner.is_accepted %}
+          <!-- 파트너라면 -->
+          <input type="checkbox" name="selectPartner" />
+          <span class="partnerName"
+            >{{ partner.user.email|email_username }}</span
+          >
+          {% else %}
+          <!-- 파트너가 아니라면, 회색 -->
+          <input type="checkbox" name="selectPartner" />
+          <span class="partnerName" style="color: #9e9e9e"
+            >{{ partner.user.email|email_username }}</span
+          >
+          {% endif %}
+        </div>
+        <div class="right">
+          {% if partner.is_accepted %}
+          <!-- 수락된 경우 -->
+          <a href="#" class="pBreakLog">시설</a>
+          <a href="#" class="pAccidentLog">사고</a>
+          {% else %} {% if partner.is_requester %}
+          <!-- 요청을 보낸 경우 -->
+          <p class="requestBtn">수락대기</p>
+          {% else %}
+          <!-- 요청을 받은 경우 -->
+          <button class="acceptBtn" data-request-id="{{ partner.request_id }}">
+            수락하기
+          </button>
+          {% endif %} {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <p class="noPartner">아직 동반자가 없습니다.</p>
+      {% endfor %}
+    </div>
+    <a href="{% url 'accounts:account_logout' %}" class="button-link"
+      >로그아웃</a
+    >
   </div>
-  <div class="partnerList">
-    <div class="eachPartner">
-      <input type="checkbox" name="selectPartner" />
-      <span class="partnerName">Partner1</span>
-      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
-      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
-    </div>
-    <div class="eachPartner">
-      <input type="checkbox" name="selectPartner" />
-      <span class="partnerName">Partner2</span>
-      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
-      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
-    </div>
-    <div class="eachPartner">
-      <input type="checkbox" name="selectPartner" />
-      <span class="partnerName">Partner3</span>
-      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
-      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
-    </div>
-    <div class="eachPartner">
-      <input type="checkbox" name="selectPartner" />
-      <span class="partnerName">Partner4</span>
-      <a href="파트너의 breaklog" class="pBreakLog">시설</a>
-      <a href="파트너의 accidentlog" class="pAccidentLog">사고</a>
-    </div>
-  </div>
-  <a href="/accounts/logout/">로그아웃</a>
 </main>
+
+<!-- 모달 -->
+<div id="addPartnerModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <form id="sendRequestForm">
+      {% csrf_token %}
+      <label for="email">이메일:</label>
+      <input type="email" id="email" name="email" required />
+      <button type="submit" id="sendRequestBtn">요청 보내기</button>
+    </form>
+
+    <!-- 검색 결과를 표시할 리스트 -->
+    <ul id="searchResults"></ul>
+  </div>
+</div>
+
+<div id="verifyRequestModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <form id="verifyRequestForm">
+      {% csrf_token %}
+      <label for="verificationCode">인증번호:</label>
+      <input
+        type="text"
+        id="verificationCode"
+        name="verificationCode"
+        required
+      />
+      <button type="submit" id="verifyBtn">수락하기</button>
+    </form>
+  </div>
+</div>
+
+<script src="{% static 'accounts/js/matching.js' %}"></script>
+
 {% endblock content %}

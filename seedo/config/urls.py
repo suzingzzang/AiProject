@@ -31,4 +31,5 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
     path("", index, name="home"),
     path("camera/", include("camera.urls")),
+    path("matching/", include("matching.urls")),
 ]
