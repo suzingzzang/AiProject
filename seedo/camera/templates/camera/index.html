@@ -1,0 +1,282 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Home</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        let model;
+        let recording = false;
+        let sensorData = [];
+        let mediaRecorder;
+        let recordedChunks = [];
+
+        // Load the COCO-SSD model
+        cocoSsd
+          .load()
+          .then(function (loadedModel) {
+            model = loadedModel;
+            console.log("COCO-SSD model loaded.");
+          })
+          .catch(function (err) {
+            console.error("Error loading COCO-SSD model:", err);
+          });
+
+        function createNewFrame() {
+          return {
+            timestamp: Date.now(),
+            gps: {},
+            acc: {},
+            gyro: {},
+          };
+        }
+
+        function updateGPS() {
+          if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+              function (position) {
+                const frame = createNewFrame();
+                frame.gps = {
+                  latitude: position.coords.latitude,
+                  longitude: position.coords.longitude,
+                };
+                sensorData.push(frame);
+
+                document.getElementById("location").textContent =
+                  `Location: Latitude ${position.coords.latitude}, Longitude ${position.coords.longitude}`;
+              },
+              function (error) {
+                console.error("Error accessing GPS:", error);
+                const frame = createNewFrame();
+                frame.gps = {
+                  latitude: "errortest",
+                  longitude: "errortest",
+                };
+                sensorData.push(frame);
+
+                document.getElementById("location").textContent =
+                  `Location: Latitude "errortest", Longitude "errortest"`;
+              },
+            );
+          } else {
+            console.error("Geolocation not supported");
+          }
+        }
+
+        function updateAccelerometer(event) {
+          if (event.acceleration && recording) {
+            const frame = createNewFrame();
+            let accel = event.acceleration;
+            frame.acc = {
+              x: accel.x,
+              y: accel.y,
+              z: accel.z,
+            };
+            sensorData.push(frame);
+            document.getElementById("accelerometer").textContent =
+              `Accelerometer: x=${accel.x}, y=${accel.y}, z=${accel.z}`;
+          }
+        }
+
+        function updateGyroscope(event) {
+          if (recording) {
+            const frame = createNewFrame();
+            frame.gyro = {
+              alpha: event.alpha,
+              beta: event.beta,
+              gamma: event.gamma,
+            };
+            sensorData.push(frame);
+            document.getElementById("gyroscope").textContent =
+              `Gyroscope: alpha=${event.alpha}, beta=${event.beta}, gamma=${event.gamma}`;
+          }
+        }
+
+        function startRecording() {
+          recording = true;
+          document.getElementById("recording-status").textContent =
+            "Recording...";
+          const video = document.getElementById("video");
+          const canvas = document.getElementById("canvas");
+          const context = canvas.getContext("2d");
+          let frameId = 0;
+          const frameRate = 20; // frames per second
+
+          navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .then(function (stream) {
+              video.srcObject = stream;
+              video.play();
+
+              // Set up MediaRecorder
+              mediaRecorder = new MediaRecorder(stream);
+              mediaRecorder.ondataavailable = function (event) {
+                if (event.data.size > 0) {
+                  recordedChunks.push(event.data);
+                }
+              };
+              mediaRecorder.start();
+            })
+            .catch(function (err) {
+              console.log("An error occurred: " + err);
+            });
+
+          video.addEventListener("play", function () {
+            function drawFrame() {
+              if (!recording || video.paused || video.ended) {
+                return;
+              }
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+              context.font = "30px Arial";
+              context.fillStyle = "red";
+              context.fillText("Frame ID: " + frameId, 10, 50);
+              frameId++;
+
+              // Ensure the video and canvas are ready
+              if (video.videoWidth > 0 && video.videoHeight > 0) {
+                // Run COCO-SSD object detection
+                model
+                  .detect(video)
+                  .then((predictions) => {
+                    predictions.forEach((prediction) => {
+                      if (prediction.class === "person") {
+                        context.strokeStyle = "green";
+                        context.lineWidth = 4;
+                        context.strokeRect(
+                          prediction.bbox[0],
+                          prediction.bbox[1],
+                          prediction.bbox[2],
+                          prediction.bbox[3],
+                        );
+                        context.font = "18px Arial";
+                        context.fillStyle = "green";
+                        context.fillText(
+                          `${prediction.class} - ${Math.round(
+                            prediction.score * 100,
+                          )}%`,
+                          prediction.bbox[0],
+                          prediction.bbox[1] > 10 ? prediction.bbox[1] - 5 : 10,
+                        );
+                      }
+                    });
+                  })
+                  .catch(function (err) {
+                    console.error("Error running COCO-SSD detection:", err);
+                  });
+              } else {
+                console.warn("Video or canvas not ready.");
+              }
+
+              setTimeout(drawFrame, 1000 / frameRate);
+            }
+            drawFrame();
+          });
+
+          // Start sensor data logging
+          if (window.DeviceMotionEvent) {
+            window.addEventListener("devicemotion", updateAccelerometer);
+          } else {
+            console.error("Accelerometer not supported");
+          }
+
+          if (window.DeviceOrientationEvent) {
+            window.addEventListener("deviceorientation", updateGyroscope);
+          } else {
+            console.error("Gyroscope not supported");
+          }
+
+          setInterval(updateGPS, 1000 / frameRate);
+        }
+
+        function stopRecording() {
+          recording = false;
+          document.getElementById("recording-status").textContent =
+            "Recording stopped.";
+
+          // Stop mediaRecorder and get the video data
+          mediaRecorder.stop();
+          mediaRecorder.onstop = function () {
+            const videoBlob = new Blob(recordedChunks, { type: "video/mp4" });
+            const videoFile = new File([videoBlob], "video.mp4", {
+              type: "video/mp4",
+            });
+
+            // Save sensor data to a file
+            const sensorLogBlob = new Blob(
+              [JSON.stringify(sensorData, null, 2)],
+              {
+                type: "application/json",
+              },
+            );
+            const sensorLogFile = new File([sensorLogBlob], "sensor_log.json", {
+              type: "application/json",
+            });
+
+            // Stop video stream
+            const video = document.getElementById("video");
+            const stream = video.srcObject;
+            const tracks = stream.getTracks();
+
+            tracks.forEach(function (track) {
+              track.stop();
+            });
+
+            video.srcObject = null;
+
+            // Use DataTransfer to simulate file input
+            const videoFileInput = document.getElementById("video-file");
+            const sensorLogFileInput =
+              document.getElementById("sensor-log-file");
+
+            const videoDataTransfer = new DataTransfer();
+            videoDataTransfer.items.add(videoFile);
+            videoFileInput.files = videoDataTransfer.files;
+
+            const logDataTransfer = new DataTransfer();
+            logDataTransfer.items.add(sensorLogFile);
+            sensorLogFileInput.files = logDataTransfer.files;
+
+            // Submit the form
+            document.getElementById("upload-form").submit();
+          };
+        }
+
+        document
+          .getElementById("start-camera")
+          .addEventListener("click", startRecording);
+        document
+          .getElementById("stop-camera")
+          .addEventListener("click", stopRecording);
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Sensor Data</h1>
+    <p id="location">Location: Loading...</p>
+    <p id="accelerometer">Accelerometer: Loading...</p>
+    <p id="gyroscope">Gyroscope: Loading...</p>
+    <p id="recording-status">Recording status: Not recording</p>
+
+    <button id="start-camera">Start Camera</button>
+    <button id="stop-camera">Stop Camera</button>
+    <form
+      id="upload-form"
+      method="post"
+      enctype="multipart/form-data"
+      action="{% url 'camera:upload_recording' %}"
+    >
+      {% csrf_token %}
+      <input type="file" name="video" id="video-file" style="display: none" />
+      <input
+        type="file"
+        name="sensor_log"
+        id="sensor-log-file"
+        style="display: none"
+      />
+      <button type="submit" style="display: none">Submit</button>
+    </form>
+    <video id="video" width="640" height="480" style="display: none"></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+  </body>
+</html>
