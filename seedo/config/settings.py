@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-import datetime
 import os
 from datetime import timedelta
 from pathlib import Path
@@ -48,6 +47,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "common",
     "accounts",
 ]
 
@@ -88,10 +88,10 @@ JWT_SECRET_KEY = env("JWT_SECRET_KEY")
 JWT_REFRESH_SECRET_KEY = env("JWT_REFRESH_SECRET_KEY")
 JWT_ALGORITHM = "HS256"  # 선택적으로 알고리즘을 설정할 수 있습니다.
 # Access Token 유효 기간 설정 (예: 1시간)
-JWT_ACCESS_TOKEN_EXPIRATION = timedelta(hours=1)
+JWT_ACCESS_TOKEN_EXPIRATION = timedelta(minutes=1)
 # Refresh Token 유효 기간 설정 (예: 30일)
 JWT_REFRESH_TOKEN_EXPIRATION = timedelta(days=30)
-JWT_EXPIRATION_DELTA = datetime.timedelta(hours=1)
+# JWT_EXPIRATION_DELTA = datetime.timedelta(hours=1)
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
