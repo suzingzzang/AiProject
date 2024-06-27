@@ -67,7 +67,7 @@ main {
 
 .partnerList {
   width: 100%;
-  max-height: 296px; /* 최대 높이 설정 */
+  height: 296px; /* 최대 높이 설정 */
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
@@ -115,7 +115,8 @@ main {
   overflow-x: auto;
 }
 
-.logButton {
+.pBreakLog,
+.pAccidentLog {
   width: 53px;
   height: 32px;
   background-color: #193b08;
@@ -129,8 +130,36 @@ main {
   font-weight: 400;
 }
 
-.logButton:hover {
+.pBreakLog:hover,
+.pAccidentLog:hover {
   background-color: #337614;
+}
+
+.acceptBtn {
+  width: 111px;
+  height: 32px;
+  background-color: #c2c2c2;
+  color: #000;
+  padding: 1px 3px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.requestBtn {
+  width: 111px;
+  height: 32px;
+  background-color: #c2c2c2;
+  color: #fff;
+  padding: 1px 3px;
+  border: none;
+  border-radius: 4px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
 }
 
 .button-link {
