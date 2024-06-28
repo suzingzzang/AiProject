@@ -1,6 +1,5 @@
 {% extends "base.html" %} {% load static %} {% block extra_head %}
 <link rel="stylesheet" href="{% static 'accounts/css/mypage.css' %}" />
-<meta name="csrf-token" content="{{ csrf_token }}" />
 {% endblock extra_head %} {% block content %} {% load custom_filters %}
 <main>
   <div class="layout">
@@ -21,13 +20,21 @@
         <div class="left">
           {% if partner.is_accepted %}
           <!-- 파트너라면 -->
-          <input type="checkbox" name="selectPartner" />
+          <input
+            type="checkbox"
+            name="selectPartner"
+            data-request-id="{{ partner.request_id }}"
+          />
           <span class="partnerName"
             >{{ partner.user.email|email_username }}</span
           >
           {% else %}
           <!-- 파트너가 아니라면, 회색 -->
-          <input type="checkbox" name="selectPartner" />
+          <input
+            type="checkbox"
+            name="selectPartner"
+            data-request-id="{{ partner.request_id }}"
+          />
           <span class="partnerName" style="color: #9e9e9e"
             >{{ partner.user.email|email_username }}</span
           >
@@ -75,10 +82,11 @@
 
 <div id="verifyRequestModal" class="modal">
   <div class="modal-content">
+    {{ partner.request_id }}
     <form id="verifyRequestForm">
       {% csrf_token %}
       <div>
-        <label for="verificationCode">인증번호:</label>
+        <label for="verificationCode">인증번호:{{ partner.request_id }}</label>
         <input
           type="text"
           id="verificationCode"
