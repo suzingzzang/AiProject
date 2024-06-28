@@ -180,7 +180,7 @@ listen [::]:8080 default_server;
 
 ## 🔍 배포 서버 실행 방법
 
-### 0. /BACK-END/seedo 하위에 디렉토리 생성 (존재하지 않을 경우)
+### 0. /SeedoPJT/seedo 하위에 디렉토리 생성 (존재하지 않을 경우)
 
 ```
 /seedo/logs
