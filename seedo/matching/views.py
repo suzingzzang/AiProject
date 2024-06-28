@@ -69,12 +69,13 @@ def accept_request(request, request_id):
             user_request.save()
             return JsonResponse({"status": "success"})
         else:
-            return JsonResponse({"status": "error", "message": "Invalid verification code"}, status=400)
-    return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
+            return JsonResponse({"status": "error", "message": "인증번호가 다릅니다."}, status=400)
+    return JsonResponse({"status": "error", "message": "잘못된 요청입니다."}, status=400)
 
 
 @token_required
 def remove_connection(request, request_id):
+    print("success")
     user_request = get_object_or_404(UserRequest, id=request_id)
     if request.user == user_request.requester or request.user == user_request.recipient:
         user_request.delete()

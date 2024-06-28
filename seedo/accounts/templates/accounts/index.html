@@ -20,13 +20,21 @@
         <div class="left">
           {% if partner.is_accepted %}
           <!-- 파트너라면 -->
-          <input type="checkbox" name="selectPartner" />
+          <input
+            type="checkbox"
+            name="selectPartner"
+            data-request-id="{{ partner.request_id }}"
+          />
           <span class="partnerName"
             >{{ partner.user.email|email_username }}</span
           >
           {% else %}
           <!-- 파트너가 아니라면, 회색 -->
-          <input type="checkbox" name="selectPartner" />
+          <input
+            type="checkbox"
+            name="selectPartner"
+            data-request-id="{{ partner.request_id }}"
+          />
           <span class="partnerName" style="color: #9e9e9e"
             >{{ partner.user.email|email_username }}</span
           >
@@ -66,7 +74,6 @@
       {% csrf_token %}
       <label for="email">이메일:</label>
       <input type="email" id="email" name="email" required />
-      <button type="submit" id="sendRequestBtn">요청 보내기</button>
     </form>
 
     <!-- 검색 결과를 표시할 리스트 -->
@@ -77,9 +84,10 @@
 <div id="verifyRequestModal" class="modal">
   <div class="modal-content">
     <span class="close">&times;</span>
+    {{ partner.request_id }}
     <form id="verifyRequestForm">
       {% csrf_token %}
-      <label for="verificationCode">인증번호:</label>
+      <label for="verificationCode">인증번호:{{ partner.request_id }}</label>
       <input
         type="text"
         id="verificationCode"
