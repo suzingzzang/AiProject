@@ -91,7 +91,7 @@ server {
     listen 8000;
     server_name localhost;
 
-    set $base_path /home/ubuntu/back-end/seedo;
+    set $base_path /home/ubuntu/SeedoPJT/seedo;
 
     location / {
         include uwsgi_params;
@@ -121,7 +121,7 @@ server {
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
 
-    set $base_path /home/ubuntu/back-end/seedo;
+    set $base_path /home/ubuntu/SeedoPJT/seedo;
 
     location / {
         proxy_pass http://127.0.0.1:8000;  # Internal communication
