@@ -6,6 +6,13 @@ var sendRequestForm = document.getElementById("sendRequestForm");
 var verifyRequestForm = document.getElementById("verifyRequestForm");
 var partnerList = document.querySelector(".partnerList");
 
+// CSRF 토큰을 메타 태그에서 가져오는 함수
+function getCsrfToken() {
+  return document
+    .querySelector('meta[name="csrf-token"]')
+    .getAttribute("content");
+}
+
 addPartnerBtn.addEventListener("click", function () {
   addPartnerModal.style.display = "block";
 });
@@ -61,9 +68,42 @@ document.getElementById("email").addEventListener("input", function () {
           li.textContent = user.email;
           li.setAttribute("data-user-id", user.id);
 
-          li.onclick = function () {
-            document.getElementById("email").value = user.email;
-            searchResults.innerHTML = ""; // 목록 클릭 시 검색 결과 초기화
+          // 요청 보내기
+          li.onclick = function (event) {
+            event.preventDefault();
+            var email = user.email;
+            fetch("/matching/send_request/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCsrfToken(),
+              },
+              body: JSON.stringify({ email: email }),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.status === "success") {
+                  alert("요청이 성공적으로 보내졌습니다.");
+                  addPartnerModal.style.display = "none";
+                  console.log("success");
+                } else {
+                  // 오류 메시지에 따라 다른 알림을 표시
+                  if (data.message === "이미 요청을 보냈습니다.") {
+                    alert("이미 요청을 보냈습니다.");
+                  } else if (
+                    data.message === "자신에게 요청을 보낼 수 없습니다."
+                  ) {
+                    alert("자신에게 요청을 보낼 수 없습니다.");
+                  } else {
+                    alert("요청을 보내는 도중 오류가 발생했습니다.");
+                  }
+                  console.error(data.message);
+                }
+              })
+              .catch((error) => {
+                alert("요청을 보내는 도중 오류가 발생했습니다.");
+                console.error("Error:", error);
+              });
           };
 
           searchResults.appendChild(li); // 검색 결과 리스트에 추가
@@ -77,42 +117,6 @@ document.getElementById("email").addEventListener("input", function () {
   }
 });
 
-// 요청 보내기
-sendRequestForm.addEventListener("submit", function (event) {
-  event.preventDefault();
-  var email = document.getElementById("email").value.trim();
-  fetch("/matching/send_request/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRFToken": "{{ csrf_token }}",
-    },
-    body: JSON.stringify({ email: email }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.status === "success") {
-        alert("요청이 성공적으로 보내졌습니다.");
-        addPartnerModal.style.display = "none";
-        console.log("success");
-      } else {
-        // 오류 메시지에 따라 다른 알림을 표시
-        if (data.message === "이미 요청을 보냈습니다.") {
-          alert("이미 요청을 보냈습니다.");
-        } else if (data.message === "자신에게 요청을 보낼 수 없습니다.") {
-          alert("자신에게 요청을 보낼 수 없습니다.");
-        } else {
-          alert("요청을 보내는 도중 오류가 발생했습니다.");
-        }
-        console.error(data.message);
-      }
-    })
-    .catch((error) => {
-      alert("요청을 보내는 도중 오류가 발생했습니다.");
-      console.error("Error:", error);
-    });
-});
-
 // 수락하기 버튼 클릭 시
 verifyRequestForm.addEventListener("submit", function (event) {
   event.preventDefault();
@@ -123,7 +127,7 @@ verifyRequestForm.addEventListener("submit", function (event) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRFToken": "{{ csrf_token }}",
+      "X-CSRFToken": getCsrfToken(),
     },
     body: JSON.stringify({ verification_code: verificationCode }),
   })

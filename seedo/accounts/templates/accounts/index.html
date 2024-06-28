@@ -1,5 +1,6 @@
 {% extends "base.html" %} {% load static %} {% block extra_head %}
 <link rel="stylesheet" href="{% static 'accounts/css/mypage.css' %}" />
+<meta name="csrf-token" content="{{ csrf_token }}" />
 {% endblock extra_head %} {% block content %} {% load custom_filters %}
 <main>
   <div class="layout">
@@ -65,7 +66,6 @@
       {% csrf_token %}
       <label for="email">이메일:</label>
       <input type="email" id="email" name="email" required />
-      <button type="submit" id="sendRequestBtn">요청 보내기</button>
     </form>
 
     <!-- 검색 결과를 표시할 리스트 -->
@@ -77,13 +77,15 @@
   <div class="modal-content">
     <form id="verifyRequestForm">
       {% csrf_token %}
-      <label for="verificationCode">인증번호:</label>
-      <input
-        type="text"
-        id="verificationCode"
-        name="verificationCode"
-        required
-      />
+      <div>
+        <label for="verificationCode">인증번호:</label>
+        <input
+          type="text"
+          id="verificationCode"
+          name="verificationCode"
+          required
+        />
+      </div>
       <button type="submit" id="verifyBtn">수락하기</button>
     </form>
   </div>
