@@ -237,7 +237,12 @@ main {
   font-weight: 700;
 }
 
-#sendRequestForm > input,
+#sendRequestForm > input {
+  color: #183b08;
+  text-align: left;
+  width: 190px;
+}
+
 #verifyRequestForm > div > input {
   color: #183b08;
   text-align: left;

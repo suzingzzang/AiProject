@@ -82,11 +82,10 @@
 
 <div id="verifyRequestModal" class="modal">
   <div class="modal-content">
-    {{ partner.request_id }}
     <form id="verifyRequestForm">
       {% csrf_token %}
       <div>
-        <label for="verificationCode">인증번호:{{ partner.request_id }}</label>
+        <label for="verificationCode">인증번호:</label>
         <input
           type="text"
           id="verificationCode"
