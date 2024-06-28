@@ -7,6 +7,13 @@ var sendRequestForm = document.getElementById("sendRequestForm");
 var verifyRequestForm = document.getElementById("verifyRequestForm");
 var partnerList = document.querySelector(".partnerList");
 
+// CSRF 토큰을 메타 태그에서 가져오는 함수
+function getCsrfToken() {
+  return document
+    .querySelector('meta[name="csrf-token"]')
+    .getAttribute("content");
+}
+
 addPartnerBtn.addEventListener("click", function () {
   addPartnerModal.style.display = "block";
 });
@@ -23,11 +30,12 @@ document.querySelectorAll(".acceptBtn").forEach(function (button) {
 });
 
 // Close modals
-var closeBtns = document.querySelectorAll(".close");
-closeBtns.forEach((btn) => {
-  btn.addEventListener("click", function () {
-    addPartnerModal.style.display = "none";
-    verifyRequestModal.style.display = "none";
+var modals = document.querySelectorAll(".modal");
+modals.forEach((modal) => {
+  modal.addEventListener("click", function (event) {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
   });
 });
 

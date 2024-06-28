@@ -75,7 +75,6 @@ def accept_request(request, request_id):
 
 @token_required
 def remove_connection(request, request_id):
-    print("success")
     user_request = get_object_or_404(UserRequest, id=request_id)
     if request.user == user_request.requester or request.user == user_request.recipient:
         user_request.delete()
