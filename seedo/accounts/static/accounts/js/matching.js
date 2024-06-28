@@ -31,11 +31,12 @@ partnerList.addEventListener("click", function (event) {
 });
 
 // Close modals
-var closeBtns = document.querySelectorAll(".close");
-closeBtns.forEach((btn) => {
-  btn.addEventListener("click", function () {
-    addPartnerModal.style.display = "none";
-    verifyRequestModal.style.display = "none";
+var modals = document.querySelectorAll(".modal");
+modals.forEach((modal) => {
+  modal.addEventListener("click", function (event) {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
   });
 });
 

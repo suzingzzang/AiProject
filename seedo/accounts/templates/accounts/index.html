@@ -61,7 +61,6 @@
 <!-- 모달 -->
 <div id="addPartnerModal" class="modal">
   <div class="modal-content">
-    <span class="close">&times;</span>
     <form id="sendRequestForm">
       {% csrf_token %}
       <label for="email">이메일:</label>
@@ -76,7 +75,6 @@
 
 <div id="verifyRequestModal" class="modal">
   <div class="modal-content">
-    <span class="close">&times;</span>
     <form id="verifyRequestForm">
       {% csrf_token %}
       <label for="verificationCode">인증번호:</label>
