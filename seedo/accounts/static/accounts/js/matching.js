@@ -134,7 +134,7 @@ verifyRequestForm.addEventListener("submit", function (event) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRFToken": "{{ csrf_token }}",
+      "X-CSRFToken": csrftoken,
     },
     body: JSON.stringify({ verification_code: verificationCode }),
   })
