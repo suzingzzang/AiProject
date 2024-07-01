@@ -1,0 +1,63 @@
+{% extends "base.html" %} {% load static %} {% block extra_head %}
+<link rel="stylesheet" href="{% static 'record/css/record.css' %}" />
+{% endblock extra_head %} {% block content %} {% load custom_filters %}
+<main>
+  <div class="layout">
+    <!-- userName 태그 안의 내용은 현재 선택한 사용자 이름을 띄울 곳(파트너의 기록 볼 때는 파트너 이름으로 바껴야함) -->
+    <div class="userName">{{ user.email|email_username }} 님의 사고 기록</div>
+
+    <div class="recordList">
+      <div class="recorded">
+        2024.06.20<br />13:25 사고 기록<br />
+        <div class="dropRecord">
+          <!-- DB에서 이미지 받아와야함 -->
+          <img src="{% static 'record/images/1.jpg' %}" alt="accidentImg" />
+          <p class="recordedLocation">
+            서울특별시 동대문구 왕산로35길 37 현덕육회
+          </p>
+        </div>
+      </div>
+      <hr />
+      <div class="recorded">
+        2024.06.19<br />17:46 사고 기록<br />
+        <div class="dropRecord">
+          <!-- DB에서 이미지 받아와야함 -->
+          <img src="{% static 'record/images/2.jpg' %}" alt="accidentImg" />
+          <p class="recordedLocation">
+            서울특별시 동대문구 왕산로35길 37 현덕육회
+          </p>
+        </div>
+      </div>
+      <hr />
+      <div class="recorded">
+        2024.05.24<br />11:19 사고 기록<br />
+        <div class="dropRecord">
+          <!-- DB에서 이미지 받아와야함 -->
+          <img src="{% static 'record/images/2.jpg' %}" alt="accidentImg" />
+          <p class="recordedLocation">
+            서울특별시 동대문구 왕산로35길 37 현덕육회
+          </p>
+        </div>
+      </div>
+      <hr />
+    </div>
+  </div>
+</main>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const listTitles = document.querySelectorAll(".recorded");
+
+    listTitles.forEach((title) => {
+      title.addEventListener("click", function () {
+        const content = this.querySelector(".dropRecord");
+        if (content.style.maxHeight) {
+          content.style.maxHeight = null;
+        } else {
+          content.style.maxHeight = content.scrollHeight + "px";
+        }
+      });
+    });
+  });
+</script>
+{% endblock content %}

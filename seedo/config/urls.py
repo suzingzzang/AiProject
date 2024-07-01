@@ -31,4 +31,5 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
     path("", index, name="home"),
     path("matching/", include("matching.urls")),
+    path("record/", include("record.urls")),
 ]

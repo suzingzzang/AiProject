@@ -1,14 +1,6 @@
-from common.decorators import token_required
-from django.shortcuts import render
 from django.urls import path
 
 from .views import LoginView, SignUpView, logout, profile
-
-
-@token_required
-def index(request):
-    return render(request, "accounts/index.html")
-
 
 app_name = "accounts"
 
