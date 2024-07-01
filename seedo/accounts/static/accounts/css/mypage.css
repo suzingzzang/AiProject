@@ -52,7 +52,7 @@ main {
   border-radius: 4px;
   text-align: center;
   font-weight: 700;
-  padding: 1px 3px;
+  padding: 1px 5px;
   border: none;
   cursor: pointer;
 }
@@ -60,9 +60,15 @@ main {
 .partner .addPartner {
   background-color: #193b08;
 }
+.addPartner:hover {
+  background-color: #337614;
+}
 
 .partner .delPartner {
   background-color: #e01b41;
+}
+.delPartner:hover {
+  background-color: #eb6a84;
 }
 
 .partnerList {
@@ -148,6 +154,9 @@ main {
   text-decoration: none;
   font-weight: 700;
 }
+.acceptBtn:hover {
+  background-color: #6e6e6e;
+}
 
 .requestBtn {
   width: 111px;
@@ -190,28 +199,79 @@ main {
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
   background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
+  margin: 20% auto;
+  padding: 10px;
+  border: 4px solid #888;
+  width: 292px;
+  position: relative;
 }
 
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
+#searchResults > * {
+  margin-left: 30px;
+  color: #193b08;
+  padding: 1px 0;
   cursor: pointer;
+}
+
+#searchResults > *:hover {
+  color: #337614;
+  font-weight: 700;
+}
+
+#sendRequestForm {
+  display: flex;
+  justify-content: space-between; /* 요소를 양쪽 끝으로 정렬 */
+  align-items: center;
+  width: 100%;
+}
+
+#sendRequestForm > label,
+#verifyRequestForm > div > label {
+  color: #183b08;
+  text-align: left;
+  font-weight: 700;
+}
+
+#sendRequestForm > input {
+  color: #183b08;
+  text-align: left;
+  width: 190px;
+}
+
+#verifyRequestForm > div > input {
+  color: #183b08;
+  text-align: left;
+  width: 170px;
+}
+
+#verifyRequestForm {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+#verifyRequestForm > div {
+  display: flex;
+  justify-content: space-between; /* 요소를 양쪽 끝으로 정렬 */
+  align-items: center;
+  width: 100%;
+}
+#verifyRequestForm > button {
+  align-self: flex-end; /* 버튼을 오른쪽 정렬 */
+  background-color: #c2c2c2;
+  color: #000;
+  font-size: 20px;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 700;
+  padding: 1px 5px;
+  border: none;
+  cursor: pointer;
+}
+#verifyRequestForm > button:hover {
+  background-color: #6e6e6e;
 }

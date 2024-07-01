@@ -69,8 +69,8 @@ def accept_request(request, request_id):
             user_request.save()
             return JsonResponse({"status": "success"})
         else:
-            return JsonResponse({"status": "error", "message": "Invalid verification code"}, status=400)
-    return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
+            return JsonResponse({"status": "error", "message": "인증번호가 다릅니다."}, status=400)
+    return JsonResponse({"status": "error", "message": "잘못된 요청입니다."}, status=400)
 
 
 @token_required
