@@ -7,13 +7,6 @@ var sendRequestForm = document.getElementById("sendRequestForm");
 var verifyRequestForm = document.getElementById("verifyRequestForm");
 var partnerList = document.querySelector(".partnerList");
 
-// CSRF 토큰을 메타 태그에서 가져오는 함수
-function getCsrfToken() {
-  return document
-    .querySelector('meta[name="csrf-token"]')
-    .getAttribute("content");
-}
-
 addPartnerBtn.addEventListener("click", function () {
   addPartnerModal.style.display = "block";
 });

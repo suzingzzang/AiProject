@@ -1,0 +1,18 @@
+<!-- qna/templates/qna_confirm_delete.html -->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Delete Q&A</title>
+  </head>
+  <body>
+    <h1>Delete Q&A</h1>
+    <p>Are you sure you want to delete "{{ object.title }}"?</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit">Delete</button>
+      <a href="{% url 'qna-list' %}">Cancel</a>
+    </form>
+  </body>
+</html>

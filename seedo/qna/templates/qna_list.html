@@ -1,0 +1,25 @@
+<!-- qna/templates/index.html -->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Q&A List</title>
+  </head>
+  <body>
+    <h1>Q&A List</h1>
+    <a href="{% url 'qna-create' %}">질문 작성</a>
+    {% if questions %}
+    <ul>
+      {% for question in questions %}
+      <li>
+        <a href="{% url 'qna-detail' question.pk %}">{{ question.title }}</a> -
+        {{ question.author }}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No questions found.</p>
+    {% endif %}
+  </body>
+</html>

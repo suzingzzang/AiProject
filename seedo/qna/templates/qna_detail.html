@@ -1,0 +1,36 @@
+<!-- qna/templates/qna_detail.html -->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Q&A Detail</title>
+  </head>
+  <body>
+    <h1>Q&A Detail</h1>
+    <p><strong>Title:</strong> {{ question.title }}</p>
+    <p><strong>Content:</strong> {{ question.content }}</p>
+    <p><strong>Author:</strong> {{ question.author }}</p>
+
+    <!-- Superuser일 경우에만 댓글을 작성할 수 있는 폼을 표시 -->
+    {% if request.user.is_superuser %} {% if question.comments %}
+    <h2>댓글</h2>
+    <ul>
+      <li>{{ question.comments }}</li>
+      {% if question.comments %}
+      <a href="{% url 'comment-update' question.pk %}">Edit</a>
+      |
+      <a href="{% url 'comment-delete' question.pk %}">Delete</a>
+      {% endif %}
+    </ul>
+    {% else %}
+    <form method="post" action="{% url 'comment-create' question.pk %}">
+      {% csrf_token %} {{ comment_form.as_p }}
+      <button type="submit">댓글 작성</button>
+    </form>
+    {% endif %} {% endif %}
+
+    <a href="{% url 'qna-update' question.pk %}">Edit</a> |
+    <a href="{% url 'qna-delete' question.pk %}">Delete</a>
+  </body>
+</html>
