@@ -222,6 +222,19 @@
             drawFrame();
           });
 
+          // Start sensor data logging
+          if (window.DeviceMotionEvent) {
+            window.addEventListener("devicemotion", updateAccelerometer);
+          } else {
+            console.error("Accelerometer not supported");
+          }
+
+          if (window.DeviceOrientationEvent) {
+            window.addEventListener("deviceorientation", updateGyroscope);
+          } else {
+            console.error("Gyroscope not supported");
+          }
+
           setInterval(updateSensorData, 1000 / frameRate);
         }
 
