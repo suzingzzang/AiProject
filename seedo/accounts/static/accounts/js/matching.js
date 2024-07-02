@@ -7,13 +7,6 @@ var sendRequestForm = document.getElementById("sendRequestForm");
 var verifyRequestForm = document.getElementById("verifyRequestForm");
 var partnerList = document.querySelector(".partnerList");
 
-// CSRF 토큰을 메타 태그에서 가져오는 함수
-function getCsrfToken() {
-  return document
-    .querySelector('meta[name="csrf-token"]')
-    .getAttribute("content");
-}
-
 addPartnerBtn.addEventListener("click", function () {
   addPartnerModal.style.display = "block";
 });
@@ -44,6 +37,7 @@ function getCookie(name) {
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop().split(";").shift();
 }
+
 // 이메일 검색 및 사용자 목록 표시
 document.getElementById("email").addEventListener("input", function () {
   var email = this.value.trim();

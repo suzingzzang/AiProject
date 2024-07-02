@@ -2,6 +2,8 @@ from common.decorators import token_required
 from django.shortcuts import render
 from django.urls import path
 
+from .views import *
+
 
 @token_required
 def page_break(request):
@@ -15,4 +17,8 @@ def page_accident(request):
 
 app_name = "record"
 
-urlpatterns = [path("break/", page_break, name="break"), path("accident/", page_accident, name="accident")]
+urlpatterns = [
+    path("break/", page_break, name="break"),
+    path("accident/", page_accident, name="accident"),
+    path("break/<int:request_id>/", broken_view, name="broken_list"),
+]
