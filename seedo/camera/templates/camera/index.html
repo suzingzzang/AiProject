@@ -235,6 +235,12 @@
             console.error("Gyroscope not supported");
           }
 
+          if (window.DeviceOrientationEvent) {
+            window.addEventListener("deviceorientation", updateMagnetometer);
+          } else {
+            console.error("Gyroscope not supported");
+          }
+
           setInterval(updateSensorData, 1000 / frameRate);
         }
 
