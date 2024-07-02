@@ -32,4 +32,5 @@ urlpatterns = [
     path("", index, name="home"),
     path("matching/", include("matching.urls")),
     path("record/", include("record.urls")),
+    path("qna/", include("qna.urls")),
 ]
