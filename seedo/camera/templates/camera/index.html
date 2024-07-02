@@ -29,20 +29,27 @@
             gps: {},
             acc: {},
             gyro: {},
+            mag: {},
           };
         }
 
-        function updateGPS() {
+        function updateSensorData() {
+          const frame = createNewFrame();
+          updateGPS(frame);
+          updateAccelerometer(null, frame);
+          updateGyroscope(null, frame);
+          updateMagnetometer(null, frame);
+          sensorData.push(frame);
+        }
+
+        function updateGPS(frame) {
           if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
               function (position) {
-                const frame = createNewFrame();
                 frame.gps = {
                   latitude: position.coords.latitude,
                   longitude: position.coords.longitude,
                 };
-                sensorData.push(frame);
-
                 document.getElementById("location").textContent =
                   `Location: Latitude ${position.coords.latitude}, Longitude ${position.coords.longitude}`;
               },
@@ -64,32 +71,74 @@
           }
         }
 
-        function updateAccelerometer(event) {
-          if (event.acceleration && recording) {
-            const frame = createNewFrame();
-            let accel = event.acceleration;
+        function updateAccelerometer(event, frame) {
+          try {
+            if (event.acceleration && recording) {
+              const frame = createNewFrame();
+              let accel = event.acceleration;
+              frame.acc = {
+                x: accel.x,
+                y: accel.y,
+                z: accel.z,
+              };
+              sensorData.push(frame);
+              document.getElementById("accelerometer").textContent =
+                `Accelerometer: x=${accel.x}, y=${accel.y}, z=${accel.z}`;
+            }
+          } catch {
             frame.acc = {
-              x: accel.x,
-              y: accel.y,
-              z: accel.z,
+              x: 1,
+              y: 1,
+              z: 1,
             };
-            sensorData.push(frame);
             document.getElementById("accelerometer").textContent =
-              `Accelerometer: x=${accel.x}, y=${accel.y}, z=${accel.z}`;
+              `Accelerometer: x=1, y=1, z=1`;
           }
         }
 
-        function updateGyroscope(event) {
-          if (recording) {
-            const frame = createNewFrame();
+        function updateGyroscope(event, frame) {
+          try {
+            if (recording) {
+              const frame = createNewFrame();
+              frame.gyro = {
+                alpha: event.alpha,
+                beta: event.beta,
+                gamma: event.gamma,
+              };
+              sensorData.push(frame);
+              document.getElementById("gyroscope").textContent =
+                `Gyroscope: alpha=${event.alpha}, beta=${event.beta}, gamma=${event.gamma}`;
+            }
+          } catch {
             frame.gyro = {
-              alpha: event.alpha,
-              beta: event.beta,
-              gamma: event.gamma,
+              alpha: 1,
+              beta: 1,
+              gamma: 1,
             };
-            sensorData.push(frame);
             document.getElementById("gyroscope").textContent =
-              `Gyroscope: alpha=${event.alpha}, beta=${event.beta}, gamma=${event.gamma}`;
+              `Gyroscope: alpha=1, beta=1, gamma=1`;
+          }
+        }
+
+        function updateMagnetometer(event, frame) {
+          try {
+            if (event && recording) {
+              frame.mag = {
+                x: event.magneticFieldX,
+                y: event.magneticFieldY,
+                z: event.magneticFieldZ,
+              };
+              document.getElementById("magnetometer").textContent =
+                `Magnetometer: x=${event.magneticFieldX}, y=${event.magneticFieldY}, z=${event.magneticFieldZ}`;
+            }
+          } catch {
+            frame.mag = {
+              x: 1,
+              y: 1,
+              z: 1,
+            };
+            document.getElementById("magnetometer").textContent =
+              `Magnetometer: x=1, y=1, z=1`;
           }
         }
 
@@ -101,7 +150,7 @@
           const canvas = document.getElementById("canvas");
           const context = canvas.getContext("2d");
           let frameId = 0;
-          const frameRate = 20; // frames per second
+          const frameRate = 30; // frames per second
 
           navigator.mediaDevices
             .getUserMedia({ video: true })
@@ -168,25 +217,12 @@
                 console.warn("Video or canvas not ready.");
               }
 
-              setTimeout(drawFrame, 1000 / frameRate);
+              setTimeout(drawFrame, 1000 / (frameRate / 30));
             }
             drawFrame();
           });
 
-          // Start sensor data logging
-          if (window.DeviceMotionEvent) {
-            window.addEventListener("devicemotion", updateAccelerometer);
-          } else {
-            console.error("Accelerometer not supported");
-          }
-
-          if (window.DeviceOrientationEvent) {
-            window.addEventListener("deviceorientation", updateGyroscope);
-          } else {
-            console.error("Gyroscope not supported");
-          }
-
-          setInterval(updateGPS, 1000 / frameRate);
+          setInterval(updateSensorData, 1000 / frameRate);
         }
 
         function stopRecording() {
@@ -256,6 +292,7 @@
     <p id="location">Location: Loading...</p>
     <p id="accelerometer">Accelerometer: Loading...</p>
     <p id="gyroscope">Gyroscope: Loading...</p>
+    <p id="magnetometer">Magnetometer: Loading...</p>
     <p id="recording-status">Recording status: Not recording</p>
 
     <button id="start-camera">Start Camera</button>
