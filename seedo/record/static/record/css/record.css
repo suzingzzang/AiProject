@@ -1,0 +1,102 @@
+main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  align-items: center;
+  flex-direction: column;
+  gap: 34px; /* Gap between buttons */
+  padding: 75px 0px 25px;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 360px;
+  max-width: 80vh;
+  padding: 0 34px;
+  height: 100%;
+  box-sizing: border-box;
+  gap: 34px;
+  overflow: hidden;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.dropdown {
+  width: 100%;
+  overflow: visible;
+  position: relative;
+  z-index: 10;
+}
+
+.userName {
+  color: #183b08;
+  font-weight: 700;
+  text-align: center;
+  background-color: #a0ce8a;
+  border-radius: 4px;
+  padding: 5px 0;
+  width: 100%;
+}
+
+.dropUser {
+  position: absolute;
+  top: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background-color: #c9e9ba;
+  border-radius: 4px;
+  width: 100%;
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.3s ease-out,
+    opacity 0.3s ease-out;
+  opacity: 0;
+  z-index: 10;
+}
+.dropUser > a {
+  text-decoration: none;
+  color: #183b08;
+  cursor: pointer;
+  font-weight: 700;
+}
+.dropUser > a:hover {
+  color: #539533;
+}
+
+.dropdown:hover .dropUser {
+  overflow-y: auto;
+  max-height: 200px;
+  opacity: 1;
+}
+
+.recordList {
+  font-weight: 700;
+  height: 75vh;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.recordList > .recorded {
+  font-size: 40px;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.recordList > .recorded:hover {
+  color: #6e6e6e;
+}
+
+.dropRecord {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
