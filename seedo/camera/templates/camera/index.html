@@ -305,13 +305,13 @@
 
           // Start sensor data logging
           if (window.DeviceMotionEvent) {
-            window.addEventListener("devicemotion", updateAccelerometer);
+            window.addEventListener("devicemotion", updateSensorData);
           } else {
             console.error("Accelerometer not supported");
           }
 
           if (window.DeviceOrientationEvent) {
-            window.addEventListener("deviceorientation", updateGyroscope);
+            window.addEventListener("deviceorientation", updateSensorData);
           } else {
             console.error("Gyroscope not supported");
           }
