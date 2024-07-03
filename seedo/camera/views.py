@@ -32,7 +32,7 @@ def show_camera(request):
 # model_path = os.path.join(os.path.dirname(__file__), )
 
 # print(model_path)
-model = load_model("/Users/jinho/Dev/aivlebig/SeedoPJT/seedo/camera/ml_models/initial_model2.keras")
+model = load_model("camera/ml_models/initial_model2.keras")
 
 
 def fall_recognition(request):
@@ -43,7 +43,7 @@ def fall_recognition(request):
         # sensor_data = np.array(data["sensor_data"])
         # sensor_data = sensor_data.reshape((1, 10, 5))  # Adjust shape as needed
 
-        scaler = load("/Users/jinho/Dev/aivlebig/SeedoPJT/seedo/camera/ml_models/scaler.joblib")
+        scaler = load("camera/ml_models/scaler.joblib")
         X_test = df
         X_test_normalized = scaler.transform(X_test)
         time_steps = 15
