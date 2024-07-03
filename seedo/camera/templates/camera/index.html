@@ -34,9 +34,8 @@
           if (this.buffer.length >= this.size) {
             this.buffer.shift();
           }
-          if (item.acc.x !== null) {
-            this.buffer.push(item);
-          }
+
+          this.buffer.push(item);
         }
 
         getBuffer() {
