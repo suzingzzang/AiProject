@@ -34,7 +34,9 @@
           if (this.buffer.length >= this.size) {
             this.buffer.shift();
           }
-          this.buffer.push(item);
+          if (item.acc.x !== null) {
+            this.buffer.push(item);
+          }
         }
 
         getBuffer() {
@@ -101,17 +103,12 @@
               function (error) {
                 console.error("Error accessing GPS:", error);
                 frame.gps = {
-                  latitude: sensorDataBuffer.getBuffer()[-1]["gps"]["latitude"],
-                  longitude:
-                    sensorDataBuffer.getBuffer()[-1]["gps"]["longitude"],
+                  latitude: "errortest",
+                  longitude: "errortest",
                 };
 
                 document.getElementById("location").textContent =
-                  `Location: Latitude "${
-                    sensorDataBuffer.getBuffer()[-1]["gps"]["latitude"]
-                  }", Longitude "${
-                    sensorDataBuffer.getBuffer()[-1]["gps"]["longitude"]
-                  }"`;
+                  `Location: Latitude "errortest", Longitude "errortest"`;
               },
             );
           } else {
@@ -133,16 +130,12 @@
             }
           } catch {
             frame.acc = {
-              x: sensorDataBuffer.getBuffer()[-1]["acc"]["x"],
-              y: sensorDataBuffer.getBuffer()[-1]["acc"]["y"],
-              z: sensorDataBuffer.getBuffer()[-1]["acc"]["z"],
+              x: null,
+              y: null,
+              z: null,
             };
             document.getElementById("accelerometer").textContent =
-              `Accelerometer: x=${
-                sensorDataBuffer.getBuffer()[-1]["acc"]["x"]
-              }, y=${sensorDataBuffer.getBuffer()[-1]["acc"]["y"]}, z=${
-                sensorDataBuffer.getBuffer()[-1]["acc"]["z"]
-              }`;
+              `Accelerometer: x=1, y=1, z=1`;
           }
         }
 
@@ -159,16 +152,12 @@
             }
           } catch {
             frame.gyro = {
-              alpha: sensorDataBuffer.getBuffer()[-1]["gyro"]["x"],
-              beta: sensorDataBuffer.getBuffer()[-1]["gyro"]["x"],
-              gamma: sensorDataBuffer.getBuffer()[-1]["gyro"]["x"],
+              alpha: null,
+              beta: null,
+              gamma: null,
             };
             document.getElementById("gyroscope").textContent =
-              `Gyroscope: alpha=${
-                sensorDataBuffer.getBuffer()[-1]["gyro"]["x"]
-              }, beta=${sensorDataBuffer.getBuffer()[-1]["gyro"]["x"]}, gamma=${
-                sensorDataBuffer.getBuffer()[-1]["gyro"]["x"]
-              }`;
+              `Gyroscope: alpha=1, beta=1, gamma=1`;
           }
         }
 
@@ -238,7 +227,7 @@
               context.fillStyle = "red";
               context.fillText("Frame ID: " + frameId, 10, 50);
               frameId++;
-              
+
               // Ensure the video and canvas are ready
               if (video.videoWidth > 0 && video.videoHeight > 0) {
                 // Run COCO-SSD object detection
@@ -279,7 +268,7 @@
             drawFrame();
           });
 
-          
+
           /*
           if (window.DeviceOrientationEvent) {
             window.addEventListener('deviceorientation', updateMagnetometer);
