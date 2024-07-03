@@ -5,13 +5,53 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
     <script>
+      async function sendSensorData(sensorData) {
+        const response = await fetch('{% url "camera:fall_recognition" %}', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+          body: JSON.stringify({ sensor_data: sensorData }),
+        });
+
+        const result = await response.json();
+        console.log("Prediction:", result.prediction);
+        document.getElementById("fall_recognition").textContent =
+          `'Prediction:', ${result.prediction}`;
+      }
+
+      class CircularBuffer {
+        constructor(size) {
+          this.size = size;
+          this.buffer = [];
+        }
+
+        push(item) {
+          if (this.buffer.length >= this.size) {
+            this.buffer.shift();
+          }
+          this.buffer.push(item);
+        }
+
+        getBuffer() {
+          return this.buffer;
+        }
+      }
+
       document.addEventListener("DOMContentLoaded", function () {
         let model;
         let recording = false;
-        let sensorData = [];
+        let sensorDataBuffer = new CircularBuffer(29);
         let mediaRecorder;
         let recordedChunks = [];
 
+        function maybeSendSensorData() {
+          if (sensorDataBuffer.getBuffer().length >= 29) {
+            const sensorData = sensorDataBuffer.getBuffer();
+            sendSensorData(sensorData);
+          }
+        }
         // Load the COCO-SSD model
         cocoSsd
           .load()
@@ -38,8 +78,9 @@
           updateGPS(frame);
           updateAccelerometer(null, frame);
           updateGyroscope(null, frame);
-          updateMagnetometer(null, frame);
-          sensorData.push(frame);
+          //updateMagnetometer(null, frame);
+          sensorDataBuffer.push(frame);
+          maybeSendSensorData();
         }
 
         function updateGPS(frame) {
@@ -55,12 +96,10 @@
               },
               function (error) {
                 console.error("Error accessing GPS:", error);
-                const frame = createNewFrame();
                 frame.gps = {
                   latitude: "errortest",
                   longitude: "errortest",
                 };
-                sensorData.push(frame);
 
                 document.getElementById("location").textContent =
                   `Location: Latitude "errortest", Longitude "errortest"`;
@@ -74,14 +113,12 @@
         function updateAccelerometer(event, frame) {
           try {
             if (event.acceleration && recording) {
-              const frame = createNewFrame();
               let accel = event.acceleration;
               frame.acc = {
                 x: accel.x,
                 y: accel.y,
                 z: accel.z,
               };
-              sensorData.push(frame);
               document.getElementById("accelerometer").textContent =
                 `Accelerometer: x=${accel.x}, y=${accel.y}, z=${accel.z}`;
             }
@@ -98,14 +135,12 @@
 
         function updateGyroscope(event, frame) {
           try {
-            if (recording) {
-              const frame = createNewFrame();
+            if (event.alpha & recording) {
               frame.gyro = {
                 alpha: event.alpha,
                 beta: event.beta,
                 gamma: event.gamma,
               };
-              sensorData.push(frame);
               document.getElementById("gyroscope").textContent =
                 `Gyroscope: alpha=${event.alpha}, beta=${event.beta}, gamma=${event.gamma}`;
             }
@@ -120,16 +155,18 @@
           }
         }
 
+        /*
         function updateMagnetometer(event, frame) {
           try {
-            if (event && recording) {
+            if (event.magneticFieldX && recording) {
               frame.mag = {
                 x: event.magneticFieldX,
                 y: event.magneticFieldY,
                 z: event.magneticFieldZ,
               };
-              document.getElementById("magnetometer").textContent =
-                `Magnetometer: x=${event.magneticFieldX}, y=${event.magneticFieldY}, z=${event.magneticFieldZ}`;
+              document.getElementById(
+                'magnetometer'
+              ).textContent = `Magnetometer: x=${event.magneticFieldX}, y=${event.magneticFieldY}, z=${event.magneticFieldZ}`;
             }
           } catch {
             frame.mag = {
@@ -137,10 +174,12 @@
               y: 1,
               z: 1,
             };
-            document.getElementById("magnetometer").textContent =
-              `Magnetometer: x=1, y=1, z=1`;
+            document.getElementById(
+              'magnetometer'
+            ).textContent = `Magnetometer: x=1, y=1, z=1`;
           }
         }
+        */
 
         function startRecording() {
           recording = true;
@@ -235,11 +274,13 @@
             console.error("Gyroscope not supported");
           }
 
+          /*
           if (window.DeviceOrientationEvent) {
-            window.addEventListener("deviceorientation", updateMagnetometer);
+            window.addEventListener('deviceorientation', updateMagnetometer);
           } else {
-            console.error("Gyroscope not supported");
+            console.error('Magnetometer not supported');
           }
+          */
 
           setInterval(updateSensorData, 1000 / frameRate);
         }
@@ -259,7 +300,7 @@
 
             // Save sensor data to a file
             const sensorLogBlob = new Blob(
-              [JSON.stringify(sensorData, null, 2)],
+              [JSON.stringify(sensorDataBuffer.getBuffer(), null, 2)],
               {
                 type: "application/json",
               },
@@ -311,7 +352,11 @@
     <p id="location">Location: Loading...</p>
     <p id="accelerometer">Accelerometer: Loading...</p>
     <p id="gyroscope">Gyroscope: Loading...</p>
+
+    {% comment %}
     <p id="magnetometer">Magnetometer: Loading...</p>
+    {% endcomment %}
+    <p id="fall_recognition">fall_recognition: Loading...</p>
     <p id="recording-status">Recording status: Not recording</p>
 
     <button id="start-camera">Start Camera</button>
