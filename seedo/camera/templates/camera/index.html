@@ -210,6 +210,7 @@
               console.log("An error occurred: " + err);
             });
 
+          /*
           video.addEventListener("play", function () {
             function drawFrame() {
               if (!recording || video.paused || video.ended) {
@@ -220,7 +221,7 @@
               context.fillStyle = "red";
               context.fillText("Frame ID: " + frameId, 10, 50);
               frameId++;
-
+              
               // Ensure the video and canvas are ready
               if (video.videoWidth > 0 && video.videoHeight > 0) {
                 // Run COCO-SSD object detection
