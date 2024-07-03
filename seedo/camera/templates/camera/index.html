@@ -2,8 +2,11 @@
 <html>
   <head>
     <title>Home</title>
+    {% comment %}
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    {% endcomment %} {% comment %}
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+    {% endcomment %}
     <script>
       async function sendSensorData(sensorData) {
         const response = await fetch('{% url "camera:fall_recognition" %}', {
@@ -53,16 +56,17 @@
           }
         }
         // Load the COCO-SSD model
+        /*
         cocoSsd
           .load()
           .then(function (loadedModel) {
             model = loadedModel;
-            console.log("COCO-SSD model loaded.");
+            console.log('COCO-SSD model loaded.');
           })
           .catch(function (err) {
-            console.error("Error loading COCO-SSD model:", err);
+            console.error('Error loading COCO-SSD model:', err);
           });
-
+        */
         function createNewFrame() {
           return {
             timestamp: Date.now(),
