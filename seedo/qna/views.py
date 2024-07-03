@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import View
@@ -16,13 +17,22 @@ class QnAListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.is_superuser:
-            return QnA.objects.all()
+            queryset = QnA.objects.all()
         else:
-            return QnA.objects.filter(author=self.request.user)
+            queryset = QnA.objects.filter(Q(author=self.request.user) | Q(author__is_superuser=True))
+
+        filter_type = self.request.GET.get("filter")
+        if filter_type == "answered":
+            queryset = queryset.exclude(Q(comments__exact="") | Q(comments__isnull=True))
+        elif filter_type == "unanswered":
+            queryset = queryset.filter(Q(comments__exact="") | Q(comments__isnull=True))
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["view"] = "list"
+        context["filter_type"] = self.request.GET.get("filter", "")
+        context["superuser"] = self.request.user.is_superuser
         return context
 
 
@@ -52,13 +62,10 @@ class QnADetailView(View):
 def comment_update(request, pk):
     question = get_object_or_404(QnA, pk=pk)
 
-    if question.comments:
-
-        question.comments = f"{request.user.email}: {request.POST['content']}"
-    else:
-        question.comments = f"{request.user.email}: {request.POST['content']}"
-
-    question.save()
+    if request.method == "POST":
+        comment_content = request.POST["content"]
+        question.comments = comment_content
+        question.save()
 
     return redirect("qna-detail", pk=pk)
 
@@ -66,8 +73,10 @@ def comment_update(request, pk):
 def comment_delete(request, pk):
     question = get_object_or_404(QnA, pk=pk)
 
-    question.comments = ""
-    question.save()
+    if request.method == "POST":
+        question.comments = ""
+        question.save()
+        return redirect("qna-detail", pk=pk)
 
     return redirect("qna-detail", pk=pk)
 
@@ -106,17 +115,11 @@ class QnAUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class QnADeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = QnA
-    template_name = "qna_confirm_delete.html"
-    success_url = "/qna/"
+    success_url = reverse_lazy("qna-list")
 
     def test_func(self):
         question = self.get_object()
         return self.request.user.is_superuser or self.request.user == question.author
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["view"] = "delete"
-        return context
 
 
 class CommentCreateView(FormView):
