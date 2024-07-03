@@ -1,0 +1,62 @@
+<!-- qna_list.html -->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Q&A List</title>
+  </head>
+  <body>
+    <h1>Q&A List</h1>
+    <a href="{% url 'qna-create' %}">질문 작성</a>
+
+    <form method="GET" action="{% url 'qna-list' %}">
+      <label for="filter">Filter:</label>
+      <select id="filter" name="filter">
+        <option value="">전체</option>
+        <option
+          value="answered"
+          {%
+          if
+          filter_type=""
+          ="answered"
+          %}selected{%
+          endif
+          %}
+        >
+          답변 완료
+        </option>
+        <option
+          value="unanswered"
+          {%
+          if
+          filter_type=""
+          ="unanswered"
+          %}selected{%
+          endif
+          %}
+        >
+          미답변
+        </option>
+      </select>
+      <button type="submit">적용</button>
+    </form>
+
+    {% if questions %}
+    <ul>
+      {% for question in questions %}
+      <li>
+        <a href="{% url 'qna-detail' question.pk %}">{{ question.title }}</a> -
+        {{ question.author }} {% if question.comments %}
+        <span style="color: green">답변 완료</span>
+        {% else %}
+        <span style="color: red">미답변</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No questions found.</p>
+    {% endif %}
+  </body>
+</html>

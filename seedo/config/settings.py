@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "accounts",
     "matching",
     "record",
+    "qna",
 ]
 
 MIDDLEWARE = [

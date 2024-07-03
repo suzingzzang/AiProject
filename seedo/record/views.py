@@ -50,7 +50,7 @@ def accident_view(request, request_id):
         partner_info = {"user": user_request.recipient if user_request.requester == user else user_request.requester}
         partner_list.append(partner_info)
 
-    # 조회하는 사용자의 파손 기록 조회
+    # 조회하는 사용자의 사고 기록 조회
     accident_records = Accident.objects.filter(user=request_id)
     accident_list = []
     for accident_record in accident_records:

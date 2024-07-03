@@ -19,8 +19,8 @@
     <div class="recordList">
       {% for recorded in broken_list %}
       <div class="recorded">
-        {{recorded.broken_date|date:"Y년 m월 d일"}}<br />{{recorded.broken_time|time:"H:i"}}
-        파손 자료<br />
+        {{recorded.broken_date|date:"Y년 m월 d일"}}<br />
+        {{recorded.broken_time|time:"H시 i분"}} 파손 자료<br />
         <div class="dropRecord">
           <!-- DB에서 이미지 받아와야함 / DB의 이미지 path는 record/images/파일명 으로 저장되야 함 -->
           <img
