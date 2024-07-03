@@ -107,7 +107,11 @@
                 };
 
                 document.getElementById("location").textContent =
-                  `Location: Latitude "errortest", Longitude "errortest"`;
+                  `Location: Latitude "${
+                    sensorDataBuffer.getBuffer()[-1]["gps"]["latitude"]
+                  }", Longitude "${
+                    sensorDataBuffer.getBuffer()[-1]["gps"]["longitude"]
+                  }"`;
               },
             );
           } else {
@@ -134,7 +138,11 @@
               z: sensorDataBuffer.getBuffer()[-1]["acc"]["z"],
             };
             document.getElementById("accelerometer").textContent =
-              `Accelerometer: x=1, y=1, z=1`;
+              `Accelerometer: x=${
+                sensorDataBuffer.getBuffer()[-1]["acc"]["x"]
+              }, y=${sensorDataBuffer.getBuffer()[-1]["acc"]["y"]}, z=${
+                sensorDataBuffer.getBuffer()[-1]["acc"]["z"]
+              }`;
           }
         }
 
@@ -156,7 +164,11 @@
               gamma: sensorDataBuffer.getBuffer()[-1]["gyro"]["x"],
             };
             document.getElementById("gyroscope").textContent =
-              `Gyroscope: alpha=1, beta=1, gamma=1`;
+              `Gyroscope: alpha=${
+                sensorDataBuffer.getBuffer()[-1]["gyro"]["x"]
+              }, beta=${sensorDataBuffer.getBuffer()[-1]["gyro"]["x"]}, gamma=${
+                sensorDataBuffer.getBuffer()[-1]["gyro"]["x"]
+              }`;
           }
         }
 
