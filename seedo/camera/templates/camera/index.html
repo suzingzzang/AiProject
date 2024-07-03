@@ -117,6 +117,31 @@
         }
 
         function updateAccelerometer(event, frame) {
+          if (event.acceleration && recording) {
+            let accel = event.acceleration;
+            frame.acc = {
+              x: accel.x || 0,
+              y: accel.y || 0,
+              z: accel.z || 0,
+            };
+            document.getElementById("accelerometer").textContent =
+              `Accelerometer: x=${accel.x}, y=${accel.y}, z=${accel.z}`;
+          }
+        }
+
+        function updateGyroscope(event, frame) {
+          if (event.alpha && recording) {
+            frame.gyro = {
+              alpha: event.alpha || 0,
+              beta: event.beta || 0,
+              gamma: event.gamma || 0,
+            };
+            document.getElementById("gyroscope").textContent =
+              `Gyroscope: alpha=${event.alpha}, beta=${event.beta}, gamma=${event.gamma}`;
+          }
+        }
+        /*
+        function updateAccelerometer(event, frame) {
           try {
             if (event.acceleration && recording) {
               let accel = event.acceleration;
@@ -160,6 +185,7 @@
               `Gyroscope: alpha=1, beta=1, gamma=1`;
           }
         }
+        */
 
         /*
         function updateMagnetometer(event, frame) {
