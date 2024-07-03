@@ -267,7 +267,7 @@
             }
             drawFrame();
           });
-
+          */
 
           /*
           if (window.DeviceOrientationEvent) {
@@ -343,6 +343,8 @@
 
             // Submit the form
             document.getElementById("upload-form").submit();
+            window.removeEventListener("devicemotion", updateSensorData);
+            window.removeEventListener("deviceorientation", updateSensorData);
           };
         }
 
