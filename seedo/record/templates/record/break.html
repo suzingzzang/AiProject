@@ -3,82 +3,35 @@
 {% endblock extra_head %} {% block content %} {% load custom_filters %}
 <main>
   <div class="layout">
-    <!-- userName 태그 안의 내용은 현재 선택한 사용자 이름을 띄울 곳(파트너의 기록 볼 때는 파트너 이름으로 바껴야함) -->
-    <div class="userName">{{ user.email|email_username }} 님의 파손 기록</div>
+    <div class="dropdown">
+      <div class="userName">
+        {{ selected_user.email|email_username }} 님의 파손 기록
+      </div>
+      <div class="dropUser">
+        {% for partner in partner_list %}
+        <a href="/record/break/{{partner.user.id}}/">
+          {{partner.user.email|email_username}} 님의 파손 기록</a
+        >
+        {% endfor %}
+      </div>
+    </div>
 
     <div class="recordList">
+      {% for recorded in broken_list %}
       <div class="recorded">
-        2024.06.20<br />13:25 파손 자료<br />
+        {{recorded.broken_date|date:"Y년 m월 d일"}}<br />{{recorded.broken_time|time:"H:i"}}
+        파손 자료<br />
         <div class="dropRecord">
-          <!-- DB에서 이미지 받아와야함 -->
+          <!-- DB에서 이미지 받아와야함 / DB의 이미지 path는 record/images/파일명 으로 저장되야 함 -->
           <img
-            src="{% static 'record/images/1239948965.jpg' %}"
-            alt="breakImg"
+            src="{% static recorded.broken_img %}"
+            alt="점자_블록_파손_기록"
           />
-          <p class="recordedLocation">서울특별시 중랑구 신내동 517-17</p>
+          <p class="recordedLocation">{{recorded.broken_location}}</p>
         </div>
       </div>
       <hr />
-      <div class="recorded">
-        2024.06.19<br />17:46 파손 자료<br />
-        <div class="dropRecord">
-          <!-- DB에서 이미지 받아와야함 -->
-          <img
-            src="{% static 'record/images/1239948965.jpg' %}"
-            alt="breakImg"
-          />
-          <p class="recordedLocation">서울특별시 중랑구 신내동 517-17</p>
-        </div>
-      </div>
-      <hr />
-      <div class="recorded">
-        2024.05.24<br />11:19 파손 자료<br />
-        <div class="dropRecord">
-          <!-- DB에서 이미지 받아와야함 -->
-          <img
-            src="{% static 'record/images/1239948965.jpg' %}"
-            alt="breakImg"
-          />
-          <p class="recordedLocation">서울특별시 중랑구 신내동 517-17</p>
-        </div>
-      </div>
-      <hr />
-      <div class="recorded">
-        2024.05.24<br />11:19 파손 자료<br />
-        <div class="dropRecord">
-          <!-- DB에서 이미지 받아와야함 -->
-          <img
-            src="{% static 'record/images/1239948965.jpg' %}"
-            alt="breakImg"
-          />
-          <p class="recordedLocation">서울특별시 중랑구 신내동 517-17</p>
-        </div>
-      </div>
-      <hr />
-      <div class="recorded">
-        2024.05.24<br />11:19 파손 자료<br />
-        <div class="dropRecord">
-          <!-- DB에서 이미지 받아와야함 -->
-          <img
-            src="{% static 'record/images/1239948965.jpg' %}"
-            alt="breakImg"
-          />
-          <p class="recordedLocation">서울특별시 중랑구 신내동 517-17</p>
-        </div>
-      </div>
-      <hr />
-      <div class="recorded">
-        2024.05.24<br />11:19 파손 자료<br />
-        <div class="dropRecord">
-          <!-- DB에서 이미지 받아와야함 -->
-          <img
-            src="{% static 'record/images/1239948965.jpg' %}"
-            alt="breakImg"
-          />
-          <p class="recordedLocation">서울특별시 중랑구 신내동 517-17</p>
-        </div>
-      </div>
-      <hr />
+      {% endfor %}
     </div>
   </div>
 </main>

@@ -4,8 +4,8 @@
 <main>
   <div class="walk">보행모드</div>
   <div class="navi">길안내</div>
-  <div class="breaklog">시설 파손 기록</div>
-  <div class="accidentlog">사고 기록 확인</div>
-  <div class="qnapost">문의 게시판</div>
+  <a href="/record/break/{{user.id}}">시설 파손 기록</a>
+  <a href="/record/accident/{{user.id}}">사고 기록 확인</a>
+  <a href="#">문의 게시판</a>
 </main>
 {% endblock content %}
