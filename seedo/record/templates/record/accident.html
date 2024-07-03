@@ -3,43 +3,35 @@
 {% endblock extra_head %} {% block content %} {% load custom_filters %}
 <main>
   <div class="layout">
-    <!-- userName 태그 안의 내용은 현재 선택한 사용자 이름을 띄울 곳(파트너의 기록 볼 때는 파트너 이름으로 바껴야함) -->
-    <div class="userName">{{ user.email|email_username }} 님의 사고 기록</div>
+    <div class="dropdown">
+      <div class="userName">
+        {{ selected_user.email|email_username }} 님의 사고 기록
+      </div>
+      <div class="dropUser">
+        {% for partner in partner_list %}
+        <a href="/record/accident/{{partner.user.id}}/">
+          {{partner.user.email|email_username}} 님의 사고 기록</a
+        >
+        {% endfor %}
+      </div>
+    </div>
 
     <div class="recordList">
+      {% for recorded in accident_list %}
       <div class="recorded">
-        2024.06.20<br />13:25 사고 기록<br />
+        {{recorded.accident_date|date:"Y년 m월 d일"}}<br />
+        {{recorded.accident_time|time:"H시 i분"}} 사고 기록<br />
         <div class="dropRecord">
-          <!-- DB에서 이미지 받아와야함 -->
-          <img src="{% static 'record/images/1.jpg' %}" alt="accidentImg" />
-          <p class="recordedLocation">
-            서울특별시 동대문구 왕산로35길 37 현덕육회
-          </p>
+          <!-- DB에서 이미지 받아와야함 / DB의 이미지 path는 record/images/파일명 으로 저장되야 함 -->
+          <img
+            src="{% static recorded.accident_img %}"
+            alt="{{selected_user.email|email_username}}님의_낙상_기록"
+          />
+          <p class="recordedLocation">{{recorded.accident_location}}</p>
         </div>
       </div>
       <hr />
-      <div class="recorded">
-        2024.06.19<br />17:46 사고 기록<br />
-        <div class="dropRecord">
-          <!-- DB에서 이미지 받아와야함 -->
-          <img src="{% static 'record/images/2.jpg' %}" alt="accidentImg" />
-          <p class="recordedLocation">
-            서울특별시 동대문구 왕산로35길 37 현덕육회
-          </p>
-        </div>
-      </div>
-      <hr />
-      <div class="recorded">
-        2024.05.24<br />11:19 사고 기록<br />
-        <div class="dropRecord">
-          <!-- DB에서 이미지 받아와야함 -->
-          <img src="{% static 'record/images/2.jpg' %}" alt="accidentImg" />
-          <p class="recordedLocation">
-            서울특별시 동대문구 왕산로35길 37 현덕육회
-          </p>
-        </div>
-      </div>
-      <hr />
+      {% endfor %}
     </div>
   </div>
 </main>
