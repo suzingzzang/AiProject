@@ -79,11 +79,11 @@
           };
         }
 
-        function updateSensorData() {
+        function updateSensorData(event) {
           const frame = createNewFrame();
           updateGPS(frame);
-          updateAccelerometer(null, frame);
-          updateGyroscope(null, frame);
+          updateAccelerometer(event, frame);
+          updateGyroscope(event, frame);
           //updateMagnetometer(null, frame);
           sensorDataBuffer.push(frame);
           maybeSendSensorData();
