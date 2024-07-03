@@ -101,8 +101,9 @@
               function (error) {
                 console.error("Error accessing GPS:", error);
                 frame.gps = {
-                  latitude: "errortest",
-                  longitude: "errortest",
+                  latitude: sensorDataBuffer.getBuffer()[-1]["gps"]["latitude"],
+                  longitude:
+                    sensorDataBuffer.getBuffer()[-1]["gps"]["longitude"],
                 };
 
                 document.getElementById("location").textContent =
@@ -128,9 +129,9 @@
             }
           } catch {
             frame.acc = {
-              x: 1,
-              y: 1,
-              z: 1,
+              x: sensorDataBuffer.getBuffer()[-1]["acc"]["x"],
+              y: sensorDataBuffer.getBuffer()[-1]["acc"]["y"],
+              z: sensorDataBuffer.getBuffer()[-1]["acc"]["z"],
             };
             document.getElementById("accelerometer").textContent =
               `Accelerometer: x=1, y=1, z=1`;
@@ -150,9 +151,9 @@
             }
           } catch {
             frame.gyro = {
-              alpha: 1,
-              beta: 1,
-              gamma: 1,
+              alpha: sensorDataBuffer.getBuffer()[-1]["gyro"]["x"],
+              beta: sensorDataBuffer.getBuffer()[-1]["gyro"]["x"],
+              gamma: sensorDataBuffer.getBuffer()[-1]["gyro"]["x"],
             };
             document.getElementById("gyroscope").textContent =
               `Gyroscope: alpha=1, beta=1, gamma=1`;
@@ -266,6 +267,15 @@
             drawFrame();
           });
 
+          
+          /*
+          if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', updateMagnetometer);
+          } else {
+            console.error('Magnetometer not supported');
+          }
+          */
+
           // Start sensor data logging
           if (window.DeviceMotionEvent) {
             window.addEventListener("devicemotion", updateAccelerometer);
@@ -278,14 +288,6 @@
           } else {
             console.error("Gyroscope not supported");
           }
-
-          /*
-          if (window.DeviceOrientationEvent) {
-            window.addEventListener('deviceorientation', updateMagnetometer);
-          } else {
-            console.error('Magnetometer not supported');
-          }
-          */
 
           setInterval(updateSensorData, 1000 / frameRate);
         }

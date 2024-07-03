@@ -15,9 +15,9 @@ from .forms import RecordingForm
 
 def upload_recording(request):
     if request.method == "POST":
-        form = RecordingForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
+        # form = RecordingForm(request.POST, request.FILES)
+        # if form.is_valid():
+        #     form.save()
         return redirect("camera:show_camera")
     else:
         form = RecordingForm()
