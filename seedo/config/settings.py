@@ -36,11 +36,14 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
+# 이메일 설정
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587  # Gmail SMTP 포트 번호
+EMAIL_USE_TLS = True  # TLS 사용
+EMAIL_HOST_USER = "wltnwls66@gmail.com"  # Gmail 계정 이메일
+EMAIL_HOST_PASSWORD = "3996"  # Gmail 계정 비밀번호
 
-
-TWILIO_ACCOUNT_SID = "your_account_sid"
-TWILIO_AUTH_TOKEN = "your_auth_token"
-TWILIO_PHONE_NUMBER = "your_twilio_phone_number"
 # Application definition
 
 INSTALLED_APPS = [
@@ -92,10 +95,8 @@ WSGI_APPLICATION = "config.wsgi.application"
 # JWT 관련 설정
 JWT_SECRET_KEY = env("JWT_SECRET_KEY")
 JWT_REFRESH_SECRET_KEY = env("JWT_REFRESH_SECRET_KEY")
-JWT_ALGORITHM = "HS256"  # 선택적으로 알고리즘을 설정할 수 있습니다.
-# Access Token 유효 기간 설정 (예: 1시간)
+JWT_ALGORITHM = "HS256"
 JWT_ACCESS_TOKEN_EXPIRATION = timedelta(minutes=1)
-# Refresh Token 유효 기간 설정 (예: 30일)
 JWT_REFRESH_TOKEN_EXPIRATION = timedelta(days=30)
 # JWT_EXPIRATION_DELTA = datetime.timedelta(hours=1)
 

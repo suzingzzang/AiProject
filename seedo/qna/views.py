@@ -129,12 +129,9 @@ class CommentCreateView(FormView):
     def form_valid(self, form):
         question = get_object_or_404(QnA, pk=self.kwargs["pk"])
 
-        if question.comments:
-            question.comments += f"\n{self.request.user.email}: {form.cleaned_data['content']}"
-        else:
-            question.comments = f"{self.request.user.email}: {form.cleaned_data['content']}"
-
+        question.comments = form.cleaned_data["content"]
         question.save()
+
         return super().form_valid(form)
 
     def get_success_url(self):
