@@ -4,19 +4,23 @@
     <title>Home</title>
     <script>
       async function sendSensorData(sensorData) {
-        const response = await fetch('{% url "camera:fall_recognition" %}', {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": "{{ csrf_token }}",
-          },
-          body: JSON.stringify({ sensor_data: sensorData }),
-        });
+        try {
+          const response = await fetch('{% url "camera:fall_recognition" %}', {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({ sensor_data: sensorData }),
+          });
 
-        const result = await response.json();
-        console.log("Prediction:", result.prediction);
-        document.getElementById("fall_recognition").textContent =
-          `'Prediction:', ${result.prediction}`;
+          const result = await response.json();
+          console.log("Prediction:", result.prediction);
+          document.getElementById("fall_recognition").textContent =
+            `Prediction: ${result.prediction}`;
+        } catch (error) {
+          console.error("Error sending sensor data:", error);
+        }
       }
 
       class CircularBuffer {
@@ -29,15 +33,7 @@
           if (this.buffer.length >= this.size) {
             this.buffer.shift();
           }
-          if (
-            item.acc &&
-            item.acc.x !== undefined &&
-            item.gyro &&
-            item.gyro.alpha !== undefined
-          ) {
-            this.buffer.push(item);
-            //console.log(item);
-          }
+          this.buffer.push(item);
         }
 
         getBuffer() {
@@ -46,11 +42,9 @@
       }
 
       document.addEventListener("DOMContentLoaded", function () {
-        let model;
         let recording = false;
         let sensorDataBuffer = new CircularBuffer(29);
-        let mediaRecorder;
-        let recordedChunks = [];
+        const frameRate = 30; // frames per second
 
         function maybeSendSensorData() {
           if (sensorDataBuffer.getBuffer().length >= 29) {
@@ -58,33 +52,72 @@
             sendSensorData(sensorData);
           }
         }
+
         function createNewFrame() {
           return {
             timestamp: Date.now(),
-            gps: {},
-            acc: {},
-            gyro: {},
+            gps: { latitude: null, longitude: null },
+            acc: { x: null, y: null, z: null },
+            gyro: { alpha: null, beta: null, gamma: null },
           };
         }
 
         async function updateSensorData(event) {
-          const frame = createNewFrame();
-          try {
-            await Promise.all([
-              updateGPS(frame),
-              updateAccelerometer(event, frame),
-              updateGyroscope(event, frame),
-            ]);
-            //updateMagnetometer(null, frame);
-            sensorDataBuffer.push(frame);
-            maybeSendSensorData();
-          } catch (error) {
-            console.error("Error updating sensor data:", error);
+          if (recording) {
+            const frame = createNewFrame();
+            try {
+              await Promise.all([
+                updateGPS(frame),
+                Promise.resolve(frame), // Ensure GPS promise is part of all promises
+              ]);
+
+              try {
+                // Update Accelerometer
+                if (event.acceleration) {
+                  let accel = event.acceleration;
+                  frame.acc = {
+                    x: accel.x || 0,
+                    y: accel.y || 0,
+                    z: accel.z || 0,
+                  };
+                  document.getElementById("accelerometer").textContent =
+                    `Accelerometer: x=${accel.x}, y=${accel.y}, z=${accel.z}`;
+                } else {
+                  frame.acc = { x: 0, y: 0, z: 0 };
+                }
+              } catch (error) {
+                //console.error('Error updating accelerometer data:', error);
+                frame.acc = { x: 0, y: 0, z: 0 };
+              }
+
+              try {
+                // Update Gyroscope
+                if (event.alpha !== null) {
+                  frame.gyro = {
+                    alpha: event.alpha || 0,
+                    beta: event.beta || 0,
+                    gamma: event.gamma || 0,
+                  };
+                  document.getElementById("gyroscope").textContent =
+                    `Gyroscope: alpha=${event.alpha}, beta=${event.beta}, gamma=${event.gamma}`;
+                } else {
+                  frame.gyro = { alpha: 0, beta: 0, gamma: 0 };
+                }
+              } catch (error) {
+                //console.error('Error updating gyroscope data:', error);
+                frame.gyro = { alpha: 0, beta: 0, gamma: 0 };
+              }
+
+              sensorDataBuffer.push(frame);
+              maybeSendSensorData();
+            } catch (error) {
+              console.error("Error updating sensor data:", error);
+            }
           }
         }
 
         function updateGPS(frame) {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve) => {
             if ("geolocation" in navigator) {
               navigator.geolocation.getCurrentPosition(
                 function (position) {
@@ -98,98 +131,15 @@
                 },
                 function (error) {
                   console.error("Error accessing GPS:", error);
-                  frame.gps = {
-                    latitude: "errortest",
-                    longitude: "errortest",
-                  };
-
+                  frame.gps = { latitude: 0, longitude: 0 };
                   document.getElementById("location").textContent =
-                    `Location: Latitude "errortest", Longitude "errortest"`;
+                    `Location: Latitude 0, Longitude 0`;
                   resolve();
                 },
               );
             } else {
               console.error("Geolocation not supported");
-              resolve();
-            }
-          });
-        }
-
-        function updateAccelerometer(event, frame) {
-          return new Promise((resolve, reject) => {
-            try {
-              if (event.acceleration && recording) {
-                let accel = event.acceleration;
-                frame.acc = {
-                  x: accel.x || 0,
-                  y: accel.y || 0,
-                  z: accel.z || 0,
-                };
-                document.getElementById("accelerometer").textContent =
-                  `Accelerometer: x=${accel.x}, y=${accel.y}, z=${accel.z}`;
-                resolve();
-              }
-            } catch {
-              // Ensure the buffer is not empty before accessing the last item
-              if (sensorDataBuffer.getBuffer().length > 0) {
-                let lastItem =
-                  sensorDataBuffer.getBuffer()[
-                    sensorDataBuffer.getBuffer().length - 1
-                  ];
-                frame.acc = {
-                  x: lastItem.acc.x || 0,
-                  y: lastItem.acc.y || 0,
-                  z: lastItem.acc.z || 0,
-                };
-              } else {
-                frame.acc = {
-                  x: 0,
-                  y: 0,
-                  z: 0,
-                };
-              }
-              document.getElementById("accelerometer").textContent =
-                `Accelerometer: x=1, y=1, z=1`;
-              resolve();
-            }
-          });
-        }
-
-        function updateGyroscope(event, frame) {
-          return new Promise((resolve, reject) => {
-            try {
-              if (event.alpha & recording) {
-                frame.gyro = {
-                  alpha: event.alpha || 0,
-                  beta: event.beta || 0,
-                  gamma: event.gamma || 0,
-                };
-                document.getElementById("gyroscope").textContent =
-                  `Gyroscope: alpha=${event.alpha}, beta=${event.beta}, gamma=${event.gamma}`;
-                resolve();
-              }
-            } catch {
-              // Ensure the buffer is not empty before accessing the last item
-              if (sensorDataBuffer.getBuffer().length > 0) {
-                let lastItem =
-                  sensorDataBuffer.getBuffer()[
-                    sensorDataBuffer.getBuffer().length - 1
-                  ];
-                frame.gyro = {
-                  alpha: lastItem.gyro.alpha || 0,
-                  beta: lastItem.gyro.beta || 0,
-                  gamma: lastItem.gyro.gamma || 0,
-                };
-              } else {
-                frame.gyro = {
-                  alpha: 0,
-                  beta: 0,
-                  gamma: 0,
-                };
-              }
-
-              document.getElementById("gyroscope").textContent =
-                `Gyroscope: alpha=1, beta=1, gamma=1`;
+              frame.gps = { latitude: 0, longitude: 0 };
               resolve();
             }
           });
@@ -200,32 +150,6 @@
           document.getElementById("recording-status").textContent =
             "Recording...";
 
-          const video = document.getElementById("video");
-          const canvas = document.getElementById("canvas");
-          const context = canvas.getContext("2d");
-          let frameId = 0;
-          const frameRate = 30; // frames per second
-          /*
-          navigator.mediaDevices
-            .getUserMedia({ video: true })
-            .then(function (stream) {
-              video.srcObject = stream;
-              video.play();
-
-              // Set up MediaRecorder
-              mediaRecorder = new MediaRecorder(stream);
-              mediaRecorder.ondataavailable = function (event) {
-                if (event.data.size > 0) {
-                  recordedChunks.push(event.data);
-                }
-              };
-              mediaRecorder.start();
-            })
-            .catch(function (err) {
-              console.log('An error occurred: ' + err);
-            });
-          */
-          // Start sensor data logging
           if (window.DeviceMotionEvent) {
             window.addEventListener("devicemotion", updateSensorData);
           } else {
@@ -245,55 +169,6 @@
           recording = false;
           document.getElementById("recording-status").textContent =
             "Recording stopped.";
-
-          /*
-          // Stop mediaRecorder and get the video data
-          mediaRecorder.stop();
-          mediaRecorder.onstop = function () {
-            const videoBlob = new Blob(recordedChunks, { type: 'video/mp4' });
-            const videoFile = new File([videoBlob], 'video.mp4', {
-              type: 'video/mp4',
-            });
-
-            // Save sensor data to a file
-            const sensorLogBlob = new Blob(
-              [JSON.stringify(sensorDataBuffer.getBuffer(), null, 2)],
-              {
-                type: 'application/json',
-              }
-            );
-            const sensorLogFile = new File([sensorLogBlob], 'sensor_log.json', {
-              type: 'application/json',
-            });
-
-            // Stop video stream
-            const video = document.getElementById('video');
-            const stream = video.srcObject;
-            const tracks = stream.getTracks();
-
-            tracks.forEach(function (track) {
-              track.stop();
-            });
-
-            video.srcObject = null;
-
-            // Use DataTransfer to simulate file input
-            const videoFileInput = document.getElementById('video-file');
-            const sensorLogFileInput =
-              document.getElementById('sensor-log-file');
-
-            const videoDataTransfer = new DataTransfer();
-            videoDataTransfer.items.add(videoFile);
-            videoFileInput.files = videoDataTransfer.files;
-
-            const logDataTransfer = new DataTransfer();
-            logDataTransfer.items.add(sensorLogFile);
-            sensorLogFileInput.files = logDataTransfer.files;
-
-            // Submit the form
-            document.getElementById('upload-form').submit();
-          };
-          */
           window.removeEventListener("devicemotion", updateSensorData);
           window.removeEventListener("deviceorientation", updateSensorData);
         }
