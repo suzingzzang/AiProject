@@ -38,7 +38,7 @@ model = load_model("camera/ml_models/initial_model2.keras")
 def fall_recognition(request):
     if request.method == "POST":
         data = json.loads(request.body)
-
+        print(data)
         df = process_sensor_data(data)
         # sensor_data = np.array(data["sensor_data"])
         # sensor_data = sensor_data.reshape((1, 10, 5))  # Adjust shape as needed

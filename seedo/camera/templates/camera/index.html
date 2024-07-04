@@ -34,8 +34,15 @@
           if (this.buffer.length >= this.size) {
             this.buffer.shift();
           }
-
-          this.buffer.push(item);
+          if (
+            item.acc &&
+            item.acc.x !== undefined &&
+            item.gyro &&
+            item.gyro.alpha !== undefined
+          ) {
+            this.buffer.push(item);
+            //console.log(item);
+          }
         }
 
         getBuffer() {
@@ -78,41 +85,52 @@
           };
         }
 
-        function updateSensorData(event) {
+        async function updateSensorData(event) {
           const frame = createNewFrame();
-          updateGPS(frame);
-          updateAccelerometer(event, frame);
-          updateGyroscope(event, frame);
-          //updateMagnetometer(null, frame);
-          sensorDataBuffer.push(frame);
-          maybeSendSensorData();
+          try {
+            await Promise.all([
+              updateGPS(frame),
+              updateAccelerometer(event, frame),
+              updateGyroscope(event, frame),
+            ]);
+            //updateMagnetometer(null, frame);
+            sensorDataBuffer.push(frame);
+            maybeSendSensorData();
+          } catch (error) {
+            console.error("Error updating sensor data:", error);
+          }
         }
 
         function updateGPS(frame) {
-          if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(
-              function (position) {
-                frame.gps = {
-                  latitude: position.coords.latitude,
-                  longitude: position.coords.longitude,
-                };
-                document.getElementById("location").textContent =
-                  `Location: Latitude ${position.coords.latitude}, Longitude ${position.coords.longitude}`;
-              },
-              function (error) {
-                console.error("Error accessing GPS:", error);
-                frame.gps = {
-                  latitude: "errortest",
-                  longitude: "errortest",
-                };
+          return new Promise((resolve, reject) => {
+            if ("geolocation" in navigator) {
+              navigator.geolocation.getCurrentPosition(
+                function (position) {
+                  frame.gps = {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                  };
+                  document.getElementById("location").textContent =
+                    `Location: Latitude ${position.coords.latitude}, Longitude ${position.coords.longitude}`;
+                  resolve();
+                },
+                function (error) {
+                  console.error("Error accessing GPS:", error);
+                  frame.gps = {
+                    latitude: "errortest",
+                    longitude: "errortest",
+                  };
 
-                document.getElementById("location").textContent =
-                  `Location: Latitude "errortest", Longitude "errortest"`;
-              },
-            );
-          } else {
-            console.error("Geolocation not supported");
-          }
+                  document.getElementById("location").textContent =
+                    `Location: Latitude "errortest", Longitude "errortest"`;
+                  resolve();
+                },
+              );
+            } else {
+              console.error("Geolocation not supported");
+              resolve();
+            }
+          });
         }
 
         /*
@@ -143,48 +161,83 @@
         */
 
         function updateAccelerometer(event, frame) {
-          try {
-            if (event.acceleration && recording) {
-              let accel = event.acceleration;
-              frame.acc = {
-                x: accel.x,
-                y: accel.y,
-                z: accel.z,
-              };
+          return new Promise((resolve, reject) => {
+            try {
+              if (event.acceleration && recording) {
+                let accel = event.acceleration;
+                frame.acc = {
+                  x: accel.x || 0,
+                  y: accel.y || 0,
+                  z: accel.z || 0,
+                };
+                document.getElementById("accelerometer").textContent =
+                  `Accelerometer: x=${accel.x}, y=${accel.y}, z=${accel.z}`;
+                resolve();
+              }
+            } catch {
+              // Ensure the buffer is not empty before accessing the last item
+              if (sensorDataBuffer.getBuffer().length > 0) {
+                let lastItem =
+                  sensorDataBuffer.getBuffer()[
+                    sensorDataBuffer.getBuffer().length - 1
+                  ];
+                frame.acc = {
+                  x: lastItem.acc.x || 0,
+                  y: lastItem.acc.y || 0,
+                  z: lastItem.acc.z || 0,
+                };
+              } else {
+                frame.acc = {
+                  x: 0,
+                  y: 0,
+                  z: 0,
+                };
+              }
               document.getElementById("accelerometer").textContent =
-                `Accelerometer: x=${accel.x}, y=${accel.y}, z=${accel.z}`;
+                `Accelerometer: x=1, y=1, z=1`;
+              resolve();
             }
-          } catch {
-            frame.acc = {
-              x: 0,
-              y: 0,
-              z: 0,
-            };
-            document.getElementById("accelerometer").textContent =
-              `Accelerometer: x=1, y=1, z=1`;
-          }
+          });
         }
 
         function updateGyroscope(event, frame) {
-          try {
-            if (event.alpha & recording) {
-              frame.gyro = {
-                alpha: event.alpha,
-                beta: event.beta,
-                gamma: event.gamma,
-              };
+          return new Promise((resolve, reject) => {
+            try {
+              if (event.alpha & recording) {
+                frame.gyro = {
+                  alpha: event.alpha || 0,
+                  beta: event.beta || 0,
+                  gamma: event.gamma || 0,
+                };
+                document.getElementById("gyroscope").textContent =
+                  `Gyroscope: alpha=${event.alpha}, beta=${event.beta}, gamma=${event.gamma}`;
+                resolve();
+              }
+            } catch {
+              // Ensure the buffer is not empty before accessing the last item
+              if (sensorDataBuffer.getBuffer().length > 0) {
+                let lastItem =
+                  sensorDataBuffer.getBuffer()[
+                    sensorDataBuffer.getBuffer().length - 1
+                  ];
+                frame.gyro = {
+                  alpha: lastItem.gyro.alpha || 0,
+                  beta: lastItem.gyro.beta || 0,
+                  gamma: lastItem.gyro.gamma || 0,
+                };
+              } else {
+                frame.gyro = {
+                  alpha: 0,
+                  beta: 0,
+                  gamma: 0,
+                };
+              }
+
               document.getElementById("gyroscope").textContent =
-                `Gyroscope: alpha=${event.alpha}, beta=${event.beta}, gamma=${event.gamma}`;
+                `Gyroscope: alpha=1, beta=1, gamma=1`;
+              resolve();
             }
-          } catch {
-            frame.gyro = {
-              alpha: 0,
-              beta: 0,
-              gamma: 0,
-            };
-            document.getElementById("gyroscope").textContent =
-              `Gyroscope: alpha=1, beta=1, gamma=1`;
-          }
+          });
         }
 
         /*
