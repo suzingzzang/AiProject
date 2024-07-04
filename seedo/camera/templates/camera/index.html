@@ -69,49 +69,59 @@
         }
 
         async function updateSensorData(event) {
-          const frame = createNewFrame();
-          try {
-            await Promise.all([
-              updateGPS(frame),
-              Promise.resolve(frame), // Ensure GPS promise is part of all promises
-            ]);
-
-            // Update Accelerometer
+          if (recording) {
+            const frame = createNewFrame();
             try {
-              if (event.acceleration) {
-                let accel = event.acceleration;
-                frame.acc = {
-                  x: accel.x || 0,
-                  y: accel.y || 0,
-                  z: accel.z || 0,
-                };
-                document.getElementById("accelerometer").textContent =
-                  `Accelerometer: x=${accel.x}, y=${accel.y}, z=${accel.z}`;
-              } else {
+              await Promise.all([
+                updateGPS(frame),
+                Promise.resolve(frame), // Ensure GPS promise is part of all promises
+              ]);
+
+              // Update Accelerometer
+              try {
+                if (event.acceleration) {
+                  let accel = event.acceleration;
+                  frame.acc = {
+                    x: accel.x || 0,
+                    y: accel.y || 0,
+                    z: accel.z || 0,
+                  };
+                  document.getElementById("accelerometer").textContent =
+                    `Accelerometer: x=${accel.x}, y=${accel.y}, z=${accel.z}`;
+                } else {
+                  const lastItem = sensorDataBuffer.getLastItem();
+                  frame.acc = lastItem ? lastItem.acc : { x: 0, y: 0, z: 0 };
+                  document.getElementById("accelerometer").textContent =
+                    `Accelerometer: x=${frame.acc.x}, y=${frame.acc.y}, z=${frame.acc.z}`;
+                }
+              } catch (error) {
+                //console.error('Error updating accelerometer data:', error);
                 const lastItem = sensorDataBuffer.getLastItem();
                 frame.acc = lastItem ? lastItem.acc : { x: 0, y: 0, z: 0 };
                 document.getElementById("accelerometer").textContent =
                   `Accelerometer: x=${frame.acc.x}, y=${frame.acc.y}, z=${frame.acc.z}`;
               }
-            } catch (error) {
-              console.error("Error updating accelerometer data:", error);
-              const lastItem = sensorDataBuffer.getLastItem();
-              frame.acc = lastItem ? lastItem.acc : { x: 0, y: 0, z: 0 };
-              document.getElementById("accelerometer").textContent =
-                `Accelerometer: x=${frame.acc.x}, y=${frame.acc.y}, z=${frame.acc.z}`;
-            }
 
-            // Update Gyroscope
-            try {
-              if (event.alpha !== null) {
-                frame.gyro = {
-                  alpha: event.alpha || 0,
-                  beta: event.beta || 0,
-                  gamma: event.gamma || 0,
-                };
-                document.getElementById("gyroscope").textContent =
-                  `Gyroscope: alpha=${event.alpha}, beta=${event.beta}, gamma=${event.gamma}`;
-              } else {
+              // Update Gyroscope
+              try {
+                if (event.alpha !== null) {
+                  frame.gyro = {
+                    alpha: event.alpha || 0,
+                    beta: event.beta || 0,
+                    gamma: event.gamma || 0,
+                  };
+                  document.getElementById("gyroscope").textContent =
+                    `Gyroscope: alpha=${event.alpha}, beta=${event.beta}, gamma=${event.gamma}`;
+                } else {
+                  const lastItem = sensorDataBuffer.getLastItem();
+                  frame.gyro = lastItem
+                    ? lastItem.gyro
+                    : { alpha: 0, beta: 0, gamma: 0 };
+                  document.getElementById("gyroscope").textContent =
+                    `Gyroscope: alpha=${frame.gyro.alpha}, beta=${frame.gyro.beta}, gamma=${frame.gyro.gamma}`;
+                }
+              } catch (error) {
+                //console.error('Error updating gyroscope data:', error);
                 const lastItem = sensorDataBuffer.getLastItem();
                 frame.gyro = lastItem
                   ? lastItem.gyro
@@ -119,20 +129,12 @@
                 document.getElementById("gyroscope").textContent =
                   `Gyroscope: alpha=${frame.gyro.alpha}, beta=${frame.gyro.beta}, gamma=${frame.gyro.gamma}`;
               }
-            } catch (error) {
-              console.error("Error updating gyroscope data:", error);
-              const lastItem = sensorDataBuffer.getLastItem();
-              frame.gyro = lastItem
-                ? lastItem.gyro
-                : { alpha: 0, beta: 0, gamma: 0 };
-              document.getElementById("gyroscope").textContent =
-                `Gyroscope: alpha=${frame.gyro.alpha}, beta=${frame.gyro.beta}, gamma=${frame.gyro.gamma}`;
-            }
 
-            sensorDataBuffer.push(frame);
-            maybeSendSensorData();
-          } catch (error) {
-            console.error("Error updating sensor data:", error);
+              sensorDataBuffer.push(frame);
+              maybeSendSensorData();
+            } catch (error) {
+              console.error("Error updating sensor data:", error);
+            }
           }
         }
 
