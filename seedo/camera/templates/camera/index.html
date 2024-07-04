@@ -51,11 +51,14 @@
         let recording = false;
         let sensorDataBuffer = new CircularBuffer(29);
         const frameRate = 30; // frames per second
+        let frameticks = 0;
 
         function maybeSendSensorData() {
           if (sensorDataBuffer.getBuffer().length >= 29) {
             const sensorData = sensorDataBuffer.getBuffer();
-            sendSensorData(sensorData);
+            if (frameticks % 10 === 0) {
+              sendSensorData(sensorData);
+            }
           }
         }
 
@@ -70,6 +73,7 @@
 
         async function updateSensorData(event) {
           if (recording) {
+            frameticks++;
             const frame = createNewFrame();
             try {
               await Promise.all([
@@ -188,6 +192,7 @@
         }
 
         function stopRecording() {
+          frameticks = 0;
           recording = false;
           document.getElementById("recording-status").textContent =
             "Recording stopped.";
