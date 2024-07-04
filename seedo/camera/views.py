@@ -29,19 +29,13 @@ def show_camera(request):
     return render(request, "camera/index.html")
 
 
-# model_path = os.path.join(os.path.dirname(__file__), )
-
-# print(model_path)
 model = load_model("camera/ml_models/initial_model2.keras")
 
 
 def fall_recognition(request):
     if request.method == "POST":
         data = json.loads(request.body)
-        print(data)
         df = process_sensor_data(data)
-        # sensor_data = np.array(data["sensor_data"])
-        # sensor_data = sensor_data.reshape((1, 10, 5))  # Adjust shape as needed
 
         scaler = load("camera/ml_models/scaler.joblib")
         X_test = df
@@ -59,7 +53,6 @@ def fall_recognition(request):
         y_pred = model.predict(X_test_final)
         prediction = np.argmax(y_pred, axis=1)
         return JsonResponse({"prediction": prediction.tolist()})
-        return JsonResponse({"prediction": data})
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 
@@ -73,13 +66,7 @@ def process_sensor_data(data):
         "gyr_x(deg/s)",
         "gyr_y(deg/s)",
         "gyr_z(deg/s)",
-        # "mag_x(G)",
-        # "mag_y(G)",
-        # "mag_z(G)",
         "SVM_acc(g)",
-        # "yaw(deg)",
-        # "pitch(deg)",
-        # "roll(deg)",
         "SVM_gyro(g)",
         "SVM_acc(g)_mean",
         "SVM_acc(g)_std",
@@ -104,7 +91,6 @@ def process_sensor_data(data):
         time = sensor_data["timestamp"] / 1000  # Convert timestamp to seconds
         acc = sensor_data["acc"]
         gyro = sensor_data["gyro"]
-        # mag = sensor_data["mag"]
 
         # Calculate the additional metrics
         acc_x = acc["x"]
@@ -113,9 +99,6 @@ def process_sensor_data(data):
         gyr_x = gyro["alpha"]
         gyr_y = gyro["beta"]
         gyr_z = gyro["gamma"]
-        # mag_x = mag["x"]
-        # mag_y = mag["y"]
-        # mag_z = mag["z"]
 
         SVM_acc = np.sqrt(acc_x**2 + acc_y**2 + acc_z**2)
         SVM_gyro = np.sqrt(gyr_x**2 + gyr_y**2 + gyr_z**2)
@@ -130,13 +113,7 @@ def process_sensor_data(data):
                 "gyr_x(deg/s)": gyr_x,
                 "gyr_y(deg/s)": gyr_y,
                 "gyr_z(deg/s)": gyr_z,
-                # "mag_x(G)": mag_x,
-                # "mag_y(G)": mag_y,
-                # "mag_z(G)": mag_z,
                 "SVM_acc(g)": SVM_acc,
-                # "yaw(deg)": gyr_x,
-                # "pitch(deg)": gyr_y,
-                # "roll(deg)": gyr_z,
                 "SVM_gyro(g)": SVM_gyro,
             }
         )
@@ -179,79 +156,9 @@ def process_sensor_data(data):
     )
 
     # Select only the required columns
-    # df = df[columns]
     drop_cols = ["Time(s)", "acc_x(g)", "acc_y(g)", "acc_z(g)", "gyr_x(deg/s)", "gyr_y(deg/s)", "gyr_z(deg/s)"]
 
     df.dropna(inplace=True)
     df.drop(columns=drop_cols, inplace=True)
 
-    # df.to_csv(
-    #     "/Users/jinho/Dev/aivlebig/SeedoPJT/seedo/media/csvs/sensor_data.csv",
-    #     index=False,
-    # )
     return df
-
-
-# import io
-# import numpy as np
-# from django.http import HttpResponse
-# from django.views.decorators.csrf import csrf_exempt
-# from PIL import Image
-# import torch
-# from torchvision.transforms import Compose, Resize, ToTensor
-
-# # Load the MiDaS model
-# model_type = "DPT_Large"  # You can also use DPT_Hybrid or MiDaS_small
-# midas = torch.hub.load("intel-isl/MiDaS", model_type)
-# midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
-
-# if model_type in ["DPT_Large", "DPT_Hybrid"]:
-#     transform = midas_transforms.dpt_transform
-# else:
-#     transform = midas_transforms.small_transform
-
-# # Set the device to GPU if available
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# midas.to(device).eval()
-
-
-# @csrf_exempt
-# def depth_estimation(request):
-#     if request.method == "POST":
-#         # Read image from the request
-#         image_data = request.body
-#         image = Image.open(io.BytesIO(image_data)).convert("RGB")
-
-#         # Transform the image
-#         input_batch = transform(image).to(device)
-
-#         # Predict depth
-#         with torch.no_grad():
-#             prediction = midas(input_batch)
-
-#         prediction = torch.nn.functional.interpolate(
-#             prediction.unsqueeze(1),
-#             size=image.size[::-1],  # (width, height)
-#             mode="bicubic",
-#             align_corners=False,
-#         ).squeeze()
-
-#         depth_map = prediction.cpu().numpy()
-
-#         # Normalize depth map to 0-255 for visualization
-#         depth_map = (
-#             (depth_map - depth_map.min()) / (depth_map.max() - depth_map.min()) * 255
-#         )
-#         depth_map = depth_map.astype(np.uint8)
-
-#         # Convert depth map to image
-#         depth_image = Image.fromarray(depth_map)
-
-#         # Create a byte buffer to send the image
-#         buf = io.BytesIO()
-#         depth_image.save(buf, format="PNG")
-#         buf.seek(0)
-
-#         return HttpResponse(buf, content_type="image/png")
-
-#     return HttpResponse(status=405)  # Method not allowed
