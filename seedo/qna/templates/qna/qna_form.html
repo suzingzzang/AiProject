@@ -1,0 +1,12 @@
+{% extends "base.html" %} {% load static %} {% block extra_head %}
+<link rel="stylesheet" href="{% static 'qna/css/form.css' %}" />
+{% endblock extra_head %} {% block content %} {% load custom_filters %}
+<main>
+  <div class="layout">
+    <form class="submitForm" method="post" enctype="multipart/form-data">
+      {% csrf_token %} {{ form.as_p }}
+      <button type="submit">등록하기</button>
+    </form>
+  </div>
+</main>
+{% endblock content %}

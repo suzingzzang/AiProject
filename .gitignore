@@ -96,6 +96,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+/AI_Code/
 
 # IPython
 profile_default/

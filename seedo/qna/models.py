@@ -11,6 +11,7 @@ class QnA(models.Model):
     comments = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    file_upload = models.FileField(upload_to="qna/files/", blank=True, null=True)
 
     def __str__(self):
         return self.title

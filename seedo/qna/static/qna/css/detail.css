@@ -1,0 +1,128 @@
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  box-sizing: border-box;
+  gap: 20px;
+  padding: 70px 34px 20px;
+  overflow: hidden;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.title,
+.commentHeader {
+  color: #193b08;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.sub {
+  display: flex;
+  justify-content: space-between;
+}
+.author {
+  color: #193b08;
+}
+.edel {
+  color: #6e6e6e;
+  margin-top: auto;
+}
+.edel > a,
+.edel > form > button,
+#edit-button {
+  color: #6e6e6e;
+  cursor: pointer;
+}
+.edel > a:hover,
+.edel > form > button:hover,
+#edit-button:hover {
+  color: #c2c2c2;
+}
+.edel > a {
+  text-decoration: none;
+}
+.edel > form > button,
+#edit-button {
+  background-color: transparent;
+  border: none;
+}
+
+.content {
+  width: 100%;
+  height: 30vh; /* 최대 높이 설정 */
+  padding: 3px 3px;
+  border-width: 1px;
+  border-radius: 4px;
+  background-color: #fff;
+  /* display: flex; */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 2px 2px 5px #00000080;
+  overflow-y: auto; /* 스크롤 추가 */
+}
+
+#comment-content {
+  width: 100%;
+  margin-top: 10px;
+  height: 30vh; /* 최대 높이 설정 */
+  padding: 3px 3px;
+  border-width: 1px;
+  border-radius: 4px;
+  background-color: #fff;
+  /* display: flex; */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 2px 2px 5px #00000080;
+  overflow-y: auto; /* 스크롤 추가 */
+}
+
+.commentRegist,
+.editComment {
+  text-decoration: none;
+  font-size: 40px;
+  color: #ffffff;
+  text-shadow:
+    -1px 0px #000000,
+    0px 1px #000000,
+    1px 0px #000000,
+    0px -1px #000000,
+    2px 2px 5px #00000080;
+  border: none;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 700;
+
+  padding: 10px 0;
+  width: 100%;
+  background-color: #a0ce8a;
+  cursor: pointer;
+}
+.commentRegist:hover,
+.editComment:hover {
+  background-color: #76b559;
+}
+
+#comment-display {
+  width: 100%;
+  margin-top: 10px;
+  height: fit-content; /* 최대 높이 설정 */
+  padding: 3px 3px;
+  border-width: 1px;
+  border-radius: 4px;
+  background-color: #fff;
+  /* display: flex; */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 2px 2px 5px #00000080;
+  overflow-y: auto; /* 스크롤 추가 */
+}
