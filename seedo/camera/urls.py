@@ -1,4 +1,6 @@
 # camera/urls.py
+from django.conf import settings
+from django.conf.urls.static import static
 from django.shortcuts import render
 from django.urls import path
 
@@ -18,4 +20,4 @@ urlpatterns = [
     path("upload/", upload_recording, name="upload_recording"),
     path("fall_recognition/", fall_recognition, name="fall_recognition"),
     # path("depth_estimation/", depth_estimation, name="depth_estimation"),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

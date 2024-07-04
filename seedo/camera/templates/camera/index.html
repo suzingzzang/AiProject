@@ -16,6 +16,21 @@
 
           const result = await response.json();
           console.log("Prediction:", result.prediction);
+
+          // Play sound if prediction changes from 0 to 1
+          if (previousPrediction === 0 && result.prediction === 1) {
+            document.getElementById("alert-sound").play();
+          }
+
+          // Stop sound or play a different sound if prediction changes from 1 to 0
+          if (previousPrediction === 0 && result.prediction === 0) {
+            document.getElementById("alert-sound").pause();
+            document.getElementById("alert-sound").currentTime = 0; // Reset sound
+            // document.getElementById('stop-sound').play(); // Uncomment if you have a stop sound
+          }
+
+          previousPrediction = result.prediction;
+
           document.getElementById("fall_recognition").textContent =
             `Prediction: ${result.prediction}`;
         } catch (error) {
@@ -237,5 +252,6 @@
     </form>
     <video id="video" width="640" height="480" style="display: none"></video>
     <canvas id="canvas" width="640" height="480"></canvas>
+    <audio id="alert-sound" src="alert_sound.mp3"></audio>
   </body>
 </html>
