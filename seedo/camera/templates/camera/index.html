@@ -2,11 +2,6 @@
 <html>
   <head>
     <title>Home</title>
-    {% comment %}
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    {% endcomment %} {% comment %}
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
-    {% endcomment %}
     <script>
       async function sendSensorData(sensorData) {
         const response = await fetch('{% url "camera:fall_recognition" %}', {
@@ -63,25 +58,12 @@
             sendSensorData(sensorData);
           }
         }
-        // Load the COCO-SSD model
-        /*
-        cocoSsd
-          .load()
-          .then(function (loadedModel) {
-            model = loadedModel;
-            console.log('COCO-SSD model loaded.');
-          })
-          .catch(function (err) {
-            console.error('Error loading COCO-SSD model:', err);
-          });
-        */
         function createNewFrame() {
           return {
             timestamp: Date.now(),
             gps: {},
             acc: {},
             gyro: {},
-            mag: {},
           };
         }
 
@@ -132,33 +114,6 @@
             }
           });
         }
-
-        /*
-        function updateAccelerometer(event, frame) {
-          if (event.acceleration && recording) {
-            let accel = event.acceleration;
-            frame.acc = {
-              x: accel.x || 0,
-              y: accel.y || 0,
-              z: accel.z || 0,
-            };
-            document.getElementById("accelerometer").textContent =
-              `Accelerometer: x=${accel.x}, y=${accel.y}, z=${accel.z}`;
-          }
-        }
-
-        function updateGyroscope(event, frame) {
-          if (event.alpha && recording) {
-            frame.gyro = {
-              alpha: event.alpha || 0,
-              beta: event.beta || 0,
-              gamma: event.gamma || 0,
-            };
-            document.getElementById("gyroscope").textContent =
-              `Gyroscope: alpha=${event.alpha}, beta=${event.beta}, gamma=${event.gamma}`;
-          }
-        }
-        */
 
         function updateAccelerometer(event, frame) {
           return new Promise((resolve, reject) => {
@@ -240,39 +195,14 @@
           });
         }
 
-        /*
-        function updateMagnetometer(event, frame) {
-          try {
-            if (event.magneticFieldX && recording) {
-              frame.mag = {
-                x: event.magneticFieldX,
-                y: event.magneticFieldY,
-                z: event.magneticFieldZ,
-              };
-              document.getElementById(
-                'magnetometer'
-              ).textContent = `Magnetometer: x=${event.magneticFieldX}, y=${event.magneticFieldY}, z=${event.magneticFieldZ}`;
-            }
-          } catch {
-            frame.mag = {
-              x: 1,
-              y: 1,
-              z: 1,
-            };
-            document.getElementById(
-              'magnetometer'
-            ).textContent = `Magnetometer: x=1, y=1, z=1`;
-          }
-        }
-        */
-
         function startRecording() {
           recording = true;
           document.getElementById("recording-status").textContent =
             "Recording...";
-          const video = document.getElementById("video");
-          const canvas = document.getElementById("canvas");
-          const context = canvas.getContext("2d");
+          /*
+          const video = document.getElementById('video');
+          const canvas = document.getElementById('canvas');
+          const context = canvas.getContext('2d');
           let frameId = 0;
           const frameRate = 30; // frames per second
 
@@ -292,70 +222,9 @@
               mediaRecorder.start();
             })
             .catch(function (err) {
-              console.log("An error occurred: " + err);
+              console.log('An error occurred: ' + err);
             });
-
-          /*
-          video.addEventListener("play", function () {
-            function drawFrame() {
-              if (!recording || video.paused || video.ended) {
-                return;
-              }
-              context.drawImage(video, 0, 0, canvas.width, canvas.height);
-              context.font = "30px Arial";
-              context.fillStyle = "red";
-              context.fillText("Frame ID: " + frameId, 10, 50);
-              frameId++;
-
-              // Ensure the video and canvas are ready
-              if (video.videoWidth > 0 && video.videoHeight > 0) {
-                // Run COCO-SSD object detection
-                model
-                  .detect(video)
-                  .then((predictions) => {
-                    predictions.forEach((prediction) => {
-                      if (prediction.class === "person") {
-                        context.strokeStyle = "green";
-                        context.lineWidth = 4;
-                        context.strokeRect(
-                          prediction.bbox[0],
-                          prediction.bbox[1],
-                          prediction.bbox[2],
-                          prediction.bbox[3],
-                        );
-                        context.font = "18px Arial";
-                        context.fillStyle = "green";
-                        context.fillText(
-                          `${prediction.class} - ${Math.round(
-                            prediction.score * 100,
-                          )}%`,
-                          prediction.bbox[0],
-                          prediction.bbox[1] > 10 ? prediction.bbox[1] - 5 : 10,
-                        );
-                      }
-                    });
-                  })
-                  .catch(function (err) {
-                    console.error("Error running COCO-SSD detection:", err);
-                  });
-              } else {
-                console.warn("Video or canvas not ready.");
-              }
-
-              setTimeout(drawFrame, 1000 / (frameRate / 30));
-            }
-            drawFrame();
-          });
           */
-
-          /*
-          if (window.DeviceOrientationEvent) {
-            window.addEventListener('deviceorientation', updateMagnetometer);
-          } else {
-            console.error('Magnetometer not supported');
-          }
-          */
-
           // Start sensor data logging
           if (window.DeviceMotionEvent) {
             window.addEventListener("devicemotion", updateSensorData);
@@ -377,27 +246,28 @@
           document.getElementById("recording-status").textContent =
             "Recording stopped.";
 
+          /*
           // Stop mediaRecorder and get the video data
           mediaRecorder.stop();
           mediaRecorder.onstop = function () {
-            const videoBlob = new Blob(recordedChunks, { type: "video/mp4" });
-            const videoFile = new File([videoBlob], "video.mp4", {
-              type: "video/mp4",
+            const videoBlob = new Blob(recordedChunks, { type: 'video/mp4' });
+            const videoFile = new File([videoBlob], 'video.mp4', {
+              type: 'video/mp4',
             });
 
             // Save sensor data to a file
             const sensorLogBlob = new Blob(
               [JSON.stringify(sensorDataBuffer.getBuffer(), null, 2)],
               {
-                type: "application/json",
-              },
+                type: 'application/json',
+              }
             );
-            const sensorLogFile = new File([sensorLogBlob], "sensor_log.json", {
-              type: "application/json",
+            const sensorLogFile = new File([sensorLogBlob], 'sensor_log.json', {
+              type: 'application/json',
             });
 
             // Stop video stream
-            const video = document.getElementById("video");
+            const video = document.getElementById('video');
             const stream = video.srcObject;
             const tracks = stream.getTracks();
 
@@ -408,9 +278,9 @@
             video.srcObject = null;
 
             // Use DataTransfer to simulate file input
-            const videoFileInput = document.getElementById("video-file");
+            const videoFileInput = document.getElementById('video-file');
             const sensorLogFileInput =
-              document.getElementById("sensor-log-file");
+              document.getElementById('sensor-log-file');
 
             const videoDataTransfer = new DataTransfer();
             videoDataTransfer.items.add(videoFile);
@@ -421,10 +291,11 @@
             sensorLogFileInput.files = logDataTransfer.files;
 
             // Submit the form
-            document.getElementById("upload-form").submit();
-            window.removeEventListener("devicemotion", updateSensorData);
-            window.removeEventListener("deviceorientation", updateSensorData);
+            document.getElementById('upload-form').submit();
           };
+          */
+          window.removeEventListener("devicemotion", updateSensorData);
+          window.removeEventListener("deviceorientation", updateSensorData);
         }
 
         document
@@ -441,10 +312,6 @@
     <p id="location">Location: Loading...</p>
     <p id="accelerometer">Accelerometer: Loading...</p>
     <p id="gyroscope">Gyroscope: Loading...</p>
-
-    {% comment %}
-    <p id="magnetometer">Magnetometer: Loading...</p>
-    {% endcomment %}
     <p id="fall_recognition">fall_recognition: Loading...</p>
     <p id="recording-status">Recording status: Not recording</p>
 
