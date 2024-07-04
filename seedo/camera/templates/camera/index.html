@@ -199,13 +199,13 @@
           recording = true;
           document.getElementById("recording-status").textContent =
             "Recording...";
-          /*
-          const video = document.getElementById('video');
-          const canvas = document.getElementById('canvas');
-          const context = canvas.getContext('2d');
+
+          const video = document.getElementById("video");
+          const canvas = document.getElementById("canvas");
+          const context = canvas.getContext("2d");
           let frameId = 0;
           const frameRate = 30; // frames per second
-
+          /*
           navigator.mediaDevices
             .getUserMedia({ video: true })
             .then(function (stream) {
