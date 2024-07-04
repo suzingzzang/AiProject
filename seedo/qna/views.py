@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from django.views.generic.edit import FormView
@@ -11,7 +12,7 @@ from .forms import CommentForm, QnAForm
 from .models import QnA
 
 
-@token_required
+@method_decorator(token_required, name="dispatch")
 class QnAListView(LoginRequiredMixin, ListView):
     model = QnA
     template_name = "qna/qna_list.html"
@@ -38,12 +39,13 @@ class QnAListView(LoginRequiredMixin, ListView):
         return context
 
 
-@token_required
+@method_decorator(token_required, name="dispatch")
 class QnADetailView(View):
+
     def get(self, request, pk):
         question = get_object_or_404(QnA, pk=pk)
         comment_form = CommentForm()
-        comments_list = question.comments.split("\n") if question.comments else []
+        comments_list = question.comments if question.comments else []
         context = {"question": question, "comment_form": comment_form, "comments_list": comments_list}
         return render(request, "qna/qna_detail.html", context)
 
@@ -53,10 +55,8 @@ class QnADetailView(View):
 
         if form.is_valid():
             comment = form.cleaned_data["content"]
-            if question.comments:
-                question.comments += f"\n{comment}"
-            else:
-                question.comments = comment
+
+            question.comments = comment
             question.save()
 
         return redirect("qna:qna-detail", pk=pk)
@@ -86,7 +86,7 @@ def comment_delete(request, pk):
     return redirect("qna:qna-detail", pk=pk)
 
 
-@token_required
+@method_decorator(token_required, name="dispatch")
 class QnACreateView(LoginRequiredMixin, CreateView):
     model = QnA
     form_class = QnAForm
@@ -103,7 +103,7 @@ class QnACreateView(LoginRequiredMixin, CreateView):
         return context
 
 
-@token_required
+@method_decorator(token_required, name="dispatch")
 class QnAUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = QnA
     form_class = QnAForm
@@ -120,7 +120,7 @@ class QnAUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return context
 
 
-@token_required
+@method_decorator(token_required, name="dispatch")
 class QnADeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = QnA
     success_url = reverse_lazy("qna:qna-list")
@@ -130,7 +130,7 @@ class QnADeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return self.request.user.is_superuser or self.request.user == question.author
 
 
-@token_required
+@method_decorator(token_required, name="dispatch")
 class CommentCreateView(FormView):
     template_name = "qna/qna_detail.html"
     form_class = CommentForm

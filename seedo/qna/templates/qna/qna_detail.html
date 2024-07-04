@@ -21,7 +21,21 @@
       </div>
     </div>
     <p class="content">{{ question.content }}</p>
-
+    {% comment %} 파일 확장자 확인 {% endcomment %}
+    <!--주석기능 찾음 오예-->
+    {% if question.file_upload %} {% with
+    file_extension=question.file_upload.name|lower|slice:'-4:' %} {% if
+    file_extension == '.jpg' or file_extension == '.png' or file_extension ==
+    '.gif' or file_extension == 'jpeg' %}
+    <img src="{{ question.file_upload.url }}" />
+    {% else %}
+    <p>
+      첨부 파일:
+      <a href="{{ question.file_upload.url }}" download
+        >{{ question.file_upload.name }}</a
+      >
+    </p>
+    {% endif %} {% endwith %} {% endif %}
     <!-- 댓글 -->
     {% if question.comments %}
     <div class="sub">
@@ -67,8 +81,8 @@
       style="display: none"
     >
       {% csrf_token %}
-      <textarea name="content" id="comment-content" rows="3" cols="40">
-        {{ question.comments|default_if_none:'' }}</textarea
+      <textarea name="content" id="comment-content">
+{{ question.comments }}</textarea
       >
       <button class="editComment" type="submit">댓글 수정</button>
     </form>

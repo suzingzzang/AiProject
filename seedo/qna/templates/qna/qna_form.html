@@ -3,7 +3,7 @@
 {% endblock extra_head %} {% block content %} {% load custom_filters %}
 <main>
   <div class="layout">
-    <form class="submitForm" method="post">
+    <form class="submitForm" method="post" enctype="multipart/form-data">
       {% csrf_token %} {{ form.as_p }}
       <button type="submit">등록하기</button>
     </form>

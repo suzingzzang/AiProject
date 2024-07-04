@@ -40,7 +40,7 @@ def send_request(request):
 
             verification_code = str(random.randint(100000, 999999))  # 인증 코드 생성
 
-            # 이메일 보내기
+            # 이메일 보내기(멘트 한국어로 수정해도 됨 )
             subject = "Verification Code"
             message = f"Your verification code is {verification_code}"
             from_email = settings.EMAIL_HOST_USER
