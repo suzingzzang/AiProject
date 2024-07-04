@@ -1,0 +1,99 @@
+{% extends "base.html" %} {% load static %} {% block extra_head %}
+<link rel="stylesheet" href="{% static 'qna/css/detail.css' %}" />
+{% endblock extra_head %} {% block content %} {% load custom_filters %}
+<main>
+  <div class="layout">
+    <p class="title">제목 | {{ question.title }}</p>
+    <div class="sub">
+      <p class="author">by. {{ question.author.email|email_username }} 님</p>
+      <!-- 질문 수정 및 삭제 -->
+      <div class="edel">
+        <a href="{% url 'qna:qna-update' question.pk %}">수정</a>
+        /
+        <form
+          action="{% url 'qna:qna-delete' question.pk %}"
+          method="post"
+          style="display: inline"
+        >
+          {% csrf_token %}
+          <button type="submit" onclick="confirmDelete(event)">삭제</button>
+        </form>
+      </div>
+    </div>
+    <p class="content">{{ question.content }}</p>
+
+    <!-- 댓글 -->
+    {% if question.comments %}
+    <div class="sub">
+      <span class="commentHeader">답변</span>
+      {% if request.user.is_superuser %}
+      <!-- superuser인 경우에만 댓글 수정 및 삭제 버튼 표시 -->
+      <div class="edel">
+        <button id="edit-button" onclick="showEditForm()">수정</button>
+        /
+        <form
+          method="post"
+          action="{% url 'qna:comment-delete' question.pk %}"
+          style="display: inline"
+        >
+          {% csrf_token %}
+          <button type="submit" onclick="confirmDelete(event)">삭제</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+    <p id="comment-display">{{ question.comments }}</p>
+    {% else %}
+    <!-- 댓글 작성 폼 -->
+    {% if request.user.is_superuser %}
+    <form method="post" action="{% url 'qna:comment-create' question.pk %}">
+      {% csrf_token %}
+      <textarea
+        name="content"
+        id="comment-content"
+        rows="3"
+        cols="40"
+      ></textarea>
+      <button class="commentRegist" type="submit">댓글 작성</button>
+    </form>
+    {% endif %} {% endif %}
+
+    <!-- 댓글 수정 폼 -->
+    <form
+      id="comment-edit-form"
+      method="post"
+      action="{% url 'qna:comment-update' question.pk %}"
+      onsubmit="validateCommentForm(event)"
+      style="display: none"
+    >
+      {% csrf_token %}
+      <textarea name="content" id="comment-content" rows="3" cols="40">
+        {{ question.comments|default_if_none:'' }}</textarea
+      >
+      <button class="editComment" type="submit">댓글 수정</button>
+    </form>
+  </div>
+</main>
+
+<script type="text/javascript">
+  function confirmDelete(event) {
+    if (!confirm("정말 삭제하시겠습니까?")) {
+      event.preventDefault();
+    }
+  }
+
+  function showEditForm() {
+    document.getElementById("comment-display").style.display = "none";
+    document.getElementById("edit-button").style.display = "none";
+    document.getElementById("comment-edit-form").style.display = "block";
+  }
+
+  function validateCommentForm(event) {
+    var content = document.getElementById("comment-content").value;
+    if (content.trim() === "") {
+      event.preventDefault();
+      alert("이 입력란을 작성하세요.");
+    }
+  }
+</script>
+{% endblock content %}

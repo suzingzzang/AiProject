@@ -7,6 +7,7 @@ class QnAForm(forms.ModelForm):
     class Meta:
         model = QnA
         fields = ["title", "content"]
+        labels = {"title": "제목", "content": "내용"}
 
 
 class CommentForm(forms.ModelForm):

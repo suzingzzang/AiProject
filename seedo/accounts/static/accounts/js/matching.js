@@ -37,6 +37,7 @@ function getCookie(name) {
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop().split(";").shift();
 }
+
 // 이메일 검색 및 사용자 목록 표시
 document.getElementById("email").addEventListener("input", function () {
   var email = this.value.trim();
