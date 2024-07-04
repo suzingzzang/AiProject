@@ -12,7 +12,7 @@ from .models import QnA
 
 class QnAListView(LoginRequiredMixin, ListView):
     model = QnA
-    template_name = "qna_list.html"
+    template_name = "qna/qna_list.html"
     context_object_name = "questions"
 
     def get_queryset(self):
@@ -42,7 +42,7 @@ class QnADetailView(View):
         comment_form = CommentForm()
         comments_list = question.comments.split("\n") if question.comments else []
         context = {"question": question, "comment_form": comment_form, "comments_list": comments_list}
-        return render(request, "qna_detail.html", context)
+        return render(request, "qna/qna_detail.html", context)
 
     def post(self, request, pk):
         question = get_object_or_404(QnA, pk=pk)
@@ -56,7 +56,7 @@ class QnADetailView(View):
                 question.comments = comment
             question.save()
 
-        return redirect("qna-detail", pk=pk)
+        return redirect("qna:qna-detail", pk=pk)
 
 
 def comment_update(request, pk):
@@ -67,7 +67,7 @@ def comment_update(request, pk):
         question.comments = comment_content
         question.save()
 
-    return redirect("qna-detail", pk=pk)
+    return redirect("qna:qna-detail", pk=pk)
 
 
 def comment_delete(request, pk):
@@ -76,15 +76,15 @@ def comment_delete(request, pk):
     if request.method == "POST":
         question.comments = ""
         question.save()
-        return redirect("qna-detail", pk=pk)
+        return redirect("qna:qna-detail", pk=pk)
 
-    return redirect("qna-detail", pk=pk)
+    return redirect("qna:qna-detail", pk=pk)
 
 
 class QnACreateView(LoginRequiredMixin, CreateView):
     model = QnA
     form_class = QnAForm
-    template_name = "qna_form.html"
+    template_name = "qna/qna_form.html"
     success_url = "/qna/"
 
     def form_valid(self, form):
@@ -100,7 +100,7 @@ class QnACreateView(LoginRequiredMixin, CreateView):
 class QnAUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = QnA
     form_class = QnAForm
-    template_name = "qna_form.html"
+    template_name = "qna/qna_form.html"
     success_url = "/qna/"
 
     def test_func(self):
@@ -115,7 +115,7 @@ class QnAUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class QnADeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = QnA
-    success_url = reverse_lazy("qna-list")
+    success_url = reverse_lazy("qna:qna-list")
 
     def test_func(self):
         question = self.get_object()
@@ -123,19 +123,19 @@ class QnADeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 class CommentCreateView(FormView):
-    template_name = "qna_detail.html"
+    template_name = "qna/qna_detail.html"
     form_class = CommentForm
 
     def form_valid(self, form):
         question = get_object_or_404(QnA, pk=self.kwargs["pk"])
 
         if question.comments:
-            question.comments += f"\n{self.request.user.email}: {form.cleaned_data['content']}"
+            question.comments += f"\n{form.cleaned_data['content']}"
         else:
-            question.comments = f"{self.request.user.email}: {form.cleaned_data['content']}"
+            question.comments = f"{form.cleaned_data['content']}"
 
         question.save()
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy("qna-detail", kwargs={"pk": self.kwargs["pk"]})
+        return reverse_lazy("qna:qna-detail", kwargs={"pk": self.kwargs["pk"]})

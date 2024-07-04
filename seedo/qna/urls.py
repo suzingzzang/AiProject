@@ -1,6 +1,8 @@
 from django.urls import path
 
-from .views import CommentCreateView, QnACreateView, QnADeleteView, QnADetailView, QnAListView, QnAUpdateView, comment_delete, comment_update
+from .views import *
+
+app_name = "qna"
 
 urlpatterns = [
     path("", QnAListView.as_view(), name="qna-list"),
