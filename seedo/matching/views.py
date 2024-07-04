@@ -6,9 +6,9 @@ import random
 from common.decorators import token_required
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from twilio.rest import Client
 
 from .models import UserRequest
 
@@ -38,16 +38,16 @@ def send_request(request):
             if existing_request:
                 return JsonResponse({"status": "error", "message": "이미 요청을 보냈습니다."}, status=400)
 
-            Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
             verification_code = str(random.randint(100000, 999999))  # 인증 코드 생성
 
-            # SMS 보내기
-            # message = client.messages.create(
-            #    body=f'Your verification code is {verification_code}',
-            #    from_=settings.TWILIO_PHONE_NUMBER,
-            #    to=recipient.phonenumber
-            # )
-            # user_request =
+            # 이메일 보내기(멘트 한국어로 수정해도 됨 )
+            subject = "Verification Code"
+            message = f"Your verification code is {verification_code}"
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [recipient.email]
+
+            send_mail(subject, message, from_email, recipient_list)
+
             UserRequest.objects.create(requester=request.user, recipient=recipient, verification_code=verification_code)
 
             return JsonResponse({"status": "success"})
