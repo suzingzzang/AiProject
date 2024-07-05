@@ -16,6 +16,18 @@ main {
   width: 100%;
 }
 
+.qnaList {
+  text-align: center;
+  color: #337614;
+  font-size: 24px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.qnaList:hover {
+  color: #76b559;
+  text-decoration: underline;
+}
+
 .title,
 .commentHeader {
   color: #193b08;
@@ -56,23 +68,38 @@ main {
 
 .content {
   width: 100%;
-  height: 30vh; /* 최대 높이 설정 */
+  height: 50vh; /* 최대 높이 설정 */
   padding: 3px 3px;
   border-width: 1px;
   border-radius: 4px;
   background-color: #fff;
-  /* display: flex; */
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   box-shadow: 2px 2px 5px #00000080;
   overflow-y: auto; /* 스크롤 추가 */
+  position: relative;
+}
+.content > p {
+  margin-bottom: 10px;
+}
+.content > .embededImg {
+  max-width: 95%;
+  border: 3px solid #337614;
+  border-radius: 4px;
+  position: absolute;
+  margin: 0px 3px;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.content > .embededFile {
+  position: absolute;
+  padding-left: 3px;
+  bottom: 3px;
 }
 
 #comment-content {
   width: 100%;
   margin-top: 10px;
-  height: 30vh; /* 최대 높이 설정 */
+  height: 20vh; /* 최대 높이 설정 */
   padding: 3px 3px;
   border-width: 1px;
   border-radius: 4px;

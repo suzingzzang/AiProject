@@ -4,6 +4,7 @@
   padding: 0;
   box-sizing: border-box;
   font-size: 20px;
+  font-family: Arial, sans-serif;;
 }
 
 body {
@@ -39,6 +40,7 @@ header .material-symbols-outlined {
   color: #337614;
   font-size: 26px;
   flex-shrink: 0;
+  padding: 0px 15px;
 }
 
 header a {
@@ -52,6 +54,9 @@ header .logo img {
   margin-right: 8px;
 }
 
+header .mypage {
+  padding: 0px 15px;
+}
 header .mypage:hover {
   font-weight: bold;
 }
