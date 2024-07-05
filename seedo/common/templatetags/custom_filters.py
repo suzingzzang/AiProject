@@ -9,3 +9,21 @@ def email_username(value):
         return value.split("@")[0]
     except (AttributeError, IndexError):
         return ""
+
+@register.filter(name="file_name")
+def file_name(value):
+    try:
+        return value.split("/")[-1]
+    except (AttributeError, IndexError):
+        return ""
+    
+@register.filter(name="extension_name")
+def extension_name(value):
+    try:
+        return value.split(".")[-1]
+    except (AttributeError, IndexError):
+        return ""
+    
+@register.filter
+def in_list(value, arg):
+    return value in arg.split(',')

@@ -21,7 +21,7 @@ main {
   overflow: hidden;
 }
 
-img {
+img, video {
   max-width: 100%;
   height: auto;
 }
@@ -85,13 +85,12 @@ img {
   z-index: 1;
 }
 
-.recordList > .recorded {
+.recordedTitle {
   font-size: 40px;
   line-height: 1.3;
   cursor: pointer;
 }
-
-.recordList > .recorded:hover {
+.recordedTitle:hover {
   color: #6e6e6e;
 }
 

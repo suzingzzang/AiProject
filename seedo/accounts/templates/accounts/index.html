@@ -43,8 +43,8 @@
         <div class="right">
           {% if partner.is_accepted %}
           <!-- 수락된 경우 -->
-          <a href="#" class="pBreakLog">시설</a>
-          <a href="#" class="pAccidentLog">사고</a>
+          <a href="/record/break/{{partner.user.id}}/" class="pBreakLog">시설</a>
+          <a href="/record/accident/{{partner.user.id}}/" class="pAccidentLog">사고</a>
           {% else %} {% if partner.is_requester %}
           <!-- 요청을 보낸 경우 -->
           <p class="requestBtn">수락대기</p>
