@@ -35,4 +35,5 @@ urlpatterns = [
     path("matching/", include("matching.urls")),
     path("record/", include("record.urls")),
     path("qna/", include("qna.urls")),
+    path("walking_mode", include("walking_mode.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

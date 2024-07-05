@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "matching",
     "record",
     "qna",
+    "walking_mode",
 ]
 
 MIDDLEWARE = [
