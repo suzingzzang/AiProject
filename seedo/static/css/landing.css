@@ -6,7 +6,7 @@ main {
   align-items: center;
   flex-direction: column; /* Arrange buttons vertically */
   gap: 34px; /* Gap between buttons */
-  padding: 100px 0px;
+  padding: 70px 0px 10px;
 }
 
 main div {
