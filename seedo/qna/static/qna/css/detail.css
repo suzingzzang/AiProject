@@ -76,24 +76,26 @@ main {
   box-shadow: 2px 2px 5px #00000080;
   overflow-y: auto; /* 스크롤 추가 */
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* 공간을 고르게 분배 */
 }
-.content > p {
+
+.contentText {
   margin-bottom: 10px;
+  flex-grow: 1; /* 공간을 차지하여 상단에 위치하도록 */
 }
-.content > .embededImg {
+
+.embededImg {
   max-width: 95%;
   border: 3px solid #337614;
   border-radius: 4px;
-  position: absolute;
-  margin: 0px 3px;
-  bottom: 3px;
-  left: 50%;
-  transform: translateX(-50%);
+  align-self: center; /* 중앙 정렬 */
 }
-.content > .embededFile {
-  position: absolute;
-  padding-left: 3px;
-  bottom: 3px;
+
+.embededFile {
+  align-self: flex-start; /* 왼쪽 정렬 */
+  padding: 3px;
 }
 
 #comment-content {

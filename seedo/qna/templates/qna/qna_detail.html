@@ -22,7 +22,7 @@
       </div>
     </div>
     <div class="content">
-      <p>{{ question.content }}</p>
+      <p class="contentText">{{ question.content }}</p>
       {% comment %} 파일 확장자 확인 {% endcomment %} <!--주석기능 찾음 오예-->
       {% if question.file_upload %}
         {% with file_extension=question.file_upload.name|extension_name %}

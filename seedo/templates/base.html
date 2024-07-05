@@ -28,7 +28,11 @@
         />
         Seedo
       </a>
-      <a href="/accounts/" class="mypage">My</a>
+      {% if request.user.is_superuser %}
+      <a href="/admin/" id="mypage" class="material-symbols-outlined">supervisor_account</a>
+      {% else %}
+      <a href="/accounts/" id="mypage" class="material-symbols-outlined">person</a>
+      {% endif %}
       {% else %}
       <a href="/" class="logo">
         <img
