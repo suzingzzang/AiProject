@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Home</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <script>
+      async function sendCameraImage(imageData) {
+        try {
+          const response = await fetch('{% url "walking_mode:test" %}', {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({ image_data: imageData }),
+          });
+
+          const result = await response.json();
+          console.log(result);
+          // 탐지된 객체 정보를 HTML에 표시
+          document.getElementById("object_detection").textContent =
+            `Detection: ${result.od_classes.join(", ")} (Segmentation: ${result.seg_classes.join(", ")})`;
+
+          // TTS 오디오를 재생
+          /*if (result.tts_audio_url) {
+                const audioElement = new Audio(result.tts_audio_url);
+                audioElement.autoplay = true;
+                audioElement.play();
+              }*/
+          if (result.tts_audio_url) {
+            const audioContainer = document.getElementById("audio-container");
+            const sound = new Howl({
+              src: [result.tts_audio_url],
+              format: ["mp3"], // 오디오 파일 형식을 명시
+            });
+
+            const playButton = document.createElement("button");
+            playButton.textContent = "Play Audio";
+            playButton.addEventListener("click", () => {
+              sound.play();
+            });
+
+            audioContainer.appendChild(playButton);
+          }
+        } catch (error) {
+          console.error("Error sending camera image:", error);
+        }
+      }
+
+      function captureImage(video, canvas) {
+        const context = canvas.getContext("2d");
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        return canvas.toDataURL("image/png");
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        let recording = false;
+        const frameRate = 1; // frames per second
+        let video = document.getElementById("video");
+        let canvas = document.getElementById("canvas");
+
+        function maybeSendCameraImage() {
+          if (recording) {
+            const imageData = captureImage(video, canvas);
+            sendCameraImage(imageData);
+          }
+        }
+
+        function startRecording() {
+          recording = true;
+          document.getElementById("recording-status").textContent =
+            "Recording...";
+
+          navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .then(function (stream) {
+              video.srcObject = stream;
+              video.play();
+            })
+            .catch(function (error) {
+              console.error("Error accessing camera:", error);
+            });
+
+          setInterval(maybeSendCameraImage, 1000 / frameRate);
+        }
+
+        function stopRecording() {
+          recording = false;
+          document.getElementById("recording-status").textContent =
+            "Recording stopped.";
+          video.pause();
+          video.srcObject.getTracks().forEach((track) => track.stop());
+        }
+
+        document
+          .getElementById("start-camera")
+          .addEventListener("click", startRecording);
+        document
+          .getElementById("stop-camera")
+          .addEventListener("click", stopRecording);
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Object Detection</h1>
+    <p id="object_detection">Detection: Loading...</p>
+    <p id="recording-status">Recording status: Not recording</p>
+
+    <button id="start-camera">Start Camera</button>
+    <button id="stop-camera">Stop Camera</button>
+    <form
+      id="upload-form"
+      method="post"
+      enctype="multipart/form-data"
+      action="{% url 'walking_mode:upload_recording' %}"
+    >
+      {% csrf_token %}
+      <input type="file" name="video" id="video-file" style="display: none" />
+      <input
+        type="file"
+        name="sensor_log"
+        id="sensor-log-file"
+        style="display: none"
+      />
+      <button type="submit" style="display: none">Submit</button>
+    </form>
+    <video id="video" width="640" height="480" style="display: block"></video>
+    <canvas id="canvas" width="640" height="480" style="display: none"></canvas>
+    <div id="audio-container"></div>
+  </body>
+</html>

@@ -1,3 +1,5 @@
+import base64
+import json
 import math
 import os
 import time
@@ -9,7 +11,9 @@ import cv2
 import environ
 import numpy as np
 from django.conf import settings
-from django.shortcuts import render
+from django.core.files.base import ContentFile
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
 from django.views import View
 from PIL import Image
 from ultralytics import YOLO
@@ -31,6 +35,23 @@ environ.Env.read_env(env_file=env_path)
 
 CLIENT_ID = env("NAVER_TTS_CLIENT_ID")
 SECRETE_KEY = env("NAVER_TTS_CLIENT_SECRETE_KEY")
+
+
+def upload_recording(request):
+    if request.method == "POST":
+        # form = RecordingForm(request.POST, request.FILES)
+        # if form.is_valid():
+        #     form.save()
+        return redirect("walking_mode:show_camera")
+    else:
+        pass
+        # form = RecordingForm()
+    # return render(request, "camera/index.html", {"form": form})
+
+
+def show_camera(request):
+
+    return render(request, "walking_mode/test2.html")
 
 
 # tts api
@@ -119,26 +140,29 @@ def determine_position(x_center):
 
 class ImageUploadView(View):
 
-    template_name = "test.html"
+    template_name = "test2.html"
 
     def get(self, request):
         return render(request, self.template_name)
 
     def post(self, request):
-        od_classes = []
-        seg_classes = []
-        tts_audio_url = None  # 초기화
-
-        # if request.FILES.get('image'):
-        if request.FILES.get("file"):
-            # 모델 로드
-
+        try:
             model_od = YOLO(yolo_od_pt)
             model_seg = YOLO(yolo_seg_pt)
             names_od = model_od.names
             names_seg = model_seg.names
+        except Exception as e:
+            print(f"Error loading models: {str(e)}")
+            return JsonResponse({"error": f"Error loading models: {str(e)}"}, status=500)
 
-            # image = request.FILES['image'] 영상을 기본으로
+        od_classes = []
+        seg_classes = []
+        tts_audio_url = None  # 초기화
+        history = {}
+        pixel_per_meter = 300
+
+        # file 업로드방식
+        if request.FILES.get("file"):
             file = request.FILES["file"]
             file_path = os.path.join(settings.MEDIA_ROOT, "video.mp4")
             with open(file_path, "wb+") as destination:
@@ -256,7 +280,7 @@ class ImageUploadView(View):
                                         "count": 0,
                                         "model": i,
                                     }  # history에 없다면 해당 track_id선언, 초기화,   #history에 있었다면 +1
-                                print(distance)
+                                # print(distance)
                                 if distance <= 7:
                                     history[track_id]["count"] += 1
 
@@ -331,27 +355,95 @@ class ImageUploadView(View):
 
                 cap.release()
 
-            # 디버깅 로그 추가
-            # print("Detected Object Classes:", od_classes)
-            # print("Segmented Object Classes:", seg_classes)
+        elif request.content_type == "application/json":
+            data = json.loads(request.body)
+            image_data = data.get("image_data")
+            format, imgstr = image_data.split(";base64,")
+            ext = format.split("/")[-1]
+            image_data = ContentFile(base64.b64decode(imgstr), name="temp." + ext)
+            nparr = np.frombuffer(image_data.read(), np.uint8)
+            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            od_classes, seg_classes, tts_audio_url = self.process_image(img, model_od, model_seg, history, pixel_per_meter)
+        else:
+            return JsonResponse({"error": "Invalid content type"}, status=400)
 
-            # tts 문자생성
-            # tts_audio_url = None  # 초기화
-            # tts_text = []
-            # if len(od_classes) != 0:
-            #     distance = ["0미터" for _ in range(len(od_classes))]
-            #     for od_class, distance in zip(od_classes, distance):
-            #         tts_text.append(f"{od_class}, {distance}")
-            #     tts_text = " , ".join(tts_text)
-            # else:
-            #     distance = ["0미터" for _ in range(len(seg_classes))]
-            #     for seg_class, distance in zip(seg_classes, distance):
-            #         tts_text.append(f"{seg_class}, {distance}")
-            #     tts_text = " , ".join(tts_text)
+        return JsonResponse({"od_classes": od_classes, "seg_classes": seg_classes, "tts_audio_url": tts_audio_url})
 
-            # TTS 합성
-            # tts_text = "Object detection classes: " + ", ".join(od_classes) + ". Segmentation classes: " + ", ".join(seg_classes)
+    def process_image(self, img, model_od, model_seg, history, pixel_per_meter):
+        w, h = img.shape[1], img.shape[0]
+        start_point = (w // 2, h + pixel_per_meter * 2)
+        _obstacles = [0, 1, 2, 3, 4, 5, 11, 12]
 
-        context = {"od_classes": od_classes, "seg_classes": seg_classes, "tts_audio_url": tts_audio_url}
+        current_track_ids = []
+        tts_text = None
+        tts_audio_url = None
+        od_classes = []
+        seg_classes = []
 
-        return render(request, self.template_name, context)
+        for i, model in enumerate([model_od, model_seg]):
+            names = model.model.names
+            results = model.track(img, persist=True)
+            boxes = results[0].boxes.xyxy.cpu()
+            clss = results[0].boxes.cls.cpu().tolist()
+            if results[0].boxes.id is not None:
+                track_ids = results[0].boxes.id.int().cpu().tolist()
+
+                for box, track_id, cls in zip(boxes, track_ids, clss):
+                    if i == 0:  # Object Detection
+                        od_classes.append(names[int(cls)])
+                    elif i == 1:  # Segmentation
+                        seg_classes.append(names[int(cls)])
+                    if (int(cls) in _obstacles) and i == 1:
+                        continue
+
+                    x1, y1 = int((box[0] + box[2]) // 2), int(box[3])
+                    distance = math.sqrt((x1 - start_point[0]) ** 2 + (y1 - start_point[1]) ** 2) / pixel_per_meter
+
+                    current_track_ids.append(track_id)
+
+                    if track_id not in history:
+                        history[track_id] = {"cls": cls, "count": 0, "model": i}
+                    if distance <= 7:
+                        history[track_id]["count"] += 1
+
+                    if history[track_id]["count"] >= 4:
+                        direction = determine_position(x1)
+                        cls_count = sum(1 for h in history.values() if (h["cls"] == cls and h["model"] == i))
+                        if cls_count >= 3:
+                            if 3 <= distance <= 7:
+                                tts_text = f"7m, {direction}, {names[int(cls)]},{cls_count}개"
+                            elif distance < 3:
+                                tts_text = f"3m, {direction}, {names[int(cls)]},{cls_count}개"
+
+                            for k, v in history.items():
+                                if v["cls"] == cls and v["model"] == i:
+                                    v["count"] = -20
+                        else:
+                            if 3 <= distance <= 7:
+                                tts_text = f"5m,{direction}, {names[int(cls)]}"
+                            elif distance < 7:
+                                tts_text = f"3m,{direction}, {names[int(cls)]}"
+                        history[track_id]["count"] = -10
+                    tts_text = f"7m, {names[int(cls)]},"
+                    try:
+                        if tts_text:
+                            tts_audio = naver_tts(tts_text)
+                            if tts_audio:
+                                tts_audio_dir = os.path.join(settings.MEDIA_ROOT, "tts_audio")
+                                if not os.path.exists(tts_audio_dir):
+                                    os.makedirs(tts_audio_dir)
+                                timestamp = time.strftime("%Y%m%d-%H%M%S")
+                                tts_audio_path = os.path.join(tts_audio_dir, f"tts_audio_{timestamp}.mp3")
+                                with open(tts_audio_path, "wb") as f:
+                                    f.write(tts_audio)
+                                tts_audio_url = f"media/tts_audio/tts_audio_{timestamp}.mp3"
+                    except Exception as e:
+                        print(f"TTS Error: {str(e)}")
+            else:
+                print("OD Results have no IDs")
+
+        for track_id in list(history.keys()):
+            if track_id not in current_track_ids:
+                del history[track_id]
+        print(history)
+        return od_classes, seg_classes, tts_audio_url
