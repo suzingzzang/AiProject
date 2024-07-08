@@ -1,5 +1,6 @@
 <!doctype html>
 {% load static %}
+{% load alarmList %}
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -20,16 +21,7 @@
       {% if user.is_authenticated %}
       <div>
         <span class="noti material-symbols-outlined">notifications</span>
-        <ul class="alarmList">
-          <li>날짜시간사용자명</li><hr>
-          <li>날짜시간사용자명</li><hr>
-          <li>날짜시간사용자명</li><hr>
-          <li>날짜시간사용자명</li><hr>
-          <li>날짜시간사용자명</li><hr>
-          <li>날짜시간사용자명</li><hr>
-          <li>날짜시간사용자명</li><hr>
-          <li>날짜시간사용자명</li><hr>
-        </ul>
+        {% get_user_notifications %}
       </div>
       <a href="/" class="logo">
         <img
@@ -66,14 +58,24 @@
     const noti = document.querySelector('.noti');
     const alarmList = document.querySelector('.alarmList');
 
-    noti.addEventListener("click", function(){
+    noti.addEventListener("click", function(event){
+      event.stopPropagation();
       if (alarmList.classList.contains('show')) {
         alarmList.classList.remove('show');
         setTimeout(() => { alarmList.style.display = 'none'; }, 500);
       } else {
         alarmList.style.display = 'block';
         setTimeout(() => { alarmList.classList.add('show'); }, 0);
-      };
+      }
+    });
+
+    document.addEventListener("click", function(event){
+      if (!alarmList.contains(event.target) && !noti.contains(event.target)) {
+        if (alarmList.classList.contains('show')) {
+          alarmList.classList.remove('show');
+          setTimeout(() => { alarmList.style.display = 'none'; }, 500);
+        }
+      }
     });
   });
 </script>
