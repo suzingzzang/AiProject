@@ -74,7 +74,8 @@
         function initMap() {
             map = new Tmapv2.Map("map", {
                 center: new Tmapv2.LatLng(37.5665, 126.9780),
-                zoom: 13
+                zoom: 13,
+                httpsMode : true
             });
             // 현재 위치 가져오기
             getCurrentLocation();
@@ -411,13 +412,13 @@
 
                         var marker = new Tmapv2.Marker({
                             position: markerPosition,
-                            icon: "http://tmapapi.sktelecom.com/upload/tmap/marker/pin_b_m_" + k + ".png",
+                            //icon: "http://tmapapi.sktelecom.com/upload/tmap/marker/pin_b_m_" + k + ".png",
                             iconSize: new Tmapv2.Size(24, 38),
                             title: name,
                             map: map
                         });
 
-                        innerHtml += "<li onclick='setDestination(" + lat + "," + lon + ")'><img src='http://tmapapi.sktelecom.com/upload/tmap/marker/pin_b_m_" + k + ".png' style='vertical-align:middle;'/><span>" + name + "</span></li>";
+                        innerHtml += "<li onclick='setDestination(" + lat + "," + lon + ")'><span>" + name + "</span></li>";
 
                         markers.push(marker);
                         positionBounds.extend(markerPosition);
