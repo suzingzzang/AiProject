@@ -32,8 +32,10 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
     path("", index, name="home"),
+    path("camera/", include("camera.urls")),
     path("matching/", include("matching.urls")),
     path("record/", include("record.urls")),
     path("qna/", include("qna.urls")),
-    path("nav/", include('navigation.urls')),  
+    path("sensor/", include("sensor.urls")),
+    path("nav/", include("navigation.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

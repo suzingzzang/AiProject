@@ -22,7 +22,7 @@ def broken_view(request, request_id):
         partner_list.append(partner_info)
 
     # 조회하는 사용자의 파손 기록 조회
-    broken_records = Condition.objects.filter(user=request_id).order_by('-condition_date', '-condition_time')
+    broken_records = Condition.objects.filter(user=request_id).order_by("-condition_date", "-condition_time")
     broken_list = []
     for broken_record in broken_records:
         broken_info = {
@@ -51,7 +51,7 @@ def accident_view(request, request_id):
         partner_list.append(partner_info)
 
     # 조회하는 사용자의 사고 기록 조회
-    accident_records = Accident.objects.filter(user=request_id).order_by('-accident_date', '-accident_time')
+    accident_records = Accident.objects.filter(user=request_id).order_by("-accident_date", "-accident_time")
     accident_list = []
     for accident_record in accident_records:
         accident_info = {

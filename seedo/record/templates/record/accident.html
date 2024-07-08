@@ -4,14 +4,10 @@
 <main>
   <div class="layout">
     <div class="dropdown">
-      <div class="userName">
-        {{ selected_user.email|email_username }} 님의 사고 기록
-      </div>
+      <div class="userName">{{ selected_user.email|email_username }} 님의 사고 기록</div>
       <div class="dropUser">
         {% for partner in partner_list %}
-        <a href="/record/accident/{{partner.user.id}}/">
-          {{partner.user.email|email_username}} 님의 사고 기록</a
-        >
+        <a href="/record/accident/{{partner.user.id}}/"> {{partner.user.email|email_username}} 님의 사고 기록</a>
         {% endfor %}
       </div>
     </div>
