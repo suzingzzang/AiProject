@@ -1,5 +1,6 @@
 <!doctype html>
 {% load static %}
+{% load alarmList %}
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -20,16 +21,7 @@
       {% if user.is_authenticated %}
       <div>
         <span class="noti material-symbols-outlined">notifications</span>
-        <ul class="alarmList">
-          <li>날짜시간사용자명</li><hr>
-          <li>날짜시간사용자명</li><hr>
-          <li>날짜시간사용자명</li><hr>
-          <li>날짜시간사용자명</li><hr>
-          <li>날짜시간사용자명</li><hr>
-          <li>날짜시간사용자명</li><hr>
-          <li>날짜시간사용자명</li><hr>
-          <li>날짜시간사용자명</li><hr>
-        </ul>
+        {% get_user_notifications %}
       </div>
       <a href="/" class="logo">
         <img

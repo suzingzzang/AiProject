@@ -66,13 +66,6 @@ header .logo img {
 .alarmList {
   display: none;
   text-align: center;
-  color: #ffffff;
-  text-shadow:
-    -1px 0px #000000,
-    0px 1px #000000,
-    1px 0px #000000,
-    0px -1px #000000;
-  font-weight: 700;
 
   border: none;
   border-radius: 4px;
@@ -81,7 +74,8 @@ header .logo img {
 
   padding: 5px 5px;
   width: fit-content;
-  max-height: 200px;
+  max-width: 200px;
+  max-height: 250px;
   overflow-y: auto;
 
   position: absolute;
@@ -92,4 +86,13 @@ header .logo img {
 .alarmList.show {
   display: block;
   opacity: 1;
+}
+.alarmList > * {
+  color: #ffffff;
+  text-shadow:
+    -1px 0px #000000,
+    0px 1px #000000,
+    1px 0px #000000,
+    0px -1px #000000;
+  font-weight: 700;
 }
