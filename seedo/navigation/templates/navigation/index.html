@@ -4,10 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedestrian Navigation</title>
-
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
-</head>
-</head>
+    <style>
+        .container {
+            display: flex;
+        }
+        #map {
+            height: 300px;
+            flex: 3;
+        }
+        .search-results {
+            flex: 1;
+            overflow-y: auto;
+            height: 300px;
+        }
+        .search-results ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .search-results li {
+            cursor: pointer;
+            padding: 5px;
+        }
+        .search-results li:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
 </head>
 <body>
     <h1>Pedestrian Navigation</h1>
@@ -22,15 +45,28 @@
         <label for="endLng">도착지 경도:</label>
         <input type="text" id="endLng" placeholder="도착지 경도를 입력하세요">
         <button onclick="findRoute()">경로 찾기</button>
-
     </div>
 
-    <div id="map" style="height: 300px;"></div>
+    <div>
+        <input type="text" class="text_custom" id="searchKeyword" name="searchKeyword" value="서울시">	
+        <button id="btn_select">POI 검색</button>
+    </div>
+
+    <div class="container">
+        <div class="search-results">
+            <ul id="searchResult" name="searchResult">
+                <li>검색결과</li>
+            </ul>
+        </div>
+        <div id="map"></div>
+    </div>
     <div id="route-info"></div>
+
     <script>
         var map;
         var markers = [];
-        var polyline;  // 전역 변수로 폴리라인 저장
+        var markerArr = [];
+        var polyline;
 
         function initMap() {
             map = new Tmapv2.Map("map", {
@@ -44,11 +80,6 @@
         }
 
         function addMarker(location) {
-            // 기존 경로가 있으면 삭제
-            if (polyline) {
-                polyline.setMap(null);
-            }
-
             if (markers.length >= 2) {
                 markers.forEach(function(marker) {
                     marker.setMap(null);
@@ -63,7 +94,6 @@
 
             markers.push(marker);
 
-            // 마커 위치를 입력란에 표시
             if (markers.length === 1) {
                 document.getElementById('startLat').value = location.lat();
                 document.getElementById('startLng').value = location.lng();
@@ -112,7 +142,6 @@
         }
 
         function displayRoute(directionsData) {
-            // 기존 경로가 있으면 삭제
             if (polyline) {
                 polyline.setMap(null);
             }
@@ -135,7 +164,6 @@
                 }
             });
 
-            // 새로운 경로 폴리라인 생성
             polyline = new Tmapv2.Polyline({
                 path: pathCoordinates,
                 strokeColor: "#FF0000",
@@ -143,12 +171,25 @@
                 map: map
             });
 
-            // 맵 중심 위치 및 줌 레벨 조정
             var bounds = new Tmapv2.LatLngBounds();
             points.forEach(function(point) {
                 bounds.extend(point);
             });
             map.fitBounds(bounds);
+
+            var routeInfoContainer = document.getElementById('route-info');
+            while (routeInfoContainer.firstChild) {
+                routeInfoContainer.removeChild(routeInfoContainer.firstChild);
+            }
+
+            features.forEach(function(feature) {
+                if (feature.properties.description.includes("이동")) {
+                    var info = document.createElement('div');
+                    info.classList.add('route-info-item');
+                    info.innerHTML = `<p>${feature.properties.description}</p>`;
+                    routeInfoContainer.appendChild(info);
+                }
+            });
         }
 
         function getCookie(name) {
@@ -168,7 +209,80 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             initMap();
+
+            $("#btn_select").click(function() {
+                var searchKeyword = $('#searchKeyword').val();
+                var headers = {}; 
+                headers["appKey"] = "po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3";
+
+                $.ajax({
+                    method: "GET",
+                    headers: headers,
+                    url: "https://apis.openapi.sk.com/tmap/pois?version=1&format=json&callback=result",
+                    async: false,
+                    data: {
+                        "searchKeyword": searchKeyword,
+                        "resCoordType": "EPSG3857",
+                        "reqCoordType": "WGS84GEO",
+                        "count": 10
+                    },
+                    success: function(response) {
+                        var resultpoisData = response.searchPoiInfo.pois.poi;
+                        if (markerArr.length > 0) {
+                            for (var i in markerArr) {
+                                markerArr[i].setMap(null);
+                            }
+                        }
+                        var innerHtml = "";	
+                        var positionBounds = new Tmapv2.LatLngBounds();	
+                        
+                        resultpoisData.forEach(function(poi, k) {
+                            var noorLat = Number(poi.noorLat);
+                            var noorLon = Number(poi.noorLon);
+                            var name = poi.name;
+                            
+                            var pointCng = new Tmapv2.Point(noorLon, noorLat);
+                            var projectionCng = new Tmapv2.Projection.convertEPSG3857ToWGS84GEO(pointCng);
+                            
+                            var lat = projectionCng._lat;
+                            var lon = projectionCng._lng;
+                            
+                            var markerPosition = new Tmapv2.LatLng(lat, lon);
+                            
+                            var marker = new Tmapv2.Marker({
+                                position: markerPosition,
+                                icon: "http://tmapapi.sktelecom.com/upload/tmap/marker/pin_b_m_" + (k % 10) + ".png",
+                                iconSize: new Tmapv2.Size(24, 38),
+                                title: name,
+                                map: map
+                            });
+
+                            marker.addListener("click", function() {
+                                addMarker(markerPosition);
+                            });
+                            
+                            innerHtml += `<li onclick="setMarker(${lat}, ${lon})"><img src='http://tmapapi.sktelecom.com/upload/tmap/marker/pin_b_m_${k % 10}.png' style='vertical-align:middle;'/><span>${name}</span></li>`;
+                            
+                            markerArr.push(marker);
+                            positionBounds.extend(markerPosition);
+                        });
+                        
+                        $("#searchResult").html(innerHtml);	
+                        map.panToBounds(positionBounds);
+                        map.zoomOut();
+                        
+                    },
+                    error: function(request, status, error) {
+                        console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                    }
+                });
+            });
         });
+
+        function setMarker(lat, lon) {
+            var location = new Tmapv2.LatLng(lat, lon);
+            addMarker(location);
+        }
     </script>
 </body>
 </html>

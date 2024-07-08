@@ -33,8 +33,8 @@ def get_walking_directions(request):
             "searchOption": "0",  
             "sort": "index",
             # 추후에 geocode를 이용해서 좌표값을 주소값으로 변환한다음 보내야함....
-            "startName": "%EB%B3%B4%ED%96%89%EC%9E%90-%EA%B2%BD%EB%A1%9C%EC%95%88%EB%82%B4",
-            "endName": "%EB%B3%B4%ED%96%89%EC%9E%90-%EA%B2%BD%EB%A1%9C%EC%95%88%EB%82%B4"
+            "startName": "출발지",
+            "endName": "도착지"
         }
 
         try:
