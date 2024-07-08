@@ -18,7 +18,19 @@
   <body>
     <header>
       {% if user.is_authenticated %}
-      <span class="material-symbols-outlined"> notifications </span>
+      <div>
+        <span class="noti material-symbols-outlined">notifications</span>
+        <ul class="alarmList">
+          <li>날짜시간사용자명</li><hr>
+          <li>날짜시간사용자명</li><hr>
+          <li>날짜시간사용자명</li><hr>
+          <li>날짜시간사용자명</li><hr>
+          <li>날짜시간사용자명</li><hr>
+          <li>날짜시간사용자명</li><hr>
+          <li>날짜시간사용자명</li><hr>
+          <li>날짜시간사용자명</li><hr>
+        </ul>
+      </div>
       <a href="/" class="logo">
         <img
           src="{% static 'images/seedo_logo.png' %} "
@@ -48,3 +60,20 @@
     {% block content %} {% endblock content %}
   </body>
 </html>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const noti = document.querySelector('.noti');
+    const alarmList = document.querySelector('.alarmList');
+
+    noti.addEventListener("click", function(){
+      if (alarmList.classList.contains('show')) {
+        alarmList.classList.remove('show');
+        setTimeout(() => { alarmList.style.display = 'none'; }, 500);
+      } else {
+        alarmList.style.display = 'block';
+        setTimeout(() => { alarmList.classList.add('show'); }, 0);
+      };
+    });
+  });
+</script>
