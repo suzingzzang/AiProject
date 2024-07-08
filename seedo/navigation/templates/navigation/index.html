@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedestrian Navigation</title>
+
+    <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
+</head>
+</head>
+</head>
+<body>
+    <h1>Pedestrian Navigation</h1>
+    
+    <div class="form-container">
+        <label for="startLat">출발지 위도:</label>
+        <input type="text" id="startLat" placeholder="출발지 위도를 입력하세요">
+        <label for="startLng">출발지 경도:</label>
+        <input type="text" id="startLng" placeholder="출발지 경도를 입력하세요">
+        <label for="endLat">도착지 위도:</label>
+        <input type="text" id="endLat" placeholder="도착지 위도를 입력하세요">
+        <label for="endLng">도착지 경도:</label>
+        <input type="text" id="endLng" placeholder="도착지 경도를 입력하세요">
+        <button onclick="findRoute()">경로 찾기</button>
+
+    </div>
+
+    <div id="map" style="height: 300px;"></div>
+    <div id="route-info"></div>
+    <script>
+        var map;
+        var markers = [];
+        var polyline;  // 전역 변수로 폴리라인 저장
+
+        function initMap() {
+            map = new Tmapv2.Map("map", {
+                center: new Tmapv2.LatLng(37.5665, 126.9780),
+                zoom: 13
+            });
+
+            map.addListener('click', function(event) {
+                addMarker(event.latLng);
+            });
+        }
+
+        function addMarker(location) {
+            // 기존 경로가 있으면 삭제
+            if (polyline) {
+                polyline.setMap(null);
+            }
+
+            if (markers.length >= 2) {
+                markers.forEach(function(marker) {
+                    marker.setMap(null);
+                });
+                markers = [];
+            }
+
+            var marker = new Tmapv2.Marker({
+                position: location,
+                map: map
+            });
+
+            markers.push(marker);
+
+            // 마커 위치를 입력란에 표시
+            if (markers.length === 1) {
+                document.getElementById('startLat').value = location.lat();
+                document.getElementById('startLng').value = location.lng();
+            } else if (markers.length === 2) {
+                document.getElementById('endLat').value = location.lat();
+                document.getElementById('endLng').value = location.lng();
+            }
+        }
+
+        function findRoute() {
+            if (markers.length < 2) {
+                console.error('출발지와 도착지를 모두 지정해주세요.');
+                return;
+            }
+
+            var startLocation = markers[0].getPosition();
+            var endLocation = markers[1].getPosition();
+            sendLocations(startLocation, endLocation);
+        }
+
+        function sendLocations(startLocation, endLocation) {
+            var csrftoken = getCookie('csrftoken');
+            var data = {
+                start_location: [startLocation.lng(), startLocation.lat()],
+                end_location: [endLocation.lng(), endLocation.lat()]
+            };
+            console.log(JSON.stringify(data));
+            fetch('/nav/location/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('네트워크 응답이 올바르지 않습니다');
+                }
+                return response.json();
+            })
+            .then(data => {
+                displayRoute(data);
+            })
+            .catch(error => console.error('데이터를 가져오는 중 오류 발생:', error));
+        }
+
+        function displayRoute(directionsData) {
+            // 기존 경로가 있으면 삭제
+            if (polyline) {
+                polyline.setMap(null);
+            }
+
+            var features = directionsData.features;
+            var pathCoordinates = [];
+            var points = [];
+
+            features.forEach(function(feature) {
+                if (feature.geometry.type === 'Point') {
+                    var pointCoordinates = feature.geometry.coordinates;
+                    var point = new Tmapv2.LatLng(pointCoordinates[1], pointCoordinates[0]);
+                    points.push(point);
+                } else if (feature.geometry.type === 'LineString') {
+                    var lineCoordinates = feature.geometry.coordinates;
+                    lineCoordinates.forEach(function(coord) {
+                        var point = new Tmapv2.LatLng(coord[1], coord[0]);
+                        pathCoordinates.push(point);
+                    });
+                }
+            });
+
+            // 새로운 경로 폴리라인 생성
+            polyline = new Tmapv2.Polyline({
+                path: pathCoordinates,
+                strokeColor: "#FF0000",
+                strokeWeight: 3,
+                map: map
+            });
+
+            // 맵 중심 위치 및 줌 레벨 조정
+            var bounds = new Tmapv2.LatLngBounds();
+            points.forEach(function(point) {
+                bounds.extend(point);
+            });
+            map.fitBounds(bounds);
+        }
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+        });
+    </script>
+</body>
+</html>

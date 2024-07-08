@@ -43,7 +43,8 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "wltnwls266@naver.com"
 EMAIL_HOST_PASSWORD = "2PUKNYYLZC99"
-
+# 내비 설정
+TMAP_API_KEY = 'po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3'
 # Application definition
 
 INSTALLED_APPS = [
@@ -58,6 +59,7 @@ INSTALLED_APPS = [
     "matching",
     "record",
     "qna",
+    "navigation",
 ]
 
 MIDDLEWARE = [
