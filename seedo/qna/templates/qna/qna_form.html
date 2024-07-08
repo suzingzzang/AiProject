@@ -3,10 +3,53 @@
 {% endblock extra_head %} {% block content %} {% load custom_filters %}
 <main>
   <div class="layout">
+    <a href="/qna/" class="title">Q&A List</a>
     <form class="submitForm" method="post" enctype="multipart/form-data">
-      {% csrf_token %} {{ form.as_p }}
+      {% csrf_token %}
+      <label for="id_title">제목:</label> {{ form.title }}
+      <label for="id_content">내용:</label> {{ form.content }}
+      <p>
+        <div class="fileCondition">
+          <label class="uploadFile" for="{{ form.file_upload.id_for_label }}">파일 업로드:</label>
+          {% if form.instance.file_upload %}
+          <div class="delFile">
+            <input type="checkbox" name="file_upload-clear" id="file_upload-clear_id">
+            <label for="file_upload-clear_id">삭제</label>
+          </div>
+          {% endif %}
+        </div>
+        <input type="file" name="file_upload" id="{{ form.file_upload.id_for_label }}">
+        {% if form.instance.file_upload %}
+        <span class="currentFile">현재 파일: <a href="{{ form.instance.file_upload.url }}">{{ form.instance.file_upload.name|file_name }}</a></span>
+        {% endif %}
+      </p>
       <button type="submit">등록하기</button>
     </form>
   </div>
 </main>
+
+<script>
+  function adjustFileUploadLayout() {
+    var fileInput = document.querySelector('input[type="file"]');
+    var uploadFile = document.querySelector('.uploadFile');
+    var fileCondition = document.querySelector('.fileCondition');
+    var delFile = document.querySelector('.delFile');
+
+    if (window.innerWidth >= 500) {
+        // 500px 이상일 때: input[type="file"]을 label 다음으로 이동
+        if (fileInput && fileCondition) {
+          uploadFile.insertAdjacentElement('afterend', fileInput);
+        }
+    } else {
+      // 500px 이하일 때: input[type="file"]을 .fileCondition 다음으로 이동
+      fileCondition.insertAdjacentElement('afterend', fileInput);
+    }
+  }
+
+  // 초기 로드 시 레이아웃 조정
+  window.addEventListener('load', adjustFileUploadLayout);
+
+  // 뷰포트 크기가 변경될 때 레이아웃 조정
+  window.addEventListener('resize', adjustFileUploadLayout);
+</script>
 {% endblock content %}
