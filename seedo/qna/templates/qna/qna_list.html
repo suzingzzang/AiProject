@@ -7,10 +7,32 @@
     <form class="filter" method="GET" action="{% url 'qna:qna-list' %}">
       <select id="filter" name="filter">
         <option class="filterOpt" value="">전체</option>
-        <option class="filterOpt" value="answered"
-          {% if filter_type == "answered" %}selected{% endif %}>답변 완료</option>
-        <option class="filterOpt" value="unanswered"
-          {% if filter_type == "unanswered" %}selected{% endif %}>미답변</option>
+        <option
+          class="filterOpt"
+          value="answered"
+          {%
+          if
+          filter_type=""
+          ="answered"
+          %}selected{%
+          endif
+          %}
+        >
+          답변 완료
+        </option>
+        <option
+          class="filterOpt"
+          value="unanswered"
+          {%
+          if
+          filter_type=""
+          ="unanswered"
+          %}selected{%
+          endif
+          %}
+        >
+          미답변
+        </option>
       </select>
       <button class="acpbtn" type="submit">적용</button>
     </form>
@@ -18,10 +40,13 @@
 
   <ul class="question_list">
     {% for question in questions %}
-    <a class="eachQ" href="{% url 'qna:qna-detail' question.pk %}">{{ question.title }}
-      <span class="eachQunder">by. {{ question.author.email|email_username }} 님
-      {% if question.comments %}<span style="color: green">답변 완료</span>
-      {% else %}<span style="color: red">미답변</span>{% endif %}</span>
+    <a class="eachQ" href="{% url 'qna:qna-detail' question.pk %}"
+      >{{ question.title }}
+      <span class="eachQunder"
+        >by. {{ question.author.email|email_username }} 님 {% if
+        question.comments %}<span style="color: green">답변 완료</span> {% else
+        %}<span style="color: red">미답변</span>{% endif %}</span
+      >
     </a>
     {% empty %}
     <p>등록된 문의가 없습니다.</p>

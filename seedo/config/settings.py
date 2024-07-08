@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "matching",
     "record",
     "qna",
+    "sensor",
 ]
 
 MIDDLEWARE = [

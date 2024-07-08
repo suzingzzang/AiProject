@@ -36,4 +36,5 @@ urlpatterns = [
     path("matching/", include("matching.urls")),
     path("record/", include("record.urls")),
     path("qna/", include("qna.urls")),
+    path("sensor/", include("sensor.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
