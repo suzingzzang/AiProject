@@ -17,6 +17,17 @@ main {
   width: 100%;
 }
 
+.title {
+  color: #337614;
+  font-size: 24px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.title:hover {
+  color: #76b559;
+  text-decoration: underline;
+}
+
 .submitForm,
 .submitForm * {
   width: 100%;
@@ -24,9 +35,13 @@ main {
 }
 
 [for="id_title"],
-[for="id_content"] {
+[for="id_content"],
+[for="id_file_upload"] {
   color: #337614;
   font-weight: 700;
+}
+#id_file_upload {
+  color: #193b08;
 }
 
 [type="submit"] {
@@ -48,6 +63,7 @@ main {
   width: 100%;
   background-color: #a0ce8a;
   cursor: pointer;
+  margin-top: 10px;
 }
 [type="submit"]:hover {
   background-color: #76b559;
@@ -69,7 +85,7 @@ main {
 }
 #id_content {
   width: 100%;
-  height: 60vh; /* 최대 높이 설정 */
+  height: 38vh; /* 최대 높이 설정 */
   padding: 3px 3px;
   border-width: 1px;
   border-radius: 4px;
@@ -80,4 +96,14 @@ main {
   align-items: center;
   box-shadow: 2px 2px 5px #00000080;
   overflow-y: auto; /* 스크롤 추가 */
+}
+
+.fileCondition {
+  display: flex;
+  width: 100%;
+}
+
+.delFile {
+  display: flex;
+  justify-content: right;
 }

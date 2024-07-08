@@ -14,10 +14,7 @@ addPartnerBtn.addEventListener("click", function () {
 document.querySelectorAll(".acceptBtn").forEach(function (button) {
   button.addEventListener("click", function () {
     var requestId = this.getAttribute("data-request-id");
-    verifyRequestForm.setAttribute(
-      "action",
-      `/matching/accept_request/${requestId}/`,
-    );
+    verifyRequestForm.setAttribute("action", `/matching/accept_request/${requestId}/`);
     verifyRequestModal.style.display = "block";
   });
 });
@@ -119,9 +116,7 @@ function sendRequest(email) {
 // 수락하기 버튼 클릭 시
 verifyRequestForm.addEventListener("submit", function (event) {
   event.preventDefault();
-  var verificationCode = document
-    .getElementById("verificationCode")
-    .value.trim();
+  var verificationCode = document.getElementById("verificationCode").value.trim();
   var csrftoken = getCookie("csrftoken");
 
   fetch(this.getAttribute("action"), {
@@ -145,9 +140,7 @@ verifyRequestForm.addEventListener("submit", function (event) {
     });
 });
 removePartnerBtn.addEventListener("click", function () {
-  var selectedPartners = document.querySelectorAll(
-    'input[name="selectPartner"]:checked',
-  );
+  var selectedPartners = document.querySelectorAll('input[name="selectPartner"]:checked');
 
   selectedPartners.forEach((partner) => {
     var requestID = partner.getAttribute("data-request-id");

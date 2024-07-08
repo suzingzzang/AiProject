@@ -34,8 +34,7 @@ async function sendSensorData(sensorData) {
 
     previousPrediction = result.prediction;
 
-    document.getElementById("fall_recognition").textContent =
-      `Prediction: ${result.prediction}`;
+    document.getElementById("fall_recognition").textContent = `Prediction: ${result.prediction}`;
   } catch (error) {
     console.error("Error sending sensor data:", error);
   }
@@ -106,20 +105,17 @@ document.addEventListener("DOMContentLoaded", function () {
               y: accel.y || 0,
               z: accel.z || 0,
             };
-            document.getElementById("accelerometer").textContent =
-              `Accelerometer: x=${accel.x}, y=${accel.y}, z=${accel.z}`;
+            document.getElementById("accelerometer").textContent = `Accelerometer: x=${accel.x}, y=${accel.y}, z=${accel.z}`;
           } else {
             const lastItem = sensorDataBuffer.getLastItem();
             frame.acc = lastItem ? lastItem.acc : { x: 0, y: 0, z: 0 };
-            document.getElementById("accelerometer").textContent =
-              `Accelerometer: x=${frame.acc.x}, y=${frame.acc.y}, z=${frame.acc.z}`;
+            document.getElementById("accelerometer").textContent = `Accelerometer: x=${frame.acc.x}, y=${frame.acc.y}, z=${frame.acc.z}`;
           }
         } catch (error) {
           //console.error('Error updating accelerometer data:', error);
           const lastItem = sensorDataBuffer.getLastItem();
           frame.acc = lastItem ? lastItem.acc : { x: 0, y: 0, z: 0 };
-          document.getElementById("accelerometer").textContent =
-            `Accelerometer: x=${frame.acc.x}, y=${frame.acc.y}, z=${frame.acc.z}`;
+          document.getElementById("accelerometer").textContent = `Accelerometer: x=${frame.acc.x}, y=${frame.acc.y}, z=${frame.acc.z}`;
         }
 
         // Update Gyroscope
@@ -130,24 +126,17 @@ document.addEventListener("DOMContentLoaded", function () {
               beta: event.beta || 0,
               gamma: event.gamma || 0,
             };
-            document.getElementById("gyroscope").textContent =
-              `Gyroscope: alpha=${event.alpha}, beta=${event.beta}, gamma=${event.gamma}`;
+            document.getElementById("gyroscope").textContent = `Gyroscope: alpha=${event.alpha}, beta=${event.beta}, gamma=${event.gamma}`;
           } else {
             const lastItem = sensorDataBuffer.getLastItem();
-            frame.gyro = lastItem
-              ? lastItem.gyro
-              : { alpha: 0, beta: 0, gamma: 0 };
-            document.getElementById("gyroscope").textContent =
-              `Gyroscope: alpha=${frame.gyro.alpha}, beta=${frame.gyro.beta}, gamma=${frame.gyro.gamma}`;
+            frame.gyro = lastItem ? lastItem.gyro : { alpha: 0, beta: 0, gamma: 0 };
+            document.getElementById("gyroscope").textContent = `Gyroscope: alpha=${frame.gyro.alpha}, beta=${frame.gyro.beta}, gamma=${frame.gyro.gamma}`;
           }
         } catch (error) {
           //console.error('Error updating gyroscope data:', error);
           const lastItem = sensorDataBuffer.getLastItem();
-          frame.gyro = lastItem
-            ? lastItem.gyro
-            : { alpha: 0, beta: 0, gamma: 0 };
-          document.getElementById("gyroscope").textContent =
-            `Gyroscope: alpha=${frame.gyro.alpha}, beta=${frame.gyro.beta}, gamma=${frame.gyro.gamma}`;
+          frame.gyro = lastItem ? lastItem.gyro : { alpha: 0, beta: 0, gamma: 0 };
+          document.getElementById("gyroscope").textContent = `Gyroscope: alpha=${frame.gyro.alpha}, beta=${frame.gyro.beta}, gamma=${frame.gyro.gamma}`;
         }
 
         sensorDataBuffer.push(frame);
@@ -167,15 +156,13 @@ document.addEventListener("DOMContentLoaded", function () {
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
             };
-            document.getElementById("location").textContent =
-              `Location: Latitude ${position.coords.latitude}, Longitude ${position.coords.longitude}`;
+            document.getElementById("location").textContent = `Location: Latitude ${position.coords.latitude}, Longitude ${position.coords.longitude}`;
             resolve();
           },
           function (error) {
             console.error("Error accessing GPS:", error);
             frame.gps = { latitude: 0, longitude: 0 };
-            document.getElementById("location").textContent =
-              `Location: Latitude 0, Longitude 0`;
+            document.getElementById("location").textContent = `Location: Latitude 0, Longitude 0`;
             resolve();
           },
         );
@@ -209,16 +196,11 @@ document.addEventListener("DOMContentLoaded", function () {
   function stopSensoring() {
     frameticks = 0;
     sensoring = false;
-    document.getElementById("sensoring-status").textContent =
-      "Sensoring stopped.";
+    document.getElementById("sensoring-status").textContent = "Sensoring stopped.";
     window.removeEventListener("devicemotion", updateSensorData);
     window.removeEventListener("deviceorientation", updateSensorData);
   }
 
-  document
-    .getElementById("start-sensor")
-    .addEventListener("click", startSensoring);
-  document
-    .getElementById("stop-sensor")
-    .addEventListener("click", stopSensoring);
+  document.getElementById("start-sensor").addEventListener("click", startSensoring);
+  document.getElementById("stop-sensor").addEventListener("click", stopSensoring);
 });

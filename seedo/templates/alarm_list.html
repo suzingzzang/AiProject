@@ -1,0 +1,10 @@
+{% load custom_filters %}
+<ul class="alarmList">
+  {% for alarm in accident_records %}
+  <a href="/record/accident/{{alarm.user.id}}/">
+    {{ alarm.accident_date|date:"m.d" }} {{ alarm.accident_time|time:"H:i" }}<br />
+    {{ alarm.user.email|email_username }} 님
+  </a>
+  <hr />
+  {% endfor %}
+</ul>

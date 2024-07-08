@@ -4,14 +4,10 @@
 <main>
   <div class="layout">
     <div class="dropdown">
-      <div class="userName">
-        {{ selected_user.email|email_username }} 님의 사고 기록
-      </div>
+      <div class="userName">{{ selected_user.email|email_username }} 님의 사고 기록</div>
       <div class="dropUser">
         {% for partner in partner_list %}
-        <a href="/record/accident/{{partner.user.id}}/">
-          {{partner.user.email|email_username}} 님의 사고 기록</a
-        >
+        <a href="/record/accident/{{partner.user.id}}/"> {{partner.user.email|email_username}} 님의 사고 기록</a>
         {% endfor %}
       </div>
     </div>
@@ -19,14 +15,13 @@
     <div class="recordList">
       {% for recorded in accident_list %}
       <div class="recorded">
-        {{recorded.accident_date|date:"Y년 m월 d일"}}<br />
-        {{recorded.accident_time|time:"H시 i분"}} 사고 기록<br />
+        <div class="recordedTitle">
+          {{recorded.accident_date|date:"Y년 m월 d일"}}<br />
+          {{recorded.accident_time|time:"H시 i분"}} 기록<br />
+        </div>
         <div class="dropRecord">
           <!-- DB에서 이미지 받아와야함 / DB의 이미지 path는 record/images/파일명 으로 저장되야 함 -->
-          <img
-            src="{% static recorded.accident_img %}"
-            alt="{{selected_user.email|email_username}}님의_낙상_기록"
-          />
+          <video src="{{ recorded.accident_video.url }}" controls></video>
           <p class="recordedLocation">{{recorded.accident_location}}</p>
         </div>
       </div>
@@ -38,11 +33,12 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const listTitles = document.querySelectorAll(".recorded");
+    const listTitles = document.querySelectorAll(".recordedTitle");
 
     listTitles.forEach((title) => {
       title.addEventListener("click", function () {
-        const content = this.querySelector(".dropRecord");
+        const recorded = this.closest(".recorded");
+        const content = recorded.querySelector(".dropRecord");
         if (content.style.maxHeight) {
           content.style.maxHeight = null;
         } else {
