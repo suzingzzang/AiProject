@@ -41,9 +41,10 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.naver.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "wltnwls266@naver.com"
-EMAIL_HOST_PASSWORD = "2PUKNYYLZC99"
-
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+# 내비 설정
+TMAP_API_KEY = env("TMAP_API_KEY")
 # Application definition
 
 INSTALLED_APPS = [
@@ -58,6 +59,7 @@ INSTALLED_APPS = [
     "matching",
     "record",
     "qna",
+    "navigation",
 ]
 
 MIDDLEWARE = [
