@@ -32,7 +32,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
     path("", index, name="home"),
-    path("camera/", include("camera.urls")),
     path("matching/", include("matching.urls")),
     path("record/", include("record.urls")),
     path("qna/", include("qna.urls")),

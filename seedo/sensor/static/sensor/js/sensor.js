@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Update Accelerometer
         try {
-          if (event.acceleration) {
+          if (event.acceleration && event.acceleration !== undefined) {
             let accel = event.acceleration;
             frame.acc = {
               x: accel.x || 0,
@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Update Gyroscope
         try {
-          if (event.alpha !== null) {
+          if (event.alpha !== null && event.alpha !== undefined) {
             frame.gyro = {
               alpha: event.alpha || 0,
               beta: event.beta || 0,
