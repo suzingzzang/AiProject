@@ -1,13 +1,10 @@
 <!doctype html>
-{% load static %}
+{% load static %} {% load alarmList %}
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
-    />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="{% static 'css/base.css' %}" />
     <link rel="icon" href="{% static 'images/favicon.ico' %}" />
     <title>Seedo</title>
@@ -18,29 +15,21 @@
   <body>
     <header>
       {% if user.is_authenticated %}
-      <span class="material-symbols-outlined"> notifications </span>
+      <div>
+        <span class="noti material-symbols-outlined">notifications</span>
+        {% get_user_notifications %}
+      </div>
       <a href="/" class="logo">
-        <img
-          src="{% static 'images/seedo_logo.png' %} "
-          alt="seedo_logo"
-          width="25px"
-          height="25px"
-        />
+        <img src="{% static 'images/seedo_logo.png' %} " alt="seedo_logo" width="25px" height="25px" />
         Seedo
       </a>
       {% if request.user.is_superuser %}
       <a href="/admin/" id="mypage" class="material-symbols-outlined">supervisor_account</a>
       {% else %}
       <a href="/accounts/" id="mypage" class="material-symbols-outlined">person</a>
-      {% endif %}
-      {% else %}
+      {% endif %} {% else %}
       <a href="/" class="logo">
-        <img
-          src="{% static 'images/seedo_logo.png' %} "
-          alt="seedo_logo"
-          width="25px"
-          height="25px"
-        />
+        <img src="{% static 'images/seedo_logo.png' %} " alt="seedo_logo" width="25px" height="25px" />
         Seedo
       </a>
       {% endif %}
@@ -48,3 +37,36 @@
     {% block content %} {% endblock content %}
   </body>
 </html>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const noti = document.querySelector(".noti");
+    const alarmList = document.querySelector(".alarmList");
+
+    noti.addEventListener("click", function (event) {
+      event.stopPropagation();
+      if (alarmList.classList.contains("show")) {
+        alarmList.classList.remove("show");
+        setTimeout(() => {
+          alarmList.style.display = "none";
+        }, 500);
+      } else {
+        alarmList.style.display = "block";
+        setTimeout(() => {
+          alarmList.classList.add("show");
+        }, 0);
+      }
+    });
+
+    document.addEventListener("click", function (event) {
+      if (!alarmList.contains(event.target) && !noti.contains(event.target)) {
+        if (alarmList.classList.contains("show")) {
+          alarmList.classList.remove("show");
+          setTimeout(() => {
+            alarmList.style.display = "none";
+          }, 500);
+        }
+      }
+    });
+  });
+</script>

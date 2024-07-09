@@ -11,11 +11,7 @@
       <div class="edel">
         <a href="{% url 'qna:qna-update' question.pk %}">수정</a>
         /
-        <form
-          action="{% url 'qna:qna-delete' question.pk %}"
-          method="post"
-          style="display: inline"
-        >
+        <form action="{% url 'qna:qna-delete' question.pk %}" method="post" style="display: inline">
           {% csrf_token %}
           <button type="submit" onclick="confirmDelete(event)">삭제</button>
         </form>
@@ -23,18 +19,18 @@
     </div>
     <div class="content">
       <p class="contentText">{{ question.content }}</p>
-      {% comment %} 파일 확장자 확인 {% endcomment %} <!--주석기능 찾음 오예-->
-      {% if question.file_upload %}
-        {% with file_extension=question.file_upload.name|extension_name %}
-          {% if file_extension|in_list:"jpg,png,gif,jpeg"  %}
-            <img class="embededImg" src="{{ question.file_upload.url }}">
-          {% else %}
-            <p class="embededFile">첨부 파일: <a href="{{ question.file_upload.url }}" download>{{ question.file_upload.name|file_name }}</a></p>
-          {% endif %}
-        {% endwith %}
-      {% endif %}
+      {% comment %} 파일 확장자 확인 {% endcomment %}
+      <!--주석기능 찾음 오예-->
+      {% if question.file_upload %} {% with file_extension=question.file_upload.name|extension_name %} {% if file_extension|in_list:"jpg,png,gif,jpeg" %}
+      <img class="embededImg" src="{{ question.file_upload.url }}" />
+      {% else %}
+      <p class="embededFile">
+        첨부 파일:
+        <a href="{{ question.file_upload.url }}" download>{{ question.file_upload.name|file_name }}</a>
+      </p>
+      {% endif %} {% endwith %} {% endif %}
     </div>
-    
+
     <!-- 댓글 -->
     {% if question.comments %}
     <div class="sub">
@@ -44,11 +40,7 @@
       <div class="edel">
         <button id="edit-button" onclick="showEditForm()">수정</button>
         /
-        <form
-          method="post"
-          action="{% url 'qna:comment-delete' question.pk %}"
-          style="display: inline"
-        >
+        <form method="post" action="{% url 'qna:comment-delete' question.pk %}" style="display: inline">
           {% csrf_token %}
           <button type="submit" onclick="confirmDelete(event)">삭제</button>
         </form>
@@ -61,28 +53,17 @@
     {% if request.user.is_superuser %}
     <form method="post" action="{% url 'qna:comment-create' question.pk %}">
       {% csrf_token %}
-      <textarea
-        name="content"
-        id="comment-content"
-        rows="3"
-        cols="40"
-      ></textarea>
+      <textarea name="content" id="comment-content" rows="3" cols="40"></textarea>
       <button class="commentRegist" type="submit">댓글 작성</button>
     </form>
     {% endif %} {% endif %}
 
     <!-- 댓글 수정 폼 -->
-    <form
-    id="comment-edit-form"
-    method="post"
-    action="{% url 'qna:comment-update' question.pk %}"
-    onsubmit="validateCommentForm(event)"
-    style="display: none"
-  >
-    {% csrf_token %}
-    <textarea name="content" id="comment-content">{{ question.comments }}</textarea>
-    <button class="editComment" type="submit">댓글 수정</button>
-  </form>
+    <form id="comment-edit-form" method="post" action="{% url 'qna:comment-update' question.pk %}" onsubmit="validateCommentForm(event)" style="display: none">
+      {% csrf_token %}
+      <textarea name="content" id="comment-content">{{ question.comments }}</textarea>
+      <button class="editComment" type="submit">댓글 수정</button>
+    </form>
   </div>
 </main>
 

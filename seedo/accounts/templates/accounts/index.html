@@ -20,24 +20,12 @@
         <div class="left">
           {% if partner.is_accepted %}
           <!-- 파트너라면 -->
-          <input
-            type="checkbox"
-            name="selectPartner"
-            data-request-id="{{ partner.request_id }}"
-          />
-          <span class="partnerName"
-            >{{ partner.user.email|email_username }}</span
-          >
+          <input type="checkbox" name="selectPartner" data-request-id="{{ partner.request_id }}" />
+          <span class="partnerName">{{ partner.user.email|email_username }}</span>
           {% else %}
           <!-- 파트너가 아니라면, 회색 -->
-          <input
-            type="checkbox"
-            name="selectPartner"
-            data-request-id="{{ partner.request_id }}"
-          />
-          <span class="partnerName" style="color: #9e9e9e"
-            >{{ partner.user.email|email_username }}</span
-          >
+          <input type="checkbox" name="selectPartner" data-request-id="{{ partner.request_id }}" />
+          <span class="partnerName" style="color: #9e9e9e">{{ partner.user.email|email_username }}</span>
           {% endif %}
         </div>
         <div class="right">
@@ -50,9 +38,7 @@
           <p class="requestBtn">수락대기</p>
           {% else %}
           <!-- 요청을 받은 경우 -->
-          <button class="acceptBtn" data-request-id="{{ partner.request_id }}">
-            수락하기
-          </button>
+          <button class="acceptBtn" data-request-id="{{ partner.request_id }}">수락하기</button>
           {% endif %} {% endif %}
         </div>
       </div>
@@ -60,9 +46,7 @@
       <p class="noPartner">아직 동반자가 없습니다.</p>
       {% endfor %}
     </div>
-    <a href="{% url 'accounts:account_logout' %}" class="button-link"
-      >로그아웃</a
-    >
+    <a href="{% url 'accounts:account_logout' %}" class="button-link">로그아웃</a>
   </div>
 </main>
 
@@ -86,12 +70,7 @@
       {% csrf_token %}
       <div>
         <label for="verificationCode">인증번호:</label>
-        <input
-          type="text"
-          id="verificationCode"
-          name="verificationCode"
-          required
-        />
+        <input type="text" id="verificationCode" name="verificationCode" required />
       </div>
       <button type="submit" id="verifyBtn">수락하기</button>
     </form>

@@ -4,14 +4,10 @@
 <main>
   <div class="layout">
     <div class="dropdown">
-      <div class="userName">
-        {{ selected_user.email|email_username }} 님의 파손 기록
-      </div>
+      <div class="userName">{{ selected_user.email|email_username }} 님의 파손 기록</div>
       <div class="dropUser">
         {% for partner in partner_list %}
-        <a href="/record/break/{{partner.user.id}}/">
-          {{partner.user.email|email_username}} 님의 파손 기록</a
-        >
+        <a href="/record/break/{{partner.user.id}}/"> {{partner.user.email|email_username}} 님의 파손 기록</a>
         {% endfor %}
       </div>
     </div>
@@ -21,14 +17,11 @@
       <div class="recorded">
         <div class="recordedTitle">
           {{recorded.broken_date|date:"Y년 m월 d일"}}<br />
-          {{recorded.broken_time|time:"H시 i분"}} 파손 자료<br />
+          {{recorded.broken_time|time:"H시 i분"}} 자료<br />
         </div>
         <div class="dropRecord">
           <!-- DB에서 이미지 받아와야함 / DB의 이미지 path는 record/images/파일명 으로 저장되야 함 -->
-          <img
-            src="{{ recorded.broken_img.url }}"
-            alt="점자_블록_파손_기록"
-          />
+          <img src="{{ recorded.broken_img.url }}" alt="점자_블록_파손_기록" />
           <p class="recordedLocation">{{recorded.broken_location}}</p>
         </div>
       </div>

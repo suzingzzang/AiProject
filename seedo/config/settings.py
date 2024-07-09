@@ -41,9 +41,10 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.naver.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "wltnwls266@naver.com"
-EMAIL_HOST_PASSWORD = "2PUKNYYLZC99"
-
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+# 내비 설정
+TMAP_API_KEY = env("TMAP_API_KEY")
 # Application definition
 
 INSTALLED_APPS = [
@@ -55,9 +56,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "common",
     "accounts",
+    "camera",
     "matching",
     "record",
     "qna",
+    "sensor",
+    "navigation",
     "walking_mode",
 ]
 
@@ -152,6 +156,11 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "accounts", "static"),
     os.path.join(BASE_DIR, "record", "static"),
 ]  # 프로젝트 수준의 static 디렉토리
+
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

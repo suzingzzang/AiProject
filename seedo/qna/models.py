@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models.signals import pre_save, post_delete
+from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 
 User = get_user_model()
@@ -18,7 +18,9 @@ class QnA(models.Model):
     def __str__(self):
         return self.title
 
+
 # Signal handlers
+
 
 @receiver(pre_save, sender=QnA)
 def delete_old_qna_file(sender, instance, **kwargs):
@@ -26,6 +28,7 @@ def delete_old_qna_file(sender, instance, **kwargs):
         old_instance = QnA.objects.get(pk=instance.pk)
         if old_instance.file_upload and old_instance.file_upload != instance.file_upload:
             old_instance.file_upload.delete(save=False)
+
 
 @receiver(post_delete, sender=QnA)
 def delete_qna_file_on_delete(sender, instance, **kwargs):

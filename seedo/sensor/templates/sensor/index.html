@@ -1,0 +1,15 @@
+{% extends "base.html" %} {% load static %} {% block extra_head %}
+<script src="{% static 'sensor/js/sensor.js' %}"></script>
+{% endblock extra_head %} {% block content %}
+<h1>Sensor Data</h1>
+<p id="location">Location: Loading...</p>
+<p id="accelerometer">Accelerometer: Loading...</p>
+<p id="gyroscope">Gyroscope: Loading...</p>
+<p id="fall_recognition">fall_recognition: Loading...</p>
+<p id="sensoring-status">Secording status: Not sensoring</p>
+
+<button id="start-sensor">Start sensor</button>
+<button id="stop-sensor">Stop sensor</button>
+<audio id="alert-sound" src="media/audios/alert_sound.mp3"></audio>
+
+{% endblock content %}
