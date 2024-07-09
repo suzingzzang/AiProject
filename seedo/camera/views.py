@@ -29,7 +29,7 @@ def show_camera(request):
     return render(request, "camera/index.html")
 
 
-model = load_model("camera/ml_models/initial_model2.keras")
+model = load_model("camera/ml_models/initial_model2.h5")
 
 
 def fall_recognition(request):
