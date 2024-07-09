@@ -36,10 +36,6 @@ CLIENT_ID = env("NAVER_TTS_CLIENT_ID")
 SECRETE_KEY = env("NAVER_TTS_CLIENT_SECRETE_KEY")
 
 
-def show_camera(request):
-    return render(request, "walking_mode/test2.html")
-
-
 # tts api
 def naver_tts(text):
     try:
@@ -68,49 +64,48 @@ def naver_tts(text):
 
 
 # 프레임수 줄여주는 코드
-def reduce_fps(input_video_path, fps_video_path, target_fps=2):
-    # 비디오 파일 열기
-    cap = cv2.VideoCapture(input_video_path)
-    if not cap.isOpened():
-        print("Error opening video file")
-        return
+# def reduce_fps(input_video_path, fps_video_path, target_fps=2):
+#     # 비디오 파일 열기
+#     cap = cv2.VideoCapture(input_video_path)
+#     if not cap.isOpened():
+#         print("Error opening video file")
+#         return
 
-    # 원본 비디오의 FPS 및 프레임 크기 가져오기
-    original_fps = cap.get(cv2.CAP_PROP_FPS)
-    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+#     # 원본 비디오의 FPS 및 프레임 크기 가져오기
+#     original_fps = cap.get(cv2.CAP_PROP_FPS)
+#     frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+#     frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    # 출력 비디오 설정
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    # 오리지널 패스에 같은 크기로 사진 저장
-    out = cv2.VideoWriter(fps_video_path, fourcc, target_fps, (frame_width, frame_height))
+#     # 출력 비디오 설정
+#     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+#     # 오리지널 패스에 같은 크기로 사진 저장
+#     out = cv2.VideoWriter(fps_video_path, fourcc, target_fps, (frame_width, frame_height))
 
-    # FPS 감소 비율 계산
-    fps_ratio = original_fps / target_fps
+#     # FPS 감소 비율 계산
+#     fps_ratio = original_fps / target_fps
 
-    frame_count = 0
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
+#     frame_count = 0
+#     while cap.isOpened():
+#         ret, frame = cap.read()
+#         if not ret:
+#             break
 
-        # 지정된 비율에 따라 프레임 쓰기
-        if frame_count % int(fps_ratio) == 0:
-            out.write(frame)
+#         # 지정된 비율에 따라 프레임 쓰기
+#         if frame_count % int(fps_ratio) == 0:
+#             out.write(frame)
 
-        frame_count += 1
+#         frame_count += 1
 
-    # 비디오 파일 닫기
-    cap.release()
-    out.release()
-    print(f"Finished reducing FPS from {original_fps} to {target_fps}. Output saved to {fps_video_path}")
+#     # 비디오 파일 닫기
+#     cap.release()
+#     out.release()
+#     print(f"Finished reducing FPS from {original_fps} to {target_fps}. Output saved to {fps_video_path}")
 
 
 # 위치 결정 함수
 def determine_position(x_center):
     # yolo 모델 이미지 사이즈
     image_width = 640
-
     if x_center < image_width / 5:
         direction = "10시 방향"
     elif x_center < 2 * image_width / 5:
@@ -121,7 +116,6 @@ def determine_position(x_center):
         direction = "1시 방향"
     else:
         direction = "2시 방향"
-
     return direction
 
 
@@ -145,7 +139,7 @@ class ImageUploadView(View):
         seg_classes = []
         tts_audio_url = None  # 초기화
         history = {}
-        pixel_per_meter = 300
+        pixel_per_meter = 120
 
         # 카메라에서 불러오는 방식
         if request.content_type == "application/json":
@@ -237,7 +231,6 @@ class ImageUploadView(View):
                         history[track_id]["count"] = -10  # 한 번 등장시 한동안 등장하지 않도록
                         # tts 출력
                         try:
-                            start_time = time.time()
                             if tts_text:
                                 tts_audio = naver_tts(tts_text)
                                 if tts_audio:
@@ -249,14 +242,8 @@ class ImageUploadView(View):
                                     with open(tts_audio_path, "wb") as f:
                                         f.write(tts_audio)
                                     tts_audio_url = settings.MEDIA_URL + f"tts_audio/tts_audio_{timestamp}.mp3"
-                                    end_time = time.time()
-                                    elapsed_time = end_time - start_time
-                                    print(f"Time taken: {elapsed_time} seconds")
                         except Exception as e:
                             print(f"TTS Error: {str(e)}")
-            else:
-                print("OD Results have no IDs")
-
         for track_id in list(history.keys()):
             if track_id not in current_track_ids:
                 del history[track_id]

@@ -58,51 +58,45 @@
         return canvas.toDataURL("image/png");
       }
 
+      let recording = false;
+      const frameRate = 1; // frames per second
+
+      function maybeSendCameraImage() {
+        if (recording) {
+          const imageData = captureImage(video, canvas);
+          sendCameraImage(imageData);
+        }
+      }
+
+      function startRecording() {
+        recording = true;
+        document.getElementById("recording-status").textContent = "Recording...";
+
+        navigator.mediaDevices
+          .getUserMedia({ video: { facingMode: "environment" } })
+          .then(function (stream) {
+            video.srcObject = stream;
+            video.play();
+          })
+          .catch(function (error) {
+            console.error("Error accessing camera:", error);
+          });
+        setInterval(maybeSendCameraImage, 1000 / frameRate);
+      }
+
+      function stopRecording() {
+        recording = false;
+        document.getElementById("recording-status").textContent = "Recording stopped.";
+        video.pause();
+        video.srcObject.getTracks().forEach((track) => track.stop());
+      }
+
       document.addEventListener("DOMContentLoaded", function () {
-        let recording = false;
-        const frameRate = 1; // frames per second
         let video = document.getElementById("video");
         let canvas = document.getElementById("canvas");
 
-        function maybeSendCameraImage() {
-          if (recording) {
-            const imageData = captureImage(video, canvas);
-            sendCameraImage(imageData);
-          }
-        }
-
-        function startRecording() {
-          recording = true;
-          document.getElementById("recording-status").textContent =
-            "Recording...";
-
-          navigator.mediaDevices
-            .getUserMedia({ video: { facingMode: "environment" } })
-            .then(function (stream) {
-              video.srcObject = stream;
-              video.play();
-            })
-            .catch(function (error) {
-              console.error("Error accessing camera:", error);
-            });
-
-          setInterval(maybeSendCameraImage, 1000 / frameRate);
-        }
-
-        function stopRecording() {
-          recording = false;
-          document.getElementById("recording-status").textContent =
-            "Recording stopped.";
-          video.pause();
-          video.srcObject.getTracks().forEach((track) => track.stop());
-        }
-
-        document
-          .getElementById("start-camera")
-          .addEventListener("click", startRecording);
-        document
-          .getElementById("stop-camera")
-          .addEventListener("click", stopRecording);
+        document.getElementById("start-camera").addEventListener("click", startRecording);
+        document.getElementById("stop-camera").addEventListener("click", stopRecording);
       });
     </script>
   </head>
