@@ -73,8 +73,7 @@
 
         function startRecording() {
           recording = true;
-          document.getElementById("recording-status").textContent =
-            "Recording...";
+          document.getElementById("recording-status").textContent = "Recording...";
 
           navigator.mediaDevices
             .getUserMedia({ video: { facingMode: "environment" } })
@@ -91,18 +90,13 @@
 
         function stopRecording() {
           recording = false;
-          document.getElementById("recording-status").textContent =
-            "Recording stopped.";
+          document.getElementById("recording-status").textContent = "Recording stopped.";
           video.pause();
           video.srcObject.getTracks().forEach((track) => track.stop());
         }
 
-        document
-          .getElementById("start-camera")
-          .addEventListener("click", startRecording);
-        document
-          .getElementById("stop-camera")
-          .addEventListener("click", stopRecording);
+        document.getElementById("start-camera").addEventListener("click", startRecording);
+        document.getElementById("stop-camera").addEventListener("click", stopRecording);
       });
     </script>
   </head>
