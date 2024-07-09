@@ -3,6 +3,7 @@ var markers = [];
 var polyline;
 var currentWaypointIndex = 0;
 var waypoints = [];
+var routeSearchStarted = false;
 
 function initMap() {
   map = new Tmapv2.Map("map", {
@@ -20,11 +21,15 @@ function initMap() {
   }, 5000);
 
   map.addListener("click", function (event) {
-    addMarker(event.latLng);
+    if (!routeSearchStarted) {
+      addMarker(event.latLng);
+    }
   });
 
   map.addListener("touchstart", function (event) {
-    addMarker(event.latLng);
+    if (!routeSearchStarted) {
+      addMarker(event.latLng);
+    }
   });
 }
 function getCurrentLocation() {
@@ -128,6 +133,19 @@ function checkRoute(currentLocation) {
     }
   } else {
     alert("경로를 완료했습니다.");
+    window.location.reload();
+  }
+
+  // markers[1] 확인 후 위치 정보 가져오기 시도 getDestination안되는듯
+  if (markers[1]) {
+    var distanceToDestination = getDistance(currentLocation, markers[1].getPosition());
+    console.log(distanceToDestination);
+    if (distanceToDestination < 10) {
+      alert("도착 지점 근처에 도착했습니다. 경로 안내를 종료합니다.");
+      window.location.reload();
+    }
+  } else {
+    console.error("목적지 마커가 정의되지 않았습니다.");
   }
 
   if (!isOnRoute(currentLocation)) {
@@ -262,8 +280,40 @@ function findRoute() {
     checkRoute(markers.currentLocationMarker.getPosition());
   }, 10000); // 매 10초마다 경로 체크
 }
+function setDestination(lat, lon) {
+  if (!document.getElementById("startLat").value) {
+    document.getElementById("startLat").value = lat;
+    document.getElementById("startLng").value = lon;
+
+    // 출발지 마커 설정
+    var startLocation = new Tmapv2.LatLng(lat, lon);
+    markers.push(new Tmapv2.Marker({
+      position: startLocation,
+      map: map,
+      title: "출발지"
+    }));
+  } else if (!document.getElementById("endLat").value) {
+    document.getElementById("endLat").value = lat;
+    document.getElementById("endLng").value = lon;
+
+    // 목적지 마커 설정
+    var destinationLocation = new Tmapv2.LatLng(lat, lon);
+    markers.push(new Tmapv2.Marker({
+      position: destinationLocation,
+      map: map,
+      title: "목적지"
+    }));
+
+    // 출발지와 목적지가 모두 설정되었을 때 경로 탐색 시작
+    
+    var startLocation = markers[0].getPosition(); // 출발지 마커 위치
+    var destinationLocation = markers[1].getPosition(); // 목적지 마커 위치
+    sendLocations(startLocation, destinationLocation);
+  }
+}
 
 function sendLocations(startLocation, endLocation) {
+  routeSearchStarted = true; // 경로 탐색 시작
   var csrftoken = getCookie("csrftoken");
   var data = {
     start_location: [startLocation.lng(), startLocation.lat()],
@@ -309,7 +359,7 @@ function updateRouteInfo(features) {
   routeInfoContainer.innerHTML = "";
 
   var nextDescription = features[currentWaypointIndex].properties.description;
-
+  console.log(nextDescription);
   var info = document.createElement("div");
   info.classList.add("route-info-item");
   info.innerHTML = `<p>다음 안내: ${nextDescription}</p>`;
@@ -387,9 +437,10 @@ $("#btn_select").click(function () {
   $.ajax({
     method: "GET",
     headers: headers,
-    url: "https://apis.openapi.sk.com/tmap/pois?version=1&format=json&callback=result",
-    async: false,
+    url: "https://apis.openapi.sk.com/tmap/pois",
     data: {
+      version: 1,
+      format: "json",
       searchKeyword: searchKeyword,
       resCoordType: "EPSG3857",
       reqCoordType: "WGS84GEO",
@@ -397,11 +448,8 @@ $("#btn_select").click(function () {
     },
     success: function (response) {
       var resultpoisData = response.searchPoiInfo.pois.poi;
-      if (markers.length > 0) {
-        for (var i in markers) {
-          markers[i].setMap(null);
-        }
-      }
+      clearMarkers(); // 기존 마커 삭제 //마커 사이즈 에러 맞는듯
+
       var innerHtml = "";
       var positionBounds = new Tmapv2.LatLngBounds();
 
@@ -414,11 +462,9 @@ $("#btn_select").click(function () {
         var lat = projectionCng._lat;
         var lon = projectionCng._lng;
         var markerPosition = new Tmapv2.LatLng(lat, lon);
-
+        //마커 아이콘 객체 불러오는 부분 삭제 새로딩하면서 에러남
         var marker = new Tmapv2.Marker({
           position: markerPosition,
-          //icon: "http://tmapapi.sktelecom.com/upload/tmap/marker/pin_b_m_" + k + ".png",
-          iconSize: new Tmapv2.Size(24, 38),
           title: name,
           map: map,
         });
@@ -434,17 +480,17 @@ $("#btn_select").click(function () {
       map.zoomOut();
     },
     error: function (request, status, error) {
-      console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+      console.error("Error:", error);
     },
   });
 });
 
-function setDestination(lat, lon) {
-  if (!document.getElementById("startLat").value) {
-    document.getElementById("startLat").value = lat;
-    document.getElementById("startLng").value = lon;
-  } else if (!document.getElementById("endLat").value) {
-    document.getElementById("endLat").value = lat;
-    document.getElementById("endLng").value = lon;
+function clearMarkers() {
+  if (markers.length > 0) {
+    for (var i = 0; i < markers.length; i++) {
+      markers[i].setMap(null);
+    }
+    markers = []; // 마커 배열 초기화
   }
 }
+
