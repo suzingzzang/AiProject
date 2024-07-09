@@ -17,7 +17,7 @@ def get_sensor(request):
     return render(request, "sensor/index.html")
 
 
-model = load_model("sensor/ml_models/sensor/ml_model/fall_recognition_v0.keras")
+model = load_model("sensor/ml_models/sensor/ml_model/fall_recognition_v0.h5")
 
 
 def fall_recognition(request):
