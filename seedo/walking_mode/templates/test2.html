@@ -4,7 +4,11 @@
     <title>Home</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <script>
+      const MAX_CONCURRENT_REQUESTS = 3; // 동시에 처리될 수 있는 최대 요청 수
+      let activeRequests = 0; // 현재 처리 중인 요청 수
+
       async function sendCameraImage(imageData) {
+        console.log(activeRequests);
         try {
           const response = await fetch('{% url "walking_mode:test" %}', {
             method: "POST",
@@ -49,6 +53,8 @@
           }
         } catch (error) {
           console.error("Error sending camera image:", error);
+        } finally {
+          activeRequests--; // 요청이 완료되면 activeRequests를 감소
         }
       }
 
@@ -64,8 +70,9 @@
         let video = document.getElementById("video");
         let canvas = document.getElementById("canvas");
 
-        function maybeSendCameraImage() {
-          if (recording) {
+        async function maybeSendCameraImage() {
+          if (recording && activeRequests < MAX_CONCURRENT_REQUESTS) {
+            activeRequests++; // 새로운 요청을 시작하기 전에 activeRequests를 증가
             const imageData = captureImage(video, canvas);
             sendCameraImage(imageData);
           }
