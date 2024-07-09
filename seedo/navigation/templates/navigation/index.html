@@ -8,15 +8,21 @@
   <h1>Pedestrian Navigation</h1>
 
   <div class="form-container">
-    <label for="startLat">출발지 위도:</label>
+    <label for="startAddress">출발지:</label>
+    <div id="startAddress"></div>
+    <label for="startLat">위도:</label>
     <input type="text" id="startLat" placeholder="출발지 위도를 입력하세요" />
-    <label for="startLng">출발지 경도:</label>
+    <label for="startLng">경도:</label>
     <input type="text" id="startLng" placeholder="출발지 경도를 입력하세요" />
-    <label for="endLat">도착지 위도:</label>
+  </div>
+  
+  <div class="form-container">
+    <label for="endAddress">도착지:</label>
+    <div id="endAddress"></div>
+    <label for="endLat">위도:</label>
     <input type="text" id="endLat" placeholder="도착지 위도를 입력하세요" />
-    <label for="endLng">도착지 경도:</label>
+    <label for="endLng">경도:</label>
     <input type="text" id="endLng" placeholder="도착지 경도를 입력하세요" />
-    <button onclick="findRoute()">경로 찾기</button>
   </div>
 
   <div>

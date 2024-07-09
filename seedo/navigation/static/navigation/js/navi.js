@@ -154,14 +154,90 @@ function addMarker(location) {
 
   markers.push(marker);
 
-  // 마커 위치를 입력란에 표시
-  if (markers.length === 1) {
-    document.getElementById("startLat").value = location.lat();
-    document.getElementById("startLng").value = location.lng();
-  } else if (markers.length === 2) {
-    document.getElementById("endLat").value = location.lat();
-    document.getElementById("endLng").value = location.lng();
+ // 마커 위치를 입력란에 표시
+ if (markers.length === 1) {
+  document.getElementById("startLat").value = location.lat();
+  document.getElementById("startLng").value = location.lng();
+
+  // 출발지 주소 업데이트
+  reverseGeo(location.lat(), location.lng(), function (address) {
+    updateAddress('start', address);
+  });
+} else if (markers.length === 2) {
+  document.getElementById("endLat").value = location.lat();
+  document.getElementById("endLng").value = location.lng();
+
+  // 도착지 주소 업데이트
+  reverseGeo(location.lat(), location.lng(), function (address) {
+    updateAddress('end', address);
+  });
+}
+}
+
+function reverseGeo(lat, lng, callback) {
+var headers = {};
+headers["appKey"] = "po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3";
+
+$.ajax({
+  method: "GET",
+  headers: headers,
+  url: "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&format=json&callback=result",
+  async: false,
+  data: {
+    "coordType": "WGS84GEO",
+    "addressType": "A10",
+    "lon": lng,
+    "lat": lat
+  },
+  success: function (response) {
+    var arrResult = response.addressInfo;
+    var newRoadAddr = arrResult.city_do + ' ' + arrResult.gu_gun + ' ';
+
+    if (arrResult.eup_myun == '' && (arrResult.legalDong.charAt(arrResult.legalDong.length - 1) == "읍" || arrResult.legalDong.charAt(arrResult.legalDong.length - 1) == "면")) {
+      newRoadAddr += arrResult.legalDong;
+    } else {
+      newRoadAddr += arrResult.eup_myun;
+    }
+    newRoadAddr += ' ' + arrResult.roadName + ' ' + arrResult.buildingIndex;
+
+    if (arrResult.legalDong != '' && (arrResult.legalDong.charAt(arrResult.legalDong.length - 1) != "읍" && arrResult.legalDong.charAt(arrResult.legalDong.length - 1) != "면")) {
+      if (arrResult.buildingName != '') {
+        newRoadAddr += (' (' + arrResult.legalDong + ', ' + arrResult.buildingName + ') ');
+      } else {
+        newRoadAddr += (' (' + arrResult.legalDong + ')');
+      }
+    } else if (arrResult.buildingName != '') {
+      newRoadAddr += (' (' + arrResult.buildingName + ') ');
+    }
+
+    var jibunAddr = arrResult.city_do + ' ' + arrResult.gu_gun + ' ' + arrResult.legalDong + ' ' + arrResult.ri + ' ' + arrResult.bunji;
+
+    if (arrResult.buildingName != '') {
+      jibunAddr += (' ' + arrResult.buildingName);
+    }
+
+    var address = "새주소 : " + newRoadAddr + "<br/>";
+    address += "지번주소 : " + jibunAddr + "<br/>";
+    address += "위경도좌표 : " + lat + ", " + lng;
+
+    callback(address);
+  },
+  error: function (request, status, error) {
+    console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
   }
+});
+}
+
+function updateAddress(type, address) {
+var addressDiv;
+
+if (type === 'start') {
+  addressDiv = document.getElementById("startAddress");
+} else if (type === 'end') {
+  addressDiv = document.getElementById("endAddress");
+}
+
+addressDiv.innerHTML = address;
 }
 
 function findRoute() {
