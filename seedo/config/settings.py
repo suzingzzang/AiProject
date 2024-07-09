@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "qna",
     "sensor",
     "navigation",
+    "walking_mode",
 ]
 
 MIDDLEWARE = [
