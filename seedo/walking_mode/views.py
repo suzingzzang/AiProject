@@ -2,7 +2,6 @@ import base64
 import json
 import math
 import os
-import time
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -10,7 +9,6 @@ from pathlib import Path
 import cv2
 import environ
 import numpy as np
-from django.conf import settings
 from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -63,45 +61,6 @@ def naver_tts(text):
         raise Exception(str(e))
 
 
-# 프레임수 줄여주는 코드
-# def reduce_fps(input_video_path, fps_video_path, target_fps=2):
-#     # 비디오 파일 열기
-#     cap = cv2.VideoCapture(input_video_path)
-#     if not cap.isOpened():
-#         print("Error opening video file")
-#         return
-
-#     # 원본 비디오의 FPS 및 프레임 크기 가져오기
-#     original_fps = cap.get(cv2.CAP_PROP_FPS)
-#     frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-#     frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
-#     # 출력 비디오 설정
-#     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-#     # 오리지널 패스에 같은 크기로 사진 저장
-#     out = cv2.VideoWriter(fps_video_path, fourcc, target_fps, (frame_width, frame_height))
-
-#     # FPS 감소 비율 계산
-#     fps_ratio = original_fps / target_fps
-
-#     frame_count = 0
-#     while cap.isOpened():
-#         ret, frame = cap.read()
-#         if not ret:
-#             break
-
-#         # 지정된 비율에 따라 프레임 쓰기
-#         if frame_count % int(fps_ratio) == 0:
-#             out.write(frame)
-
-#         frame_count += 1
-
-#     # 비디오 파일 닫기
-#     cap.release()
-#     out.release()
-#     print(f"Finished reducing FPS from {original_fps} to {target_fps}. Output saved to {fps_video_path}")
-
-
 # 위치 결정 함수
 def determine_position(x_center):
     # yolo 모델 이미지 사이즈
@@ -137,7 +96,7 @@ class ImageUploadView(View):
 
         od_classes = []
         seg_classes = []
-        tts_audio_url = None  # 초기화
+        tts_audio_base64 = None  # 초기화
         history = {}
         pixel_per_meter = 120
 
@@ -150,7 +109,7 @@ class ImageUploadView(View):
             image_data = ContentFile(base64.b64decode(imgstr), name="temp." + ext)
             nparr = np.frombuffer(image_data.read(), np.uint8)
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-            od_classes, seg_classes, tts_audio_url, annotated_image = self.process_image(img, model_od, model_seg, history, pixel_per_meter)
+            od_classes, seg_classes, tts_audio_base64, annotated_image = self.process_image(img, model_od, model_seg, history, pixel_per_meter)
         else:
             return JsonResponse({"error": "Invalid content type"}, status=400)
 
@@ -160,7 +119,9 @@ class ImageUploadView(View):
         else:
             img_base64 = None
 
-        return JsonResponse({"od_classes": od_classes, "seg_classes": seg_classes, "tts_audio_url": tts_audio_url, "annotated_image": img_base64})
+        response_data = {"od_classes": od_classes, "seg_classes": seg_classes, "tts_audio_base64": tts_audio_base64, "annotated_image": img_base64}
+
+        return JsonResponse(response_data)
 
     def process_image(self, img, model_od, model_seg, history, pixel_per_meter):
         w, h = img.shape[1], img.shape[0]
@@ -169,7 +130,7 @@ class ImageUploadView(View):
 
         current_track_ids = []
         tts_text = None  # 초기화
-        tts_audio_url = None  # 초기화
+        tts_audio_base64 = None  # 초기화
         od_classes = []
         seg_classes = []
         annotator = Annotator(img, line_width=2)
@@ -234,14 +195,7 @@ class ImageUploadView(View):
                             if tts_text:
                                 tts_audio = naver_tts(tts_text)
                                 if tts_audio:
-                                    tts_audio_dir = os.path.join(settings.MEDIA_ROOT, "tts_audio")
-                                    if not os.path.exists(tts_audio_dir):
-                                        os.makedirs(tts_audio_dir)
-                                    timestamp = time.strftime("%Y%m%d-%H%M%S")
-                                    tts_audio_path = os.path.join(tts_audio_dir, f"tts_audio_{timestamp}.mp3")
-                                    with open(tts_audio_path, "wb") as f:
-                                        f.write(tts_audio)
-                                    tts_audio_url = f"media/tts_audio/tts_audio_{timestamp}.mp3"
+                                    tts_audio_base64 = base64.b64encode(tts_audio).decode("utf-8")
                         except Exception as e:
                             print(f"TTS Error: {str(e)}")
         for track_id in list(history.keys()):
@@ -249,4 +203,4 @@ class ImageUploadView(View):
                 del history[track_id]
         print(history)
         annotated_image = annotator.result() if detected_obstacle else None
-        return od_classes, seg_classes, tts_audio_url, annotated_image
+        return od_classes, seg_classes, tts_audio_base64, annotated_image
