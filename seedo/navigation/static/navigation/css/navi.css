@@ -1,0 +1,35 @@
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  flex-direction: column;
+  box-sizing: border-box;
+  gap: 20px;
+  padding: 70px 34px 20px;
+  overflow: hidden;
+}
+
+.container {
+  display: flex;
+}
+#map {
+  height: 300px;
+  flex: 3;
+}
+.search-results {
+  flex: 1;
+  overflow-y: auto;
+  height: 300px;
+}
+.search-results ul {
+  list-style-type: none;
+  padding: 0;
+}
+.search-results li {
+  cursor: pointer;
+  padding: 5px;
+}
+.search-results li:hover {
+  background-color: #f0f0f0;
+}
