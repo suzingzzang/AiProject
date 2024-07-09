@@ -15,8 +15,6 @@ function initMap() {
   // 현재 위치 가져오기
   getCurrentLocation();
 
-
-
   map.addListener("click", function (event) {
     if (!routeSearchStarted) {
       addMarker(event.latLng);
@@ -125,7 +123,7 @@ function checkRoute(currentLocation) {
   console.log("Polyline Distance: ", distanceToPolyline);
 
   // 경로 벗어남 체크
-  if (distanceToPolyline > 50) { 
+  if (distanceToPolyline > 50) {
     alert("경로를 벗어났습니다.");
     return;
   }
@@ -184,7 +182,7 @@ function getDistancePointToSegment(point, segmentStart, segmentEnd) {
 
   var dot = A * C + B * D;
   var len_sq = C * C + D * D;
-  var param = (len_sq !== 0) ? (dot / len_sq) : -1;
+  var param = len_sq !== 0 ? dot / len_sq : -1;
 
   var xx, yy;
 
@@ -223,90 +221,97 @@ function addMarker(location) {
 
   markers.push(marker);
 
- // 마커 위치를 입력란에 표시
- if (markers.length === 1) {
-  document.getElementById("startLat").value = location.lat();
-  document.getElementById("startLng").value = location.lng();
+  // 마커 위치를 입력란에 표시
+  if (markers.length === 1) {
+    document.getElementById("startLat").value = location.lat();
+    document.getElementById("startLng").value = location.lng();
 
-  // 출발지 주소 업데이트
-  reverseGeo(location.lat(), location.lng(), function (address) {
-    updateAddress('start', address);
-  });
-} else if (markers.length === 2) {
-  document.getElementById("endLat").value = location.lat();
-  document.getElementById("endLng").value = location.lng();
+    // 출발지 주소 업데이트
+    reverseGeo(location.lat(), location.lng(), function (address) {
+      updateAddress("start", address);
+    });
+  } else if (markers.length === 2) {
+    document.getElementById("endLat").value = location.lat();
+    document.getElementById("endLng").value = location.lng();
 
-  // 도착지 주소 업데이트
-  reverseGeo(location.lat(), location.lng(), function (address) {
-    updateAddress('end', address);
-  });
-}
+    // 도착지 주소 업데이트
+    reverseGeo(location.lat(), location.lng(), function (address) {
+      updateAddress("end", address);
+    });
+  }
 }
 
 function reverseGeo(lat, lng, callback) {
-var headers = {};
-headers["appKey"] = "po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3";
+  var headers = {};
+  headers["appKey"] = "po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3";
 
-$.ajax({
-  method: "GET",
-  headers: headers,
-  url: "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&format=json&callback=result",
-  async: false,
-  data: {
-    "coordType": "WGS84GEO",
-    "addressType": "A10",
-    "lon": lng,
-    "lat": lat
-  },
-  success: function (response) {
-    var arrResult = response.addressInfo;
-    var newRoadAddr = arrResult.city_do + ' ' + arrResult.gu_gun + ' ';
+  $.ajax({
+    method: "GET",
+    headers: headers,
+    url: "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&format=json&callback=result",
+    async: false,
+    data: {
+      coordType: "WGS84GEO",
+      addressType: "A10",
+      lon: lng,
+      lat: lat,
+    },
+    success: function (response) {
+      var arrResult = response.addressInfo;
+      var newRoadAddr = arrResult.city_do + " " + arrResult.gu_gun + " ";
 
-    if (arrResult.eup_myun == '' && (arrResult.legalDong.charAt(arrResult.legalDong.length - 1) == "읍" || arrResult.legalDong.charAt(arrResult.legalDong.length - 1) == "면")) {
-      newRoadAddr += arrResult.legalDong;
-    } else {
-      newRoadAddr += arrResult.eup_myun;
-    }
-    newRoadAddr += ' ' + arrResult.roadName + ' ' + arrResult.buildingIndex;
-
-    if (arrResult.legalDong != '' && (arrResult.legalDong.charAt(arrResult.legalDong.length - 1) != "읍" && arrResult.legalDong.charAt(arrResult.legalDong.length - 1) != "면")) {
-      if (arrResult.buildingName != '') {
-        newRoadAddr += (' (' + arrResult.legalDong + ', ' + arrResult.buildingName + ') ');
+      if (
+        arrResult.eup_myun == "" &&
+        (arrResult.legalDong.charAt(arrResult.legalDong.length - 1) == "읍" || arrResult.legalDong.charAt(arrResult.legalDong.length - 1) == "면")
+      ) {
+        newRoadAddr += arrResult.legalDong;
       } else {
-        newRoadAddr += (' (' + arrResult.legalDong + ')');
+        newRoadAddr += arrResult.eup_myun;
       }
-    } else if (arrResult.buildingName != '') {
-      newRoadAddr += (' (' + arrResult.buildingName + ') ');
-    }
+      newRoadAddr += " " + arrResult.roadName + " " + arrResult.buildingIndex;
 
-    var jibunAddr = arrResult.city_do + ' ' + arrResult.gu_gun + ' ' + arrResult.legalDong + ' ' + arrResult.ri + ' ' + arrResult.bunji;
+      if (
+        arrResult.legalDong != "" &&
+        arrResult.legalDong.charAt(arrResult.legalDong.length - 1) != "읍" &&
+        arrResult.legalDong.charAt(arrResult.legalDong.length - 1) != "면"
+      ) {
+        if (arrResult.buildingName != "") {
+          newRoadAddr += " (" + arrResult.legalDong + ", " + arrResult.buildingName + ") ";
+        } else {
+          newRoadAddr += " (" + arrResult.legalDong + ")";
+        }
+      } else if (arrResult.buildingName != "") {
+        newRoadAddr += " (" + arrResult.buildingName + ") ";
+      }
 
-    if (arrResult.buildingName != '') {
-      jibunAddr += (' ' + arrResult.buildingName);
-    }
+      var jibunAddr = arrResult.city_do + " " + arrResult.gu_gun + " " + arrResult.legalDong + " " + arrResult.ri + " " + arrResult.bunji;
 
-    var address = "새주소 : " + newRoadAddr + "<br/>";
-    address += "지번주소 : " + jibunAddr + "<br/>";
-    address += "위경도좌표 : " + lat + ", " + lng;
+      if (arrResult.buildingName != "") {
+        jibunAddr += " " + arrResult.buildingName;
+      }
 
-    callback(address);
-  },
-  error: function (request, status, error) {
-    console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
-  }
-});
+      var address = "새주소 : " + newRoadAddr + "<br/>";
+      address += "지번주소 : " + jibunAddr + "<br/>";
+      address += "위경도좌표 : " + lat + ", " + lng;
+
+      callback(address);
+    },
+    error: function (request, status, error) {
+      console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+    },
+  });
 }
 
 function updateAddress(type, address) {
-var addressDiv;
+  var addressDiv;
 
-if (type === 'start') {
-  addressDiv = document.getElementById("startAddress");
-} else if (type === 'end') {
-  addressDiv = document.getElementById("endAddress");
-}
+  if (type === "start") {
+    addressDiv = document.getElementById("startAddress");
+  } else if (type === "end") {
+    addressDiv = document.getElementById("endAddress");
+  }
 
-addressDiv.innerHTML = address;
+  addressDiv.innerHTML = address;
 }
 
 function findRoute() {
@@ -318,11 +323,11 @@ function findRoute() {
   var startLocation = markers[0].getPosition();
   var endLocation = markers[1].getPosition();
   sendLocations(startLocation, endLocation);
-    // 5초마다 현재 위치 업데이트
-    setInterval(function () {
-      getCurrentLocation();
-      console.log("현재 위치 업데이트");
-    }, 5000);
+  // 5초마다 현재 위치 업데이트
+  setInterval(function () {
+    getCurrentLocation();
+    console.log("현재 위치 업데이트");
+  }, 5000);
   // 경로 체크
   setInterval(function () {
     console.log("check");
@@ -336,68 +341,72 @@ function setDestination(lat, lon) {
 
     // 출발지 마커 설정
     var startLocation = new Tmapv2.LatLng(lat, lon);
-    markers.push(new Tmapv2.Marker({
-      position: startLocation,
-      map: map,
-      title: "출발지"
-    }));
+    markers.push(
+      new Tmapv2.Marker({
+        position: startLocation,
+        map: map,
+        title: "출발지",
+      }),
+    );
   } else if (!document.getElementById("endLat").value) {
     document.getElementById("endLat").value = lat;
     document.getElementById("endLng").value = lon;
 
     // 목적지 마커 설정
     var destinationLocation = new Tmapv2.LatLng(lat, lon);
-    markers.push(new Tmapv2.Marker({
-      position: destinationLocation,
-      map: map,
-      title: "목적지"
-    }));
+    markers.push(
+      new Tmapv2.Marker({
+        position: destinationLocation,
+        map: map,
+        title: "목적지",
+      }),
+    );
 
     // 출발지와 목적지가 모두 설정되었을 때 경로 탐색 시작
-    
+
     var startLocation = markers[0].getPosition(); // 출발지 마커 위치
     var destinationLocation = markers[1].getPosition(); // 목적지 마커 위치
     sendLocations(startLocation, destinationLocation);
-      // 5초마다 현재 위치 업데이트
-  setInterval(function () {
-    getCurrentLocation();
-    console.log("현재 위치 업데이트");
-  }, 5000);
-      // 경로 체크
-  setInterval(function () {
-    console.log("check");
-    checkRoute(markers.currentLocationMarker.getPosition());
-  }, 10000);
+    // 5초마다 현재 위치 업데이트
+    setInterval(function () {
+      getCurrentLocation();
+      console.log("현재 위치 업데이트");
+    }, 5000);
+    // 경로 체크
+    setInterval(function () {
+      console.log("check");
+      checkRoute(markers.currentLocationMarker.getPosition());
+    }, 10000);
   }
 }
 
 function sendLocations(startLocation, endLocation) {
   routeSearchStarted = true; // 경로 탐색 시작
-    // 출발지와 도착지 마커를 설정
-    var startMarker = new Tmapv2.Marker({
-      position: startLocation,
-      title: "출발지",
-      map: map,
-    });
-  
-    var endMarker = new Tmapv2.Marker({
-      position: endLocation,
-      title: "도착지",
-      map: map,
-    });
-  
-    // 현위치 마커가 있는지 확인
-    var currentLocationMarker = markers.currentLocationMarker;
-  
-    // 출발지, 도착지, 현위치 마커를 제외한 모든 마커 삭제
-    markers.forEach(function(marker) {
-      if (marker !== currentLocationMarker && marker !== startMarker && marker !== endMarker) {
-        marker.setMap(null);
-      }
-    });
-  
-    // 현위치, 출발지, 도착지 마커만 markers 배열에 남기기
-    markers = [currentLocationMarker, startMarker, endMarker];
+  // 출발지와 도착지 마커를 설정
+  var startMarker = new Tmapv2.Marker({
+    position: startLocation,
+    title: "출발지",
+    map: map,
+  });
+
+  var endMarker = new Tmapv2.Marker({
+    position: endLocation,
+    title: "도착지",
+    map: map,
+  });
+
+  // 현위치 마커가 있는지 확인
+  var currentLocationMarker = markers.currentLocationMarker;
+
+  // 출발지, 도착지, 현위치 마커를 제외한 모든 마커 삭제
+  markers.forEach(function (marker) {
+    if (marker !== currentLocationMarker && marker !== startMarker && marker !== endMarker) {
+      marker.setMap(null);
+    }
+  });
+
+  // 현위치, 출발지, 도착지 마커만 markers 배열에 남기기
+  markers = [currentLocationMarker, startMarker, endMarker];
   var csrftoken = getCookie("csrftoken");
   var data = {
     start_location: [startLocation.lng(), startLocation.lat()],
@@ -532,7 +541,7 @@ $("#btn_select").click(function () {
     },
     success: function (response) {
       var resultpoisData = response.searchPoiInfo.pois.poi;
-       // 기존 마커 삭제 //마커 사이즈 에러 맞는듯
+      // 기존 마커 삭제 //마커 사이즈 에러 맞는듯
 
       var innerHtml = "";
       var positionBounds = new Tmapv2.LatLngBounds();
@@ -577,4 +586,3 @@ function clearMarkers() {
     markers = []; // 마커 배열 초기화
   }
 }
-
