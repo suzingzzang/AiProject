@@ -12,9 +12,7 @@
     </script>
   </head>
   <body onload="playAudio()">
-    <h1>
-      Upload an image or video for YOLOv8 Object Detection and Segmentation
-    </h1>
+    <h1>Upload an image or video for YOLOv8 Object Detection and Segmentation</h1>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       <input type="file" name="file" accept="image/*,video/*" />

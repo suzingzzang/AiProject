@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "common",
     "accounts",
-    "camera",
     "matching",
     "record",
     "qna",
