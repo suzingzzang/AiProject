@@ -4,6 +4,7 @@ var polyline;
 var currentWaypointIndex = 0;
 var waypoints = [];
 var routeSearchStarted = false;
+var pathCoordinates = [];
 
 function initMap() {
   map = new Tmapv2.Map("map", {
@@ -14,11 +15,7 @@ function initMap() {
   // 현재 위치 가져오기
   getCurrentLocation();
 
-  // 5초마다 현재 위치 업데이트
-  setInterval(function () {
-    getCurrentLocation();
-    console.log("현재 위치 업데이트");
-  }, 5000);
+
 
   map.addListener("click", function (event) {
     if (!routeSearchStarted) {
@@ -68,7 +65,7 @@ function displayRoute(directionsData) {
   }
 
   var features = directionsData.features;
-  var pathCoordinates = [];
+  pathCoordinates = [];
   var points = [];
   waypoints = [];
 
@@ -123,11 +120,21 @@ function checkRoute(currentLocation) {
     return;
   }
 
+  // 폴리라인과의 최소 거리 계산
+  var distanceToPolyline = getDistanceToPolyline(currentLocation, pathCoordinates);
+  console.log("Polyline Distance: ", distanceToPolyline);
+
+  // 경로 벗어남 체크
+  if (distanceToPolyline > 50) { 
+    alert("경로를 벗어났습니다.");
+    return;
+  }
+
   if (currentWaypointIndex < waypoints.length) {
     var nextWaypoint = waypoints[currentWaypointIndex];
-    var distance = getDistance(currentLocation, nextWaypoint);
+    var distanceToWaypoint = getDistance(currentLocation, nextWaypoint);
 
-    if (distance < 50) {
+    if (distanceToWaypoint < 50) {
       updateRouteInfo();
       currentWaypointIndex++;
     }
@@ -136,7 +143,7 @@ function checkRoute(currentLocation) {
     window.location.reload();
   }
 
-  // markers[1] 확인 후 위치 정보 가져오기 시도 getDestination안되는듯
+  // 목적지와의 거리 계산 및 도착 체크
   if (markers[1]) {
     var distanceToDestination = getDistance(currentLocation, markers[1].getPosition());
     console.log(distanceToDestination);
@@ -147,12 +154,56 @@ function checkRoute(currentLocation) {
   } else {
     console.error("목적지 마커가 정의되지 않았습니다.");
   }
-
-  if (!isOnRoute(currentLocation)) {
-    alert("경로를 벗어났습니다.");
-  }
 }
+function getDistanceToPolyline(point, pathCoordinates) {
+  var minDistance = Infinity;
 
+  for (var i = 0; i < pathCoordinates.length - 1; i++) {
+    var segmentStart = pathCoordinates[i];
+    var segmentEnd = pathCoordinates[i + 1];
+    var distance = getDistancePointToSegment(point, segmentStart, segmentEnd);
+    if (distance < minDistance) {
+      minDistance = distance;
+    }
+  }
+
+  return minDistance;
+}
+function getDistancePointToSegment(point, segmentStart, segmentEnd) {
+  var x0 = point.lng();
+  var y0 = point.lat();
+  var x1 = segmentStart.lng();
+  var y1 = segmentStart.lat();
+  var x2 = segmentEnd.lng();
+  var y2 = segmentEnd.lat();
+
+  var A = x0 - x1;
+  var B = y0 - y1;
+  var C = x2 - x1;
+  var D = y2 - y1;
+
+  var dot = A * C + B * D;
+  var len_sq = C * C + D * D;
+  var param = (len_sq !== 0) ? (dot / len_sq) : -1;
+
+  var xx, yy;
+
+  if (param < 0) {
+    xx = x1;
+    yy = y1;
+  } else if (param > 0 && param < 1) {
+    xx = x1 + param * C;
+    yy = y1 + param * D;
+  } else {
+    xx = x2;
+    yy = y2;
+  }
+
+  var dx = x0 - xx;
+  var dy = y0 - yy;
+
+  return Math.sqrt(dx * dx + dy * dy) * 100000; // Distance in meters
+}
 function errorCallback(error) {
   console.error("Error getting GPS position: " + error.message);
 }
@@ -267,13 +318,11 @@ function findRoute() {
   var startLocation = markers[0].getPosition();
   var endLocation = markers[1].getPosition();
   sendLocations(startLocation, endLocation);
-
-  // 5초마다 현재 위치 업데이트
-  setInterval(function () {
-    getCurrentLocation();
-    console.log("현위치업데이트");
-  }, 5000); // 매 5초마다 위치 업데이트
-
+    // 5초마다 현재 위치 업데이트
+    setInterval(function () {
+      getCurrentLocation();
+      console.log("현재 위치 업데이트");
+    }, 5000);
   // 경로 체크
   setInterval(function () {
     console.log("check");
@@ -309,11 +358,46 @@ function setDestination(lat, lon) {
     var startLocation = markers[0].getPosition(); // 출발지 마커 위치
     var destinationLocation = markers[1].getPosition(); // 목적지 마커 위치
     sendLocations(startLocation, destinationLocation);
+      // 5초마다 현재 위치 업데이트
+  setInterval(function () {
+    getCurrentLocation();
+    console.log("현재 위치 업데이트");
+  }, 5000);
+      // 경로 체크
+  setInterval(function () {
+    console.log("check");
+    checkRoute(markers.currentLocationMarker.getPosition());
+  }, 10000);
   }
 }
 
 function sendLocations(startLocation, endLocation) {
   routeSearchStarted = true; // 경로 탐색 시작
+    // 출발지와 도착지 마커를 설정
+    var startMarker = new Tmapv2.Marker({
+      position: startLocation,
+      title: "출발지",
+      map: map,
+    });
+  
+    var endMarker = new Tmapv2.Marker({
+      position: endLocation,
+      title: "도착지",
+      map: map,
+    });
+  
+    // 현위치 마커가 있는지 확인
+    var currentLocationMarker = markers.currentLocationMarker;
+  
+    // 출발지, 도착지, 현위치 마커를 제외한 모든 마커 삭제
+    markers.forEach(function(marker) {
+      if (marker !== currentLocationMarker && marker !== startMarker && marker !== endMarker) {
+        marker.setMap(null);
+      }
+    });
+  
+    // 현위치, 출발지, 도착지 마커만 markers 배열에 남기기
+    markers = [currentLocationMarker, startMarker, endMarker];
   var csrftoken = getCookie("csrftoken");
   var data = {
     start_location: [startLocation.lng(), startLocation.lat()],
@@ -448,7 +532,7 @@ $("#btn_select").click(function () {
     },
     success: function (response) {
       var resultpoisData = response.searchPoiInfo.pois.poi;
-      clearMarkers(); // 기존 마커 삭제 //마커 사이즈 에러 맞는듯
+       // 기존 마커 삭제 //마커 사이즈 에러 맞는듯
 
       var innerHtml = "";
       var positionBounds = new Tmapv2.LatLngBounds();
