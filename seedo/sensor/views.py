@@ -17,7 +17,7 @@ def get_sensor(request):
     return render(request, "sensor/index.html")
 
 
-model = load_model("sensor/ml_models/sensor/ml_model/fall_recognition_v1.h5")
+model = load_model("sensor/ml_models/sensor/ml_model/fall_recognition_v2.h5")
 
 
 def fall_recognition(request):
@@ -88,7 +88,7 @@ def process_sensor_data(data):
         gyr_y = gyro["beta"]
         gyr_z = gyro["gamma"]
 
-        SVM_acc = np.sqrt(acc_x**2 + acc_y**2 + acc_z**2)
+        SVM_acc = np.sqrt(acc_x**2 + acc_y**2 + acc_z**2) * 0.55
         # SVM_gyro = np.sqrt(gyr_x**2 + gyr_y**2 + gyr_z**2)
 
         # Append row to the list
