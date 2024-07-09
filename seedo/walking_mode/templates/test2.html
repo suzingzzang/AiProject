@@ -17,16 +17,21 @@
 
           const result = await response.json();
           console.log(result);
+
           // 탐지된 객체 정보를 HTML에 표시
           document.getElementById("object_detection").textContent =
             `Detection: ${result.od_classes.join(", ")} (Segmentation: ${result.seg_classes.join(", ")})`;
 
+          // 이미지 표시
+          const imgElement = document.getElementById("annotated-image");
+          if (result.annotated_image) {
+            imgElement.src = `data:image/jpeg;base64,${result.annotated_image}`;
+            imgElement.style.display = "block";
+          } else {
+            imgElement.style.display = "none";
+          }
+
           // TTS 오디오를 재생
-          /*if (result.tts_audio_url) {
-                const audioElement = new Audio(result.tts_audio_url);
-                audioElement.autoplay = true;
-                audioElement.play();
-              }*/
           if (result.tts_audio_url) {
             const audioContainer = document.getElementById("audio-container");
             const sound = new Howl({
@@ -72,7 +77,7 @@
             "Recording...";
 
           navigator.mediaDevices
-            .getUserMedia({ video: true })
+            .getUserMedia({ video: { facingMode: "environment" } })
             .then(function (stream) {
               video.srcObject = stream;
               video.play();
@@ -108,24 +113,15 @@
 
     <button id="start-camera">Start Camera</button>
     <button id="stop-camera">Stop Camera</button>
-    <form
-      id="upload-form"
-      method="post"
-      enctype="multipart/form-data"
-      action="{% url 'walking_mode:upload_recording' %}"
-    >
-      {% csrf_token %}
-      <input type="file" name="video" id="video-file" style="display: none" />
-      <input
-        type="file"
-        name="sensor_log"
-        id="sensor-log-file"
-        style="display: none"
-      />
-      <button type="submit" style="display: none">Submit</button>
-    </form>
+
+    <h2>Video</h2>
     <video id="video" width="640" height="480" style="display: block"></video>
     <canvas id="canvas" width="640" height="480" style="display: none"></canvas>
+
+    <h2>Annotated Image</h2>
+    <img id="annotated-image" width="640" height="480" style="display: none" />
+
+    <h2>Audio Description</h2>
     <div id="audio-container"></div>
   </body>
 </html>

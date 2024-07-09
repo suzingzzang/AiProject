@@ -9,3 +9,7 @@ django-environ==0.11.2
 twilio==9.2.1
 
 Pillow==10.4.0
+
+ultralytics==8.2.50
+
+opencv-python==4.10.0.84
