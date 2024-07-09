@@ -89,11 +89,11 @@
         map.addListener("click", function (event) {
           addMarker(event.latLng);
         });
-      
         map.addListener("touchstart", function (event) {
           addMarker(event.latLng);
         });
       }
+
       function getCurrentLocation() {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(successCallback, errorCallback, {
