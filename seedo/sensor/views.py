@@ -17,7 +17,7 @@ def get_sensor(request):
     return render(request, "sensor/index.html")
 
 
-model = load_model("sensor/ml_models/sensor/ml_model/fall_recognition_v0.h5")
+model = load_model("sensor/ml_models/sensor/ml_model/fall_recognition_v1.h5")
 
 
 def fall_recognition(request):
@@ -25,7 +25,7 @@ def fall_recognition(request):
         data = json.loads(request.body)
         df = process_sensor_data(data)
 
-        scaler = load("sensor/ml_models/sensor/scaler/scaler.joblib")
+        scaler = load("sensor/ml_models/sensor/scaler/scaler_v1.joblib")
         X_test = df
         X_test_normalized = scaler.transform(X_test)
         time_steps = 15
@@ -55,19 +55,19 @@ def process_sensor_data(data):
         "gyr_y(deg/s)",
         "gyr_z(deg/s)",
         "SVM_acc(g)",
-        "SVM_gyro(g)",
+        # "SVM_gyro(g)",
         "SVM_acc(g)_mean",
         "SVM_acc(g)_std",
         "SVM_acc(g)_median",
         "SVM_acc(g)_mad",
-        "SVM_gyro(g)_mean",
-        "SVM_gyro(g)_std",
-        "SVM_gyro(g)_median",
-        "SVM_gyro(g)_mad",
+        # "SVM_gyro(g)_mean",
+        # "SVM_gyro(g)_std",
+        # "SVM_gyro(g)_median",
+        # "SVM_gyro(g)_mad",
         "SVM_acc(g)_fft_mean",
         "SVM_acc(g)_fft_std",
-        "SVM_gyro(g)_fft_mean",
-        "SVM_gyro(g)_fft_std",
+        # "SVM_gyro(g)_fft_mean",
+        # "SVM_gyro(g)_fft_std",
     ]
 
     rows = []
@@ -89,7 +89,7 @@ def process_sensor_data(data):
         gyr_z = gyro["gamma"]
 
         SVM_acc = np.sqrt(acc_x**2 + acc_y**2 + acc_z**2)
-        SVM_gyro = np.sqrt(gyr_x**2 + gyr_y**2 + gyr_z**2)
+        # SVM_gyro = np.sqrt(gyr_x**2 + gyr_y**2 + gyr_z**2)
 
         # Append row to the list
         rows.append(
@@ -102,7 +102,7 @@ def process_sensor_data(data):
                 "gyr_y(deg/s)": gyr_y,
                 "gyr_z(deg/s)": gyr_z,
                 "SVM_acc(g)": SVM_acc,
-                "SVM_gyro(g)": SVM_gyro,
+                # "SVM_gyro(g)": SVM_gyro,
             }
         )
 
@@ -116,10 +116,12 @@ def process_sensor_data(data):
     df["SVM_acc(g)_median"] = df["SVM_acc(g)"].rolling(window=window_size).median()
     df["SVM_acc(g)_mad"] = df["SVM_acc(g)"].rolling(window=window_size).apply(median_abs_deviation)
 
-    df["SVM_gyro(g)_mean"] = df["SVM_gyro(g)"].rolling(window=window_size).mean()
-    df["SVM_gyro(g)_std"] = df["SVM_gyro(g)"].rolling(window=window_size).std()
-    df["SVM_gyro(g)_median"] = df["SVM_gyro(g)"].rolling(window=window_size).median()
-    df["SVM_gyro(g)_mad"] = df["SVM_gyro(g)"].rolling(window=window_size).apply(median_abs_deviation)
+    # df["SVM_gyro(g)_mean"] = df["SVM_gyro(g)"].rolling(window=window_size).mean()
+    # df["SVM_gyro(g)_std"] = df["SVM_gyro(g)"].rolling(window=window_size).std()
+    # df["SVM_gyro(g)_median"] = df["SVM_gyro(g)"].rolling(window=window_size).median()
+    # df["SVM_gyro(g)_mad"] = (
+    #     df["SVM_gyro(g)"].rolling(window=window_size).apply(median_abs_deviation)
+    # )
 
     # Calculate FFT-based features for a specified window size
     def calculate_fft_features(signal):
@@ -136,12 +138,20 @@ def process_sensor_data(data):
         df["SVM_acc(g)"].rolling(window=window_size).apply(lambda x: calculate_fft_features(x)[1] if len(x) == window_size else np.nan)
     )
 
-    df["SVM_gyro(g)_fft_mean"] = (
-        df["SVM_gyro(g)"].rolling(window=window_size).apply(lambda x: calculate_fft_features(x)[0] if len(x) == window_size else np.nan)
-    )
-    df["SVM_gyro(g)_fft_std"] = (
-        df["SVM_gyro(g)"].rolling(window=window_size).apply(lambda x: calculate_fft_features(x)[1] if len(x) == window_size else np.nan)
-    )
+    # df["SVM_gyro(g)_fft_mean"] = (
+    #     df["SVM_gyro(g)"]
+    #     .rolling(window=window_size)
+    #     .apply(
+    #         lambda x: calculate_fft_features(x)[0] if len(x) == window_size else np.nan
+    #     )
+    # )
+    # df["SVM_gyro(g)_fft_std"] = (
+    #     df["SVM_gyro(g)"]
+    #     .rolling(window=window_size)
+    #     .apply(
+    #         lambda x: calculate_fft_features(x)[1] if len(x) == window_size else np.nan
+    #     )
+    # )
 
     # Select only the required columns
     drop_cols = ["Time(s)", "acc_x(g)", "acc_y(g)", "acc_z(g)", "gyr_x(deg/s)", "gyr_y(deg/s)", "gyr_z(deg/s)"]
