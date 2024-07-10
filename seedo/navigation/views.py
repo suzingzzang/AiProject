@@ -5,9 +5,26 @@ from common.decorators import token_required
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
-
+import urllib.parse
+import urllib.request
+from django.http import HttpResponse
+import environ
 from .models import Navigation
+from pathlib import Path
 
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# API 가져오기
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+env_path = BASE_DIR.parent / ".env"
+environ.Env.read_env(env_file=env_path)
+
+CLIENT_ID = env("NAVER_TTS_CLIENT_ID")
+SECRETE_KEY = env("NAVER_TTS_CLIENT_SECRETE_KEY")
 
 @token_required
 def index(request):
@@ -57,3 +74,35 @@ def get_walking_directions(request):
 
     else:
         return render(request, "navigation/index.html")
+
+@token_required
+def naver_tts(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            text = data.get('text', '')
+            encText = urllib.parse.quote(text)
+            data = f"speaker=nara&volume=0&speed=0&pitch=0&format=mp3&text={encText}"
+            url = "https://naveropenapi.apigw.ntruss.com/tts-premium/v1/tts"
+
+            request_api = urllib.request.Request(url)
+            request_api.add_header("X-NCP-APIGW-API-KEY-ID", CLIENT_ID)
+            request_api.add_header("X-NCP-APIGW-API-KEY", SECRETE_KEY)
+
+            response = urllib.request.urlopen(request_api, data=data.encode("utf-8"))
+            rescode = response.getcode()
+
+            if rescode == 200:
+                response_body = response.read()
+                response = HttpResponse(response_body, content_type='audio/mp3')
+                response['Content-Disposition'] = 'attachment; filename="tts.mp3"'
+                return response
+            else:
+                return HttpResponse(f"Error Code: {rescode}", status=rescode)
+        except urllib.error.HTTPError as e:
+            return HttpResponse(f"HTTPError: {e.code} {e.reason}", status=e.code)
+        except urllib.error.URLError as e:
+            return HttpResponse(f"URLError: {e.reason}", status=500)
+        except Exception as e:
+            return HttpResponse(str(e), status=500)
+    return HttpResponse(status=405)
