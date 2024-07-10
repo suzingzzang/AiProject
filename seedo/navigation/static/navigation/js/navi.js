@@ -11,6 +11,44 @@ let startLocation, startMarker;
 let endLocation, endMarker;
 let currentLocation, currentMarker;
 
+
+async function ttsAlert(text) {
+  var csrftoken = getCookie("csrftoken");
+  try {
+    const response = await fetch("/nav/tts/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+      },
+      body: JSON.stringify({ text }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+    await audio.play();
+
+    // 음성 재생이 완료되었음을 알리기 위해 Promise resolve
+    return Promise.resolve();
+  } catch (error) {
+    console.error("TTS 변환 중 오류 발생:", error);
+    // 오류 발생 시에도 Promise reject를 사용하여 처리 가능
+    return Promise.reject(error);
+  }
+}
+
+// 기존 alert 함수를 불러올때 ttsAlert 함수 호출
+window.alert = function(text) {
+  ttsAlert(text); // TTS 변환 함수 호출
+  window.alert = ttsAlert; // alert 함수를 다시 TTS 함수로 설정하여 중복 호출 방지
+};
+
+
 function initMap() {
   map = new Tmapv2.Map("map", {
     center: new Tmapv2.LatLng(37.5665, 126.978),
@@ -147,9 +185,10 @@ function displayRoute(directionsData) {
       routeInfoContainer.appendChild(info);
     }
   });
+  window.alert = ttsAlert;
 }
 
-function checkRoute(currentLocation) {
+async function checkRoute(currentLocation) {
   if (!currentMarker) {
     console.error("현재 위치 마커가 정의되지 않았습니다.");
     return;
@@ -161,7 +200,7 @@ function checkRoute(currentLocation) {
 
   // 경로 벗어남 체크
   if (distanceToPolyline > 50) {
-    alert("경로를 벗어났습니다.");
+    ttsAlert("경로를 벗어났습니다.");
     return;
   }
 
@@ -174,8 +213,10 @@ function checkRoute(currentLocation) {
       currentWaypointIndex++;
     }
   } else {
-    alert("경로를 완료했습니다.");
+    ttsAlert("경로를 완료했습니다.");
+    await delay(5000); // 3초 대기
     window.location.reload();
+    return;
   }
 
   // 목적지와의 거리 계산 및 도착 체크
@@ -183,12 +224,17 @@ function checkRoute(currentLocation) {
     var distanceToDestination = getDistance(currentLocation, endMarker.getPosition());
     console.log(distanceToDestination);
     if (distanceToDestination < 10) {
-      alert("도착 지점 근처에 도착했습니다. 경로 안내를 종료합니다.");
+      ttsAlert("도착 지점 근처에 도착했습니다. 경로 안내를 종료합니다.");
+      await delay(6000); // 3초 대기
       window.location.reload();
+      return;
     }
   } else {
     console.error("목적지 마커가 정의되지 않았습니다.");
   }
+}
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 function getDistanceToPolyline(point, pathCoordinates) {
   var minDistance = Infinity;
