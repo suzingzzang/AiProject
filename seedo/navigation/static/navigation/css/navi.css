@@ -11,25 +11,16 @@ main {
 }
 
 .container {
+  width: 100%;
+  height: 300px;
   display: flex;
 }
 #map {
   height: 300px;
   flex: 3;
 }
-.search-results {
+#searchResult {
   flex: 1;
   overflow-y: auto;
   height: 300px;
-}
-.search-results ul {
-  list-style-type: none;
-  padding: 0;
-}
-.search-results li {
-  cursor: pointer;
-  padding: 5px;
-}
-.search-results li:hover {
-  background-color: #f0f0f0;
 }
