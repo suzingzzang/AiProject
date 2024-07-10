@@ -6,11 +6,6 @@ var waypoints = [];
 var routeSearchStarted = false;
 var pathCoordinates = [];
 
-let markerLatLng, infoWindow;
-let startLocation, startMarker;
-let endLocation, endMarker;
-let currentLocation, currentMarker;
-
 function initMap() {
   map = new Tmapv2.Map("map", {
     center: new Tmapv2.LatLng(37.5665, 126.978),
@@ -21,46 +16,14 @@ function initMap() {
   getCurrentLocation();
 
   map.addListener("click", function (event) {
-    if (infoWindow) {
-      infoWindow.setVisible(false);
-    }
-
-    markerLatLng = event.latLng;
     if (!routeSearchStarted) {
-      var content = `<div style='width: 120px'>
-                       <div onclick='addMarker("start")'>출발지 설정</div>
-                       <div onclick='addMarker("end")'>목적지 설정</div>
-                     </div>`;
-      //Popup 객체 생성.
-      infoWindow = new Tmapv2.InfoWindow({
-        position: new Tmapv2.LatLng(event.latLng.lat(), event.latLng.lng()), //Popup 이 표출될 맵 좌표
-        content: content, //Popup 표시될 text
-        type: 2, //Popup의 type 설정.
-        border: 4,
-        map: map, //Popup이 표시될 맵 객체
-      });
+      addMarker(event.latLng);
     }
   });
 
   map.addListener("touchstart", function (event) {
-    if (infoWindow) {
-      infoWindow.setVisible(false);
-    }
-
-    markerLatLng = event.latLng;
     if (!routeSearchStarted) {
-      var content = `<div style='width: 120px'>
-                       <div ontouchstart='addMarker("start")'>출발지 설정</div>
-                       <div ontouchstart='addMarker("end")'>목적지 설정</div>
-                     </div>`;
-      //Popup 객체 생성.
-      infoWindow = new Tmapv2.InfoWindow({
-        position: new Tmapv2.LatLng(event.latLng.lat(), event.latLng.lng()), //Popup 이 표출될 맵 좌표
-        content: content, //Popup 표시될 text
-        type: 2, //Popup의 type 설정.
-        border: 4,
-        map: map, //Popup이 표시될 맵 객체
-      });
+      addMarker(event.latLng);
     }
   });
 }
@@ -79,17 +42,17 @@ function getCurrentLocation() {
 function successCallback(position) {
   var lat = position.coords.latitude;
   var lng = position.coords.longitude;
-  currentLocation = new Tmapv2.LatLng(lat, lng);
+  var currentLocation = new Tmapv2.LatLng(lat, lng);
 
   // 현재 위치 마커 초기화 또는 위치 업데이트
-  if (!currentMarker) {
-    currentMarker = new Tmapv2.Marker({
+  if (!markers.currentLocationMarker) {
+    markers.currentLocationMarker = new Tmapv2.Marker({
       position: currentLocation,
       map: map, // 반드시 map 옵션을 설정하여 지도에 연결
       title: "현재 위치",
     });
   } else {
-    currentMarker.setPosition(currentLocation);
+    markers.currentLocationMarker.setPosition(currentLocation);
   }
 
   map.panTo(currentLocation); // 지도를 현재 위치로 이동
@@ -150,7 +113,7 @@ function displayRoute(directionsData) {
 }
 
 function checkRoute(currentLocation) {
-  if (!currentMarker) {
+  if (!markers.currentLocationMarker) {
     console.error("현재 위치 마커가 정의되지 않았습니다.");
     return;
   }
@@ -179,8 +142,8 @@ function checkRoute(currentLocation) {
   }
 
   // 목적지와의 거리 계산 및 도착 체크
-  if (endMarker) {
-    var distanceToDestination = getDistance(currentLocation, endMarker.getPosition());
+  if (markers[1]) {
+    var distanceToDestination = getDistance(currentLocation, markers[1].getPosition());
     console.log(distanceToDestination);
     if (distanceToDestination < 10) {
       alert("도착 지점 근처에 도착했습니다. 경로 안내를 종료합니다.");
@@ -243,26 +206,39 @@ function errorCallback(error) {
   console.error("Error getting GPS position: " + error.message);
 }
 
-function addMarker(type) {
-  if (type === "start") {
-    startLocation = new Tmapv2.LatLng(markerLatLng.lat(), markerLatLng.lng());
-    startMarker = new Tmapv2.Marker({
-      position: startLocation,
-      map: map,
-      title: "출발지",
+function addMarker(location) {
+  if (markers.length >= 2) {
+    markers.forEach(function (marker) {
+      marker.setMap(null);
     });
-  } else {
-    endLocation = new Tmapv2.LatLng(markerLatLng.lat(), markerLatLng.lng());
-    endMarker = new Tmapv2.Marker({
-      position: endLocation,
-      map: map,
-      title: "목적지",
+    markers = [];
+  }
+
+  var marker = new Tmapv2.Marker({
+    position: location,
+    map: map,
+  });
+
+  markers.push(marker);
+
+  // 마커 위치를 입력란에 표시
+  if (markers.length === 1) {
+    document.getElementById("startLat").value = location.lat();
+    document.getElementById("startLng").value = location.lng();
+
+    // 출발지 주소 업데이트
+    reverseGeo(location.lat(), location.lng(), function (address) {
+      updateAddress("start", address);
+    });
+  } else if (markers.length === 2) {
+    document.getElementById("endLat").value = location.lat();
+    document.getElementById("endLng").value = location.lng();
+
+    // 도착지 주소 업데이트
+    reverseGeo(location.lat(), location.lng(), function (address) {
+      updateAddress("end", address);
     });
   }
-  reverseGeo(markerLatLng.lat(), markerLatLng.lng(), function (address) {
-    updateAddress(type, address);
-  });
-  infoWindow.setVisible(false);
 }
 
 function reverseGeo(lat, lng, callback) {
@@ -338,118 +314,14 @@ function updateAddress(type, address) {
   addressDiv.innerHTML = address;
 }
 
-// 아래는 poi 검색하는 부분이니까, 여기를 출발지, 목적지 구분해서 넣어줌
-function searchLocation(searchKeyword, setFunction) {
-  var headers = {};
-  headers["appKey"] = "po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3";
-
-  $.ajax({
-    method: "GET",
-    headers: headers,
-    url: "https://apis.openapi.sk.com/tmap/pois",
-    data: {
-      version: 1,
-      format: "json",
-      searchKeyword: searchKeyword,
-      resCoordType: "EPSG3857",
-      reqCoordType: "WGS84GEO",
-      count: 10,
-    },
-    success: function (response) {
-      var resultpoisData = response.searchPoiInfo.pois.poi;
-
-      var innerHtml = "";
-      var positionBounds = new Tmapv2.LatLngBounds();
-
-      for (var k in resultpoisData) {
-        var noorLat = Number(resultpoisData[k].noorLat);
-        var noorLon = Number(resultpoisData[k].noorLon);
-        var name = resultpoisData[k].name;
-        var pointCng = new Tmapv2.Point(noorLon, noorLat);
-        var projectionCng = new Tmapv2.Projection.convertEPSG3857ToWGS84GEO(pointCng);
-        var lat = projectionCng._lat;
-        var lon = projectionCng._lng;
-        var markerPosition = new Tmapv2.LatLng(lat, lon);
-        var marker = new Tmapv2.Marker({
-          position: markerPosition,
-          title: name,
-          map: map,
-        });
-
-        innerHtml += "<li onclick='" + setFunction + "(" + lat + "," + lon + ")'><span>" + name + "</span></li>";
-
-        markers.push(marker);
-        positionBounds.extend(markerPosition);
-      }
-
-      $("#searchResult").html(innerHtml);
-      map.panToBounds(positionBounds);
-      map.zoomOut();
-    },
-    error: function (request, status, error) {
-      console.error("Error:", error);
-    },
-  });
-}
-
-$("#startBtn").click(function () {
-  var searchKeyword = $("#startKey").val();
-  searchLocation(searchKeyword, "setStart");
-});
-
-$("#endBtn").click(function () {
-  var searchKeyword = $("#endKey").val();
-  searchLocation(searchKeyword, "setEnd");
-});
-
-function setStart(lat, lon) {
-  $("#searchResult").html("");
-  reverseGeo(lat, lon, function (address) {
-    updateAddress("start", address);
-  });
-  clearMarkers();
-
-  startLocation = new Tmapv2.LatLng(lat, lon);
-  startMarker = new Tmapv2.Marker({
-    position: startLocation,
-    map: map,
-    title: "출발지",
-  });
-  map.setCenter(startLocation);
-  map.setZoom(13);
-}
-function setEnd(lat, lon) {
-  $("#searchResult").html("");
-  reverseGeo(lat, lon, function (address) {
-    updateAddress("end", address);
-  });
-  clearMarkers();
-
-  endLocation = new Tmapv2.LatLng(lat, lon);
-  endMarker = new Tmapv2.Marker({
-    position: endLocation,
-    map: map,
-    title: "목적지",
-  });
-  map.setCenter(endLocation);
-  map.setZoom(13);
-}
-
-function clearMarkers() {
-  if (markers.length > 0) {
-    for (var i = 0; i < markers.length; i++) {
-      markers[i].setMap(null);
-    }
-    markers = []; // 마커 배열 초기화
-  }
-}
-
 function findRoute() {
-  if (!startMarker && !endMarker) {
+  if (Object.keys(markers).length < 2) {
     console.error("출발지와 도착지를 모두 지정해주세요.");
     return;
   }
 
+  var startLocation = markers[0].getPosition();
+  var endLocation = markers[1].getPosition();
   sendLocations(startLocation, endLocation);
   // 5초마다 현재 위치 업데이트
   setInterval(function () {
@@ -459,19 +331,82 @@ function findRoute() {
   // 경로 체크
   setInterval(function () {
     console.log("check");
-    checkRoute(currentMarker.getPosition());
+    checkRoute(markers.currentLocationMarker.getPosition());
   }, 10000); // 매 10초마다 경로 체크
+}
+function setDestination(lat, lon) {
+  if (!document.getElementById("startLat").value) {
+    document.getElementById("startLat").value = lat;
+    document.getElementById("startLng").value = lon;
+
+    // 출발지 마커 설정
+    var startLocation = new Tmapv2.LatLng(lat, lon);
+    markers.push(
+      new Tmapv2.Marker({
+        position: startLocation,
+        map: map,
+        title: "출발지",
+      }),
+    );
+  } else if (!document.getElementById("endLat").value) {
+    document.getElementById("endLat").value = lat;
+    document.getElementById("endLng").value = lon;
+
+    // 목적지 마커 설정
+    var destinationLocation = new Tmapv2.LatLng(lat, lon);
+    markers.push(
+      new Tmapv2.Marker({
+        position: destinationLocation,
+        map: map,
+        title: "목적지",
+      }),
+    );
+
+    // 출발지와 목적지가 모두 설정되었을 때 경로 탐색 시작
+
+    var startLocation = markers[0].getPosition(); // 출발지 마커 위치
+    var destinationLocation = markers[1].getPosition(); // 목적지 마커 위치
+    sendLocations(startLocation, destinationLocation);
+    // 5초마다 현재 위치 업데이트
+    setInterval(function () {
+      getCurrentLocation();
+      console.log("현재 위치 업데이트");
+    }, 5000);
+    // 경로 체크
+    setInterval(function () {
+      console.log("check");
+      checkRoute(markers.currentLocationMarker.getPosition());
+    }, 10000);
+  }
 }
 
 function sendLocations(startLocation, endLocation) {
   routeSearchStarted = true; // 경로 탐색 시작
+  // 출발지와 도착지 마커를 설정
+  var startMarker = new Tmapv2.Marker({
+    position: startLocation,
+    title: "출발지",
+    map: map,
+  });
 
-  if (infoWindow) {
-    infoWindow.setVisible(false);
-  }
+  var endMarker = new Tmapv2.Marker({
+    position: endLocation,
+    title: "도착지",
+    map: map,
+  });
+
+  // 현위치 마커가 있는지 확인
+  var currentLocationMarker = markers.currentLocationMarker;
+
+  // 출발지, 도착지, 현위치 마커를 제외한 모든 마커 삭제
+  markers.forEach(function (marker) {
+    if (marker !== currentLocationMarker && marker !== startMarker && marker !== endMarker) {
+      marker.setMap(null);
+    }
+  });
 
   // 현위치, 출발지, 도착지 마커만 markers 배열에 남기기
-  markers = [currentMarker, startMarker, endMarker];
+  markers = [currentLocationMarker, startMarker, endMarker];
   var csrftoken = getCookie("csrftoken");
   var data = {
     start_location: [startLocation.lng(), startLocation.lat()],
@@ -499,14 +434,14 @@ function sendLocations(startLocation, endLocation) {
 }
 
 function updateCurrentLocationMarker(location) {
-  if (!currentMarker) {
-    currentMarker = new Tmapv2.Marker({
+  if (!markers.currentLocationMarker) {
+    markers.currentLocationMarker = new Tmapv2.Marker({
       position: location,
       map: map,
       title: "현재 위치",
     });
   } else {
-    currentMarker.setPosition(location);
+    markers.currentLocationMarker.setPosition(location);
   }
   // 지도를 현재 위치로 이동
   map.panTo(location);
@@ -522,6 +457,26 @@ function updateRouteInfo(features) {
   info.classList.add("route-info-item");
   info.innerHTML = `<p>다음 안내: ${nextDescription}</p>`;
   routeInfoContainer.appendChild(info);
+}
+
+function isOnRoute(currentLocation) {
+  if (waypoints.length === 0) {
+    console.warn("경로가 정의되지 않았습니다.");
+    return false;
+  }
+
+  var toleranceDistance = 50;
+
+  for (var i = 0; i < waypoints.length; i++) {
+    var waypoint = waypoints[i];
+    var distance = getDistance(currentLocation, waypoint);
+
+    if (distance <= toleranceDistance) {
+      return true; // 현재 위치가 경로상에 있는 경우
+    }
+  }
+
+  return false; // 현재 위치가 경로상에 없는 경우
 }
 
 // gpt한테 물어봄 해버시늄??처음들어봄
@@ -566,3 +521,68 @@ function getCookie(name) {
 document.addEventListener("DOMContentLoaded", function () {
   initMap();
 });
+
+$("#btn_select").click(function () {
+  var searchKeyword = $("#searchKeyword").val();
+  var headers = {};
+  headers["appKey"] = "po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3";
+
+  $.ajax({
+    method: "GET",
+    headers: headers,
+    url: "https://apis.openapi.sk.com/tmap/pois",
+    data: {
+      version: 1,
+      format: "json",
+      searchKeyword: searchKeyword,
+      resCoordType: "EPSG3857",
+      reqCoordType: "WGS84GEO",
+      count: 10,
+    },
+    success: function (response) {
+      var resultpoisData = response.searchPoiInfo.pois.poi;
+      // 기존 마커 삭제 //마커 사이즈 에러 맞는듯
+
+      var innerHtml = "";
+      var positionBounds = new Tmapv2.LatLngBounds();
+
+      for (var k in resultpoisData) {
+        var noorLat = Number(resultpoisData[k].noorLat);
+        var noorLon = Number(resultpoisData[k].noorLon);
+        var name = resultpoisData[k].name;
+        var pointCng = new Tmapv2.Point(noorLon, noorLat);
+        var projectionCng = new Tmapv2.Projection.convertEPSG3857ToWGS84GEO(pointCng);
+        var lat = projectionCng._lat;
+        var lon = projectionCng._lng;
+        var markerPosition = new Tmapv2.LatLng(lat, lon);
+        //마커 아이콘 객체 불러오는 부분 삭제 새로딩하면서 에러남
+        var marker = new Tmapv2.Marker({
+          position: markerPosition,
+          title: name,
+          map: map,
+        });
+
+        innerHtml += "<li onclick='setDestination(" + lat + "," + lon + ")'><span>" + name + "</span></li>";
+
+        markers.push(marker);
+        positionBounds.extend(markerPosition);
+      }
+
+      $("#searchResult").html(innerHtml);
+      map.panToBounds(positionBounds);
+      map.zoomOut();
+    },
+    error: function (request, status, error) {
+      console.error("Error:", error);
+    },
+  });
+});
+
+function clearMarkers() {
+  if (markers.length > 0) {
+    for (var i = 0; i < markers.length; i++) {
+      markers[i].setMap(null);
+    }
+    markers = []; // 마커 배열 초기화
+  }
+}
