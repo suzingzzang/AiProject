@@ -10,32 +10,29 @@
   <div class="form-container">
     <label for="startAddress">출발지:</label>
     <div id="startAddress"></div>
-    <label for="startLat">위도:</label>
-    <input type="text" id="startLat" placeholder="출발지 위도를 입력하세요" />
-    <label for="startLng">경도:</label>
-    <input type="text" id="startLng" placeholder="출발지 경도를 입력하세요" />
   </div>
 
   <div class="form-container">
     <label for="endAddress">도착지:</label>
     <div id="endAddress"></div>
-    <label for="endLat">위도:</label>
-    <input type="text" id="endLat" placeholder="도착지 위도를 입력하세요" />
-    <label for="endLng">경도:</label>
-    <input type="text" id="endLng" placeholder="도착지 경도를 입력하세요" />
   </div>
   <button onclick="findRoute()">경로 찾기</button>
-  <div>
-    <input type="text" class="text_custom" id="searchKeyword" name="searchKeyword" value="" />
-    <button id="btn_select">적용하기</button>
+
+  <!-- 출발지 목적지 검색 시 맵 좌측에 뜨게 or media 적용해서 상단에 뜨도록 하기 -->
+  <div class="startPoint">
+    <input type="text" class="text_custom" id="startKey" name="startKey" value="" />
+    <button id="startBtn">출발지 검색</button>
   </div>
+
+  <div class="endPoint">
+    <input type="text" class="text_custom" id="endKey" name="endKey" value="" />
+    <button id="endBtn">목적지 검색</button>
+  </div>
+
+  <ul id="searchResult" name="searchResult"></ul>
+
   <div class="container">
-    <div class="search-results">
-      <ul id="searchResult" name="searchResult">
-        <li>검색결과</li>
-      </ul>
-    </div>
-    <div id="map" style="height: 300px; width: 300px"></div>
+    <div id="map"></div>
   </div>
   <div id="route-info"></div>
 </main>
