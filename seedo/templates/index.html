@@ -2,8 +2,8 @@
 <link rel="stylesheet" href="{% static 'css/landing.css' %}" />
 {% endblock extra_head %} {% block content %}
 <main>
-  <a class="walk", href="/walking_mode/">보행모드</a>
-  <a href="/nav/">길안내</a>
+  <a href="/walking_mode/" class="walk">보행모드</a>
+  <a href="/nav/" class="navi">길안내</a>
   <a href="/record/break/{{user.id}}">시설 파손 기록</a>
   <a href="/record/accident/{{user.id}}">사고 기록 확인</a>
   <a href="/qna/">문의 게시판</a>
