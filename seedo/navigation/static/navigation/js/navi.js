@@ -514,6 +514,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 $("#btn_select").click(function () {
+ 
   var searchKeyword = $("#searchKeyword").val();
   var headers = {};
   headers["appKey"] = "po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3";
