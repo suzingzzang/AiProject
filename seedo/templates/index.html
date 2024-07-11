@@ -1,9 +1,24 @@
 {% extends "base.html" %} {% load static %} {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/landing.css' %}" />
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
+<script defer src="{% static 'navigation/js/navi.js' %}"></script>
 {% endblock extra_head %} {% block content %}
 <main>
+  <div id="map" style="height: 400px;"></div>
   <a class="walk", href="/walking_mode/">보행모드</a>
-  <a href="/nav/">길안내</a>
+  <a class="navi" href="/nav/">길안내</a>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var routeData = localStorage.getItem('routeData');
+      if (routeData) {
+        var walkLink = document.querySelector('.navi');
+        if (walkLink) {
+          walkLink.classList.add('active'); 
+        }
+      }
+    });
+  </script>
   <a href="/record/break/{{user.id}}">시설 파손 기록</a>
   <a href="/record/accident/{{user.id}}">사고 기록 확인</a>
   <a href="/qna/">문의 게시판</a>

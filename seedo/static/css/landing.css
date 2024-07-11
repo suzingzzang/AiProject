@@ -44,8 +44,13 @@ main a {
   width: 300px;
   background-color: #a0ce8a;
 }
-
+main .navi.active {
+  background-color: #337614;
+}
 main .walk,
 main .navi {
   background-color: #e01b41;
+}
+#map {
+  display: none;
 }

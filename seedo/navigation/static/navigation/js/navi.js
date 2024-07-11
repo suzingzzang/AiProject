@@ -11,7 +11,6 @@ let startLocation, startMarker;
 let endLocation, endMarker;
 let currentLocation, currentMarker;
 
-
 async function ttsAlert(text) {
   var csrftoken = getCookie("csrftoken");
   try {
@@ -31,14 +30,15 @@ async function ttsAlert(text) {
     const audioBlob = await response.blob();
     const audioUrl = URL.createObjectURL(audioBlob);
     const audio = new Audio(audioUrl);
-    await audio.play();
 
-    // 음성 재생이 완료되었음을 알리기 위해 Promise resolve
-    return Promise.resolve();
+    try {
+      await audio.play();
+      console.log("음성 재생 성공");
+    } catch (error) {
+      console.error("음성 재생 중 오류 발생:", error);
+    }
   } catch (error) {
     console.error("TTS 변환 중 오류 발생:", error);
-    // 오류 발생 시에도 Promise reject를 사용하여 처리 가능
-    return Promise.reject(error);
   }
 }
 
@@ -102,17 +102,7 @@ function initMap() {
     }
   });
 }
-function getCurrentLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(successCallback, errorCallback, {
-      enableHighAccuracy: true,
-      maximumAge: 0,
-      timeout: 5000,
-    });
-  } else {
-    alert("Geolocation is not supported by this browser.");
-  }
-}
+
 
 function successCallback(position) {
   var lat = position.coords.latitude;
@@ -127,10 +117,22 @@ function successCallback(position) {
       title: "현재 위치",
     });
   } else {
-    currentMarker.setPosition(currentLocation);
+    // 기존 마커가 있을 경우 삭제하고 새로운 마커 생성
+    currentMarker.setMap(null); // 기존 마커 삭제
+
+    currentMarker = new Tmapv2.Marker({
+      position: currentLocation,
+      map: map,
+      title: "현재 위치",
+    });
   }
 
   map.panTo(currentLocation); // 지도를 현재 위치로 이동
+}
+function stopnavi(){
+  localStorage.removeItem("routeData");
+  window.location.reload();
+  
 }
 function displayRoute(directionsData) {
   if (polyline) {
@@ -200,6 +202,7 @@ async function checkRoute(currentLocation) {
 
   // 경로 벗어남 체크
   if (distanceToPolyline > 50) {
+    console.log("경로이탈");
     ttsAlert("경로를 벗어났습니다.");
     return;
   }
@@ -215,6 +218,7 @@ async function checkRoute(currentLocation) {
   } else {
     ttsAlert("경로를 완료했습니다.");
     await delay(5000); // 3초 대기
+    localStorage.removeItem("routeData");
     window.location.reload();
     return;
   }
@@ -226,6 +230,7 @@ async function checkRoute(currentLocation) {
     if (distanceToDestination < 10) {
       ttsAlert("도착 지점 근처에 도착했습니다. 경로 안내를 종료합니다.");
       await delay(6000); // 3초 대기
+      localStorage.removeItem("routeData");
       window.location.reload();
       return;
     }
@@ -496,6 +501,9 @@ function findRoute() {
     return;
   }
 
+  // 경로 정보를 로컬 스토리지에 저장
+  saveRouteToLocalStorage(startLocation, endLocation);
+
   sendLocations(startLocation, endLocation);
   // 5초마다 현재 위치 업데이트
   setInterval(function () {
@@ -505,9 +513,21 @@ function findRoute() {
   // 경로 체크
   setInterval(function () {
     console.log("check");
+    console.log(currentMarker);
     checkRoute(currentMarker.getPosition());
   }, 10000); // 매 10초마다 경로 체크
 }
+
+function saveRouteToLocalStorage(startLocation, endLocation) {
+  var routeData = {
+    startLocation: [startLocation.lng(), startLocation.lat()],
+    endLocation: [endLocation.lng(), endLocation.lat()],
+    routeSearchStarted: true // 경로 탐색 상태 표시
+  };
+
+  localStorage.setItem('routeData', JSON.stringify(routeData));
+}
+
 
 function sendLocations(startLocation, endLocation) {
   routeSearchStarted = true; // 경로 탐색 시작
@@ -608,7 +628,139 @@ function getCookie(name) {
   }
   return cookieValue;
 }
+function getCurrentLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(successCallback, errorCallback, {
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 5000,
+    });
+  } else {
+    alert("Geolocation is not supported by this browser.");
+  }
+}
+
+function getCurrentLocation2() {
+  return new Promise((resolve, reject) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const currentLatLng = new Tmapv2.LatLng(lat, lng);
+          resolve(currentLatLng);
+        },
+        error => {
+          reject(error);
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 5000,
+        }
+      );
+    } else {
+      reject(new Error("Geolocation is not supported by this browser."));
+    }
+  });
+}
+function loadRouteFromLocalStorage() {
+  var routeData = localStorage.getItem('routeData');
+  if (routeData) {
+    try {
+      routeData = JSON.parse(routeData);
+
+      // 기존 구조를 새 구조로 매핑
+      var newRouteData = {
+        start: {
+          lat: routeData.startLocation[1],
+          lng: routeData.startLocation[0]
+        },
+        destination: {
+          lat: routeData.endLocation[1],
+          lng: routeData.endLocation[0]
+        },
+        routeSearchStarted: routeData.routeSearchStarted
+      };
+
+      if (newRouteData.start.lat && newRouteData.start.lng &&
+          newRouteData.destination.lat && newRouteData.destination.lng) {
+
+        var startLatLng = new Tmapv2.LatLng(newRouteData.start.lat, newRouteData.start.lng);
+        var endLatLng = new Tmapv2.LatLng(newRouteData.destination.lat, newRouteData.destination.lng);
+
+        // 출발지와 도착지 마커 표시
+        var startMarker = new Tmapv2.Marker({
+          position: startLatLng,
+          map: map,
+          title: "출발지"
+        });
+
+        var endMarker = new Tmapv2.Marker({
+          position: endLatLng,
+          map: map,
+          title: "도착지"
+        });
+        console.log("Start and end markers added to the map.");
+
+        // 경로 안내 시작
+        sendLocations(startLatLng, endLatLng);
+
+        // 현재 위치 업데이트 (5초마다)
+        setInterval(function () {
+          getCurrentLocation();
+          console.log("현재 위치 업데이트");
+        }, 5000);
+
+        // 경로 체크 (10초마다)
+        setInterval(function () {
+          console.log("---------------");
+          console.log(currentMarker);
+          checkRoute(currentMarker.getPosition());
+        }, 10000);
+      } else {
+        console.error("Invalid route data structure:", newRouteData);
+      }
+    } catch (error) {
+      console.error("Error parsing routeData JSON:", error);
+    }
+  } else {
+    console.log("No route data found in localStorage. Route guidance not started.");
+  }
+}
 
 document.addEventListener("DOMContentLoaded", function () {
-  initMap();
+  initMap(); // 지도 초기화
+  loadRouteFromLocalStorage(); // 로컬 스토리지에서 경로 불러오기
+
+  var routeData = localStorage.getItem('routeData');
+  if (routeData) {
+    // 팝업 메시지와 확인 버튼 생성
+    const popupMessage = document.createElement('div');
+    popupMessage.id = 'popupMessage';
+    popupMessage.style.position = 'fixed';
+    popupMessage.style.top = '50%';
+    popupMessage.style.left = '50%';
+    popupMessage.style.transform = 'translate(-50%, -50%)';
+    popupMessage.style.padding = '20px';
+    popupMessage.style.backgroundColor = 'white';
+    popupMessage.style.border = '1px solid black';
+    popupMessage.style.zIndex = '1000';
+    popupMessage.innerText = '경로안내를 계속하시겠습니까?';
+
+    const confirmButton = document.createElement('button');
+    confirmButton.innerText = '확인';
+    confirmButton.style.marginLeft = '10px';
+
+    popupMessage.appendChild(confirmButton);
+    document.body.appendChild(popupMessage);
+
+    // 확인 버튼 클릭 이벤트 핸들러
+    confirmButton.addEventListener('click', function() {
+      popupMessage.style.display = 'none'; // 팝업 메시지 숨기기
+      ttsAlert("경로안내를 계속합니다"); // TTS 재생
+    });
+  } else {
+    console.log("No route data found in localStorage. Route guidance not started.");
+  }
 });

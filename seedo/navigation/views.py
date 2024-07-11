@@ -77,6 +77,7 @@ def get_walking_directions(request):
 
 @token_required
 def naver_tts(request):
+    print('success')
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
