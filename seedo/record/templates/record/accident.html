@@ -1,7 +1,11 @@
 {% extends "base.html" %} {% load static %} {% block extra_head %}
 <link rel="stylesheet" href="{% static 'record/css/record.css' %}" />
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
+<script defer src="{% static 'navigation/js/navi.js' %}"></script>
 {% endblock extra_head %} {% block content %} {% load custom_filters %}
 <main>
+  <div id="map"></div>
   <div class="layout">
     <div class="dropdown">
       <div class="userName">{{ selected_user.email|email_username }} 님의 사고 기록</div>

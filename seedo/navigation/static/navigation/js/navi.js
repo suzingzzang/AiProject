@@ -212,7 +212,6 @@ async function checkRoute(currentLocation) {
     var distanceToWaypoint = getDistance(currentLocation, nextWaypoint);
 
     if (distanceToWaypoint < 50) {
-      updateRouteInfo();
       currentWaypointIndex++;
     }
   } else {
@@ -664,6 +663,7 @@ function getCurrentLocation2() {
     }
   });
 }
+
 function loadRouteFromLocalStorage() {
   var routeData = localStorage.getItem('routeData');
   if (routeData) {
@@ -673,8 +673,8 @@ function loadRouteFromLocalStorage() {
       // 기존 구조를 새 구조로 매핑
       var newRouteData = {
         start: {
-          lat: routeData.startLocation[1],
-          lng: routeData.startLocation[0]
+          lat: routeData.intermediateWaypoint[1],
+          lng: routeData.intermediateWaypoint[0]
         },
         destination: {
           lat: routeData.endLocation[1],
@@ -685,8 +685,8 @@ function loadRouteFromLocalStorage() {
 
       if (newRouteData.start.lat && newRouteData.start.lng &&
           newRouteData.destination.lat && newRouteData.destination.lng) {
-
-        var startLatLng = new Tmapv2.LatLng(newRouteData.start.lat, newRouteData.start.lng);
+        var startLatLng = new Tmapv2.LatLng(routeData.startLocation[1],routeData.startLocation[0]);
+        var currentLatLng = new Tmapv2.LatLng(newRouteData.start.lat, newRouteData.start.lng);
         var endLatLng = new Tmapv2.LatLng(newRouteData.destination.lat, newRouteData.destination.lng);
 
         // 출발지와 도착지 마커 표시
@@ -706,18 +706,12 @@ function loadRouteFromLocalStorage() {
         // 경로 안내 시작
         sendLocations(startLatLng, endLatLng);
 
-        // 현재 위치 업데이트 (5초마다)
         setInterval(function () {
           getCurrentLocation();
           console.log("현재 위치 업데이트");
+          checkRoute(currentLatLng);
+          console.log(currentLatLng);
         }, 5000);
-
-        // 경로 체크 (10초마다)
-        setInterval(function () {
-          console.log("---------------");
-          console.log(currentMarker);
-          checkRoute(currentMarker.getPosition());
-        }, 10000);
       } else {
         console.error("Invalid route data structure:", newRouteData);
       }
@@ -731,6 +725,10 @@ function loadRouteFromLocalStorage() {
 
 document.addEventListener("DOMContentLoaded", function () {
   initMap(); 
-  loadRouteFromLocalStorage(); 
+  var routeData = localStorage.getItem('routeData');
+  if (routeData) {
+    loadRouteFromLocalStorage();
+  } else {
+    console.log("로컬 스토리지에서 경로 데이터를 찾을 수 없습니다. 경로 안내를 시작하지 않았습니다.");
+  }
 });
-
