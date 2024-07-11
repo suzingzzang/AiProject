@@ -517,16 +517,16 @@ function findRoute() {
   }, 10000); // 매 10초마다 경로 체크
 }
 
-function saveRouteToLocalStorage(startLocation, endLocation) {
+function saveRouteToLocalStorage(startLocation, endLocation, currentWaypointIndex) {
   var routeData = {
     startLocation: [startLocation.lng(), startLocation.lat()],
     endLocation: [endLocation.lng(), endLocation.lat()],
-    routeSearchStarted: true // 경로 탐색 상태 표시
+    routeSearchStarted: true, // 경로 탐색 상태 표시
+    currentWaypointIndex: currentWaypointIndex // 최근 도달한 인덱스 저장
   };
 
   localStorage.setItem('routeData', JSON.stringify(routeData));
 }
-
 
 function sendLocations(startLocation, endLocation) {
   routeSearchStarted = true; // 경로 탐색 시작
