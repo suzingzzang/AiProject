@@ -730,37 +730,7 @@ function loadRouteFromLocalStorage() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  initMap(); // 지도 초기화
-  loadRouteFromLocalStorage(); // 로컬 스토리지에서 경로 불러오기
-
-  var routeData = localStorage.getItem('routeData');
-  if (routeData) {
-    // 팝업 메시지와 확인 버튼 생성
-    const popupMessage = document.createElement('div');
-    popupMessage.id = 'popupMessage';
-    popupMessage.style.position = 'fixed';
-    popupMessage.style.top = '50%';
-    popupMessage.style.left = '50%';
-    popupMessage.style.transform = 'translate(-50%, -50%)';
-    popupMessage.style.padding = '20px';
-    popupMessage.style.backgroundColor = 'white';
-    popupMessage.style.border = '1px solid black';
-    popupMessage.style.zIndex = '1000';
-    popupMessage.innerText = '경로안내를 계속하시겠습니까?';
-
-    const confirmButton = document.createElement('button');
-    confirmButton.innerText = '확인';
-    confirmButton.style.marginLeft = '10px';
-
-    popupMessage.appendChild(confirmButton);
-    document.body.appendChild(popupMessage);
-
-    // 확인 버튼 클릭 이벤트 핸들러
-    confirmButton.addEventListener('click', function() {
-      popupMessage.style.display = 'none'; // 팝업 메시지 숨기기
-      ttsAlert("경로안내를 계속합니다"); // TTS 재생
-    });
-  } else {
-    console.log("No route data found in localStorage. Route guidance not started.");
-  }
+  initMap(); 
+  loadRouteFromLocalStorage(); 
 });
+
