@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Capture</title>
+</head>
+<body>
+    <h1>OCR Capture</h1>
+    <video id="video" width="640" height="480" autoplay></video> <!-- 실시간 비디오 스트림 -->
+    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas> <!-- 비디오 프레임을 캡처할 캔버스 -->
+    <img id="captured-image" style="display:none; width: 640px; height: 480px;" /> <!-- 캡처된 이미지를 표시할 요소 -->
+    <button id="capture-button">Capture Photo</button> <!-- 사진을 찍기 위한 버튼 -->
+    <div id="result"></div> <!-- 결과를 표시할 영역 -->
+
+    <script>
+        const video = document.getElementById('video'); // 비디오 요소를 가져옵니다.
+        const canvas = document.getElementById('canvas'); // 캔버스 요소를 가져옵니다.
+        const capturedImage = document.getElementById('captured-image'); // 캡처된 이미지를 표시할 요소를 가져옵니다.
+        const captureButton = document.getElementById('capture-button'); // 버튼 요소를 가져옵니다.
+        const resultDiv = document.getElementById('result'); // 결과 표시 요소를 가져옵니다.
+
+        let isCapturing = true; // 현재 상태를 추적하기 위한 플래그
+
+        // 디바이스 카메라에 접근하여 비디오 요소에 스트림을 전달합니다.
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream; // 비디오 요소에 스트림을 설정합니다.
+            })
+            .catch(err => {
+                console.error("Error accessing the camera: ", err); // 카메라 접근 오류를 처리합니다.
+            });
+
+        captureButton.addEventListener('click', () => {
+            if (isCapturing) {
+                // 비디오 프레임을 캔버스에 그립니다.
+                const context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // 캔버스에서 이미지 데이터를 가져옵니다.
+                const imageData = canvas.toDataURL('image/jpeg');
+
+                // 이미지 데이터를 서버로 전송합니다.
+                fetch('/ocr/capture/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded', // 콘텐츠 타입을 설정합니다.
+                        'X-CSRFToken': '{{ csrf_token }}' // CSRF 토큰을 포함합니다.
+                    },
+                    body: `image_data=${encodeURIComponent(imageData)}` // 이미지 데이터를 POST 본문에 포함합니다.
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.answer) {
+                        resultDiv.innerHTML = `<p>Answer: ${data.answer}</p>`; // 서버 응답을 결과 영역에 표시합니다.
+                    } else {
+                        resultDiv.innerHTML = `<p>Error: ${data.error}</p>`; // 오류 메시지를 표시합니다.
+                    }
+                })
+                .catch(err => {
+                    console.error("Error:", err); // 요청 오류를 처리합니다.
+                });
+
+                // 캡처된 이미지를 화면에 표시합니다.
+                capturedImage.src = imageData;
+                capturedImage.style.display = 'block';
+                video.style.display = 'none'; // 비디오를 숨깁니다.
+                captureButton.innerText = 'Retake Photo'; // 버튼 텍스트를 변경합니다.
+                isCapturing = false; // 상태 플래그를 업데이트합니다.
+            } else {
+                // 비디오를 다시 표시합니다.
+                capturedImage.style.display = 'none'; // 캡처된 이미지를 숨깁니다.
+                video.style.display = 'block'; // 비디오를 다시 표시합니다.
+                captureButton.innerText = 'Capture Photo'; // 버튼 텍스트를 변경합니다.
+                resultDiv.innerHTML = ''; // 이전 결과를 지웁니다.
+                isCapturing = true; // 상태 플래그를 업데이트합니다.
+            }
+        });
+    </script>
+</body>
+</html>

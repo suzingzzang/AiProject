@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "sensor",
     "navigation",
     "walking_mode",
+    'ocr',
 ]
 
 MIDDLEWARE = [

@@ -38,4 +38,5 @@ urlpatterns = [
     path("sensor/", include("sensor.urls")),
     path("nav/", include("navigation.urls")),
     path("walking_mode/", include("walking_mode.urls")),
+    path("ocr/", include("ocr.urls"))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
