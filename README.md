@@ -1,5 +1,10 @@
-![image](https://github.com/user-attachments/assets/d4251433-1a5f-4c32-833e-d7a3593ec475)
+![image](https://github.com/user-attachments/assets/473d11b4-75dd-4cd7-8059-fbf418429fe5)!
 # Seedo
+![image](https://github.com/user-attachments/assets/f21474cc-565c-4d93-a9b3-52769a4feb2f)
+![image](https://github.com/user-attachments/assets/d3674c0d-93aa-4498-a959-28b78119ffb8)
+![image](https://github.com/user-attachments/assets/33673b30-c9f5-425e-86f5-931b063a87c3)
+
+
 
 ## 🔍 백엔드 초기 환경세팅
 
