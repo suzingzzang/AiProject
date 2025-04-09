@@ -1,3 +1,4 @@
+![image](https://github.com/user-attachments/assets/d4251433-1a5f-4c32-833e-d7a3593ec475)
 # Seedo
 
 ## 🔍 백엔드 초기 환경세팅
