@@ -5,7 +5,9 @@
 
 ---
 
-![image.png](attachment:a31ef42e-98f3-430c-9958-9aa2e78769f4:image.png)
+![image](https://github.com/user-attachments/assets/0c02452d-0e6c-423e-b042-c765f839c3fb)
+
+
 
 - 저시력자의 안전한 보행환경을 조성하여, 보행 접근성을 향상 시킨다.
 - 기존의 보행보조 도구의 한께를 해결하는 보행 보조기술이 필요하다.
@@ -29,7 +31,8 @@
 
 ---
 
-![image.png](attachment:3dd851a2-548d-455e-9d76-ed4bc0ece110:image.png)
+![image](https://github.com/user-attachments/assets/e944d84d-4bc8-42d2-8d6c-c4da5b9a5ece)
+
 
 # 5. 주요 기능
 
@@ -41,11 +44,13 @@
 
 1-1. 보도인지 차도인지 구분
 
-![image.png](attachment:409ad07c-0978-4383-ae10-6541648d7efb:image.png)
+![image](https://github.com/user-attachments/assets/2760c531-35f2-43d6-84ee-8f63ca28e62f)
+
 
 1-2. 점자블록 구분: 정상인 경우, 깨진 경우, 점자블록이 더이상 이어지지 않은 경우, 점자블록이 가려진 경우(전동킥보드 등)
 
-![image.png](attachment:6f5ab171-c853-4ec2-b2fa-9b11e4dd117a:image.png)
+![image](https://github.com/user-attachments/assets/4a77ac54-26d8-4721-b333-4b548ea57e36)
+
 
 1-3. 장애물: 볼라드(자동차 진입 억제용 말뚝), 맨홀, 웅덩이 등 (기타: 은행, 분변)
 
@@ -65,7 +70,8 @@
 
 - **사고 발생 시, 감지 후 기록 저장 및 응급 상황 연결 [ML + Database + Device]**
 
-![image.png](attachment:473773ae-db43-4b4d-b98c-214ce927210a:image.png)
+![image](https://github.com/user-attachments/assets/1690090c-a550-458f-b869-482e9ac2bb74)
+
 
 1-1. 핸드폰 GPS, 자이로센서, 가속도센서 값 활용 행동분석: 사고 판단 후, 사고 시각, 지점(위치) 기준으로 전후구간 영상기록
 
@@ -73,9 +79,11 @@
 
 ### **목적지 네비게이션 [API]**
 
-![image.png](attachment:610c0593-c7de-4ea3-ad5c-ccb5a208adea:image.png)
+![image](https://github.com/user-attachments/assets/8c7e363a-71ae-4f72-a2b7-76ab2fdde1ea)
 
-![image.png](attachment:9f485ec0-1784-431d-b129-4708a8e3fd5a:image.png)
+
+![image](https://github.com/user-attachments/assets/71e318f7-dd25-4746-a2d3-72a72786dcf4)
+
 
 1-1. 출발지, 목적지 입력 받아 경로 설정.
 
@@ -85,7 +93,8 @@
 
 ### **글 읽기 [OCR]**
 
-![image.png](attachment:cf6942a3-fcb8-4a17-92db-793780dee783:image.png)
+![image](https://github.com/user-attachments/assets/d48ab59b-6a23-4346-abe5-9bc2cc5764a5)
+
 
 1-1.카메라로 인식하고 싶은 물건 등을 촬영하고, 사진 속의 텍스트와 물건 등을 인식하여 상황에 맞게 음성 및 텍스트 출력
 
@@ -93,15 +102,18 @@
 
 ### **회원가입 후, 회원별 관리데이터 활용방안: 회원가입이 필요한 이유 [Database]**
 
-![image.png](attachment:e02c02c2-b176-4c9c-a689-4dcf49a498fb:image.png)
+![image](https://github.com/user-attachments/assets/ad98da1d-8798-41d2-9798-4d94dfdb2c64)
+
 
 1-1. 맹인 로그인: 앱 기능이 제공되고, 기록이 저장된다.
 
 1-2. 보호자 로그인:
 
-![image.png](attachment:b697fe65-9434-4edf-b27d-f9824ebb10af:image.png)
+![image](https://github.com/user-attachments/assets/c7e37a84-b1bb-46c4-8d7c-0ff18501e43f)
 
-![image.png](attachment:e5c4cb8a-089b-4f05-b551-2a8b202e130f:image.png)
+
+![image](https://github.com/user-attachments/assets/36d3e5ce-de28-43c8-84f6-ebf243cf5873)
+
 
 - 맹인과 보호자를 인증을 통해 매칭한다. 보호자는 자신이 보호하는 맹인으로 매칭된 분들의 영상을 열람할 수 있다. (삭제는 중앙 관리자(정부 측)에게 요청 필요, 보호자가 악의적인 목적으로 삭제하는 것 방지)보호자가 타지역에서 사고 알람을 전달받고 사고 영상을 확인하여, 보호조치를 할 수 있게 한다.
 
@@ -109,7 +121,8 @@
 
 ---
 
-![image.png](attachment:eb3e026e-5ccb-4b31-a436-1d9f58226586:image.png)
+![image](https://github.com/user-attachments/assets/1a41a20f-f510-44c0-b8a7-89b1262781bb)
+
 
 보행 보조 기능을 통해 시각장애인의 활동 지원과 관련된 복지 지출과 행정 비용을 효율적으로 관리하여 감소시킬 수 있으며, 보건 복지부 장애인 정책국과 함께 시각장애인들에 생활 인프라를 향상시키고, 관련 정책목표의 효율적 달성에 기여한다.
 
